@@ -1,0 +1,118 @@
+.formsignup{
+    background: #dfdfdf;
+    width: 15%;
+    margin-left: 40%;
+    padding-left: 2%;
+    padding-bottom: 4%;
+    padding-top: 3%;
+    margin-top: 2%;
+    border-radius: 50px;
+  
+}
+.radius{
+    background: #569e34;
+    width: 80px;
+    height: 80px;
+    border-radius: 300px;
+    margin-left: 30%;
+    margin-bottom: 10%;
+}
+
+
+#btnlogin {
+  margin-left: 15%;
+  margin-top: 5%;
+  width: 150px;
+  height: 60px;
+  border: 3px solid #569e34;
+  border-radius: 45px;
+  transition: all 0.3s;
+  cursor: pointer;
+  background: white;
+  font-size: 15px;
+  font-weight: 550;
+}
+#btnlogin:hover{
+    background: #569e34;
+    color: white;
+    font-size: 20px;
+  }
+  .wavegroup {
+    position: relative;
+  
+  }
+  
+  .wavegroup .input {
+    font-size: 16px;
+    padding: 10px 10px 10px 5px;
+    display: block;
+    width: 200px;
+    border: none;
+    border-bottom: 1px solid #515151;
+    background: transparent;
+    color: black;
+  }
+  
+  .wavegroup .input:focus {
+    outline: none;
+  }
+  
+  .wavegroup .label {
+    color: #999;
+    font-size: 20px;
+    font-weight: 100;
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    display: flex;
+  }
+  .wavegroup .labelchar {
+    transition: 0.2s ease all;
+    transition-delay: 0s;
+  }
+  
+  .wavegroup .input:focus ~ label .labelchar {
+    transform: translateY(-25px);
+    font-size: 15px;
+    color:black;
+    font-weight: 600;
+  
+  }
+  /*.wavegroup .input:active ~ label .labelchar {
+    transform: translateY(-25px);
+    font-size: 15px;
+    color:red;
+    font-weight: 600;
+
+  }*/
+
+  
+  .wavegroup .bar {
+    position: relative;
+    display: block;
+    width: 200px;
+  }
+  
+  .wavegroup .bar:before,.wavegroup .bar:after {
+    content: '';
+    height: 2px;
+    width: 0;
+    bottom: 1px;
+    position: absolute;
+    background: #569e34;
+    transition: 0.2s ease all;
+  
+  }
+  
+  .wavegroup .bar:before {
+    left: 50%;
+  }
+  
+  .wavegroup .bar:after {
+    right: 50%;
+  }
+  
+  .wavegroup .input:focus ~ .bar:before,
+  .wavegroup .input:focus ~ .bar:after {
+    width: 50%;
+  }

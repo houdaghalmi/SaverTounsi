@@ -1,0 +1,14 @@
+.footer{
+    color: black;
+    text-align: center;
+    background: white;
+    height: 100px;
+    margin-top: 15%;
+}
+
+
+.footer a{
+  color: black;
+  margin-right: 1%;
+  font-size: 30px;
+}
