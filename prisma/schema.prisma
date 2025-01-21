@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  budgets       Budget[]
+  transactions  Transaction[]
+  bonPlans      BonPlan[]
+  challenges    UserChallenge[]
+  settings      UserSettings?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Budget {
+  id          String        @id @default(cuid())
+  name        String
+  amount      Float
+  spent       Float         @default(0)
+  startDate   DateTime
+  endDate     DateTime
+  type        BudgetType
+  category    String
+  userId      String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user        User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          String    @id @default(cuid())
+  amount      Float
+  type        TransactionType
+  category    String
+  description String?
+  date        DateTime
+  userId      String
+  budgetId    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id])
+  budget      Budget?   @relation(fields: [budgetId], references: [id])
+}
+
+model BonPlan {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  store       String
+  location    String?
+  category    String
+  startDate   DateTime
+  endDate     DateTime
+  userId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id])
+}
+
+model Challenge {
+  id          String          @id @default(cuid())
+  title       String
+  description String
+  type        ChallengeType
+  goal        Float
+  duration    Int            // in days
+  reward      String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  participants UserChallenge[]
+}
+
+model UserChallenge {
+  id          String    @id @default(cuid())
+  userId      String
+  challengeId String
+  progress    Float     @default(0)
+  startDate   DateTime  @default(now())
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  user        User      @relation(fields: [userId], references: [id])
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+}
+
+model UserSettings {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  language        String    @default("fr")
+  currency        String    @default("TND")
+  notifications   Boolean   @default(true)
+  theme           String    @default("light")
+
+  user            User      @relation(fields: [userId], references: [id])
+}
+
+enum BudgetType {
+  MONTHLY
+  WEEKLY
+  CUSTOM
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum ChallengeType {
+  SAVINGS
+  SPENDING_REDUCTION
+  NO_SPEND
+  CUSTOM
+}
