@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Home, Folder, BarChart, Star, MessageCircle, Settings } from "lucide-react"; // Updated icons
 
 import {
   Sidebar,
@@ -9,43 +9,43 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 // Menu items.
 const items = [
   {
     title: "Home",
-    url: "#",
-    icon: Home,
+    url: "/",
+    icon: Home, // Kept Home
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
+    title: "categorie manager",
+    url: "/categories",
+    icon: Folder, // Changed to Folder
   },
   {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
+    title: "reports",
+    url: "/reports",
+    icon: BarChart, // Changed to BarChart
   },
   {
-    title: "Search",
-    url: "#",
-    icon: Search,
+    title: "bon-plans",
+    url: "/bon-plans",
+    icon: Star, // Changed to Star
   },
   {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    title: "feedback",
+    url: "/feedback",
+    icon: MessageCircle, // Changed to MessageCircle
   },
-]
+];
 
 export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>saverTounsi</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -63,6 +63,5 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }
-

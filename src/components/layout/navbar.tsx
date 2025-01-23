@@ -1,50 +1,88 @@
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
-import { Bell, Menu, Search } from "lucide-react";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useToast } from '@/components/ui/use-toast';
+import { Home, Wallet, Star, Search, Settings } from "lucide-react"; // Import icons
 
-export const Navbar = () => {
-  const { user, signOut } = useAuth();
+export default function Navbar() {
+  const pathname = usePathname();
+  const { toast } = useToast();
+
+  const handleNavigation = (page: string) => {
+    toast({
+      title: 'Navigation',
+      description: `You are now viewing the ${page} page.`,
+      variant: 'default',
+    });
+  };
 
   return (
-    <nav className="border-b bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Button variant="ghost" className="lg:hidden">
-              <Menu className="w-5 h-5" />
-            </Button>
-            <img
-              src="/images/logo/logo.svg"
-              alt="SaverTounsi"
-              className="h-8 w-auto"
-            />
-          </div>
+    <nav className="bg-white shadow-md fixed w-full top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
+          {/* Brand name */}
+          <Link
+            href="/"
+            onClick={() => handleNavigation('Home')}
+            className="text-lg font-bold text-gray-800"
+          >
+            saveTounsi 2020
+          </Link>
 
-          <div className="hidden lg:flex items-center gap-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="pl-10 pr-4 py-2 border rounded-full w-64 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" className="relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full" />
-            </Button>
-            
-            <img
-              src={user?.image || "/api/placeholder/32/32"}
-              alt={user?.name}
-              className="h-8 w-8 rounded-full"
-            />
+          {/* Navigation links with icons */}
+          <div className="flex space-x-6">
+            <Link
+              href="/"
+              onClick={() => handleNavigation('Home')}
+              className={`text-sm flex items-center ${
+                pathname === '/' ? 'text-gray-900 font-semibold' : 'text-gray-600'
+              } hover:text-gray-900`}
+            >
+              <Home className="w-4 h-4 mr-1" /> {/* Added Home icon */}
+              Home
+            </Link>
+            <Link
+              href="/inbox"
+              onClick={() => handleNavigation('Inbox')}
+              className={`text-sm flex items-center ${
+                pathname === '/inbox' ? 'text-gray-900 font-semibold' : 'text-gray-600'
+              } hover:text-gray-900`}
+            >
+              <Wallet className="w-4 h-4 mr-1" /> {/* Added Wallet icon */}
+              budget
+            </Link>
+            <Link
+              href="/categories"
+              onClick={() => handleNavigation('Calendar')}
+              className={`text-sm flex items-center ${
+                pathname === '/calendar' ? 'text-gray-900 font-semibold' : 'text-gray-600'
+              } hover:text-gray-900`}
+            >
+              <Star className="w-4 h-4 mr-1" /> {/* Added Star icon */}
+              bon plan
+            </Link>
+            <Link
+              href="/bon-plans"
+              onClick={() => handleNavigation('Search')}
+              className={`text-sm flex items-center ${
+                pathname === '/search' ? 'text-gray-900 font-semibold' : 'text-gray-600'
+              } hover:text-gray-900`}
+            >
+              <Search className="w-4 h-4 mr-1" /> {/* Added Search icon */}
+              Search
+            </Link>
+            <Link
+              href="/settings"
+              onClick={() => handleNavigation('Settings')}
+              className={`text-sm flex items-center ${
+                pathname === '/settings' ? 'text-gray-900 font-semibold' : 'text-gray-600'
+              } hover:text-gray-900`}
+            >
+              <Settings className="w-4 h-4 mr-1" /> {/* Added Settings icon */}
+              Settings
+            </Link>
           </div>
         </div>
       </div>
     </nav>
   );
-};
+}

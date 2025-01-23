@@ -1,7 +1,6 @@
 "use client";
 import { DealCard } from "@/components/bon-plans/deal-card";
 import { DealFilters } from "@/components/bon-plans/deal-filters";
-import { DealMap } from "@/components/bon-plans/deal-map";
 import { 
   Card, 
   CardContent, 
@@ -52,51 +51,29 @@ export default function BonPlansPage() {
         <h1 className="text-2xl font-bold">Bon Plans</h1>
       </div>
 
-      <Tabs defaultValue="list">
-        {/* Onglets pour basculer entre la vue liste et la vue carte */}
-        <TabsList>
-          <TabsTrigger value="list">List View</TabsTrigger>
-          <TabsTrigger value="map">Map View</TabsTrigger>
-        </TabsList>
-
-        <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Filtres */}
-          <div className="lg:col-span-1">
-            <DealFilters 
-              onFilterChange={handleFilterChange} 
-              categories={[
-                "Food & Dining",
-                "Shopping",
-                "Entertainment"
-              ]} 
-            />
-          </div>
-          
-          {/* Contenu principal (Liste ou Carte) */}
-          <div className="lg:col-span-3">
-            {/* Vue Liste */}
-            <TabsContent value="list">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredDeals.map((deal) => (
-                  <DealCard key={deal.id} deal={deal} />
-                ))}
-              </div>
-            </TabsContent>
-            
-            {/* Vue Carte */}
-            <TabsContent value="map">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Deals Near You</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <DealMap deals={filteredDeals} />
-                </CardContent>
-              </Card>
-            </TabsContent>
+      {/* Supprimer les onglets et ne garder que la vue liste */}
+      <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Filtres */}
+        <div className="lg:col-span-1">
+          <DealFilters 
+            onFilterChange={handleFilterChange} 
+            categories={[
+              "Food & Dining",
+              "Shopping",
+              "Entertainment"
+            ]} 
+          />
+        </div>
+        
+        {/* Contenu principal (Liste) */}
+        <div className="lg:col-span-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredDeals.map((deal) => (
+              <DealCard key={deal.id} deal={deal} />
+            ))}
           </div>
         </div>
-      </Tabs>
+      </div>
     </div>
   );
 }

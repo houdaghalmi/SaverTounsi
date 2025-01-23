@@ -1,14 +1,19 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "./app-sidebar"
+// src/components/nav.tsx
+"use client"; // Mark this as a Client Component
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
+
+export default function Nav({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <main>
-        <SidebarTrigger />
-        {children}
-      </main>
+      <div className="flex">
+        <Sidebar />
+        <main className="flex-grow p-4">
+          <SidebarTrigger />
+          {children}
+        </main>
+      </div>
     </SidebarProvider>
-  )
+  );
 }

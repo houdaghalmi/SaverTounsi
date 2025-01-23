@@ -1,21 +1,14 @@
 import { cn } from "@/lib/utils";
-import {
-  BarChart,
-  Wallet,
-  Tag,
-  Trophy,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { Home, Wallet, Tag, Trophy, Settings, LogOut, PieChart, Bell, Star, HelpCircle } from "lucide-react"; // Updated icons
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const navigation = [
-  { name: "Overview", href: "/dashboard", icon: BarChart },
-  { name: "Budgets", href: "/dashboard/budgets", icon: Wallet },
-  { name: "Bon Plans", href: "/dashboard/bon-plans", icon: Tag },
-  { name: "Challenges", href: "/dashboard/challenges", icon: Trophy },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Overview", href: "/dashboard", icon: PieChart }, // Changed to PieChart
+  { name: "Budgets", href: "/dashboard/budgets", icon: Wallet }, // Kept Wallet
+  { name: "Bon Plans", href: "/dashboard/bon-plans", icon: Star }, // Changed to Star
+  { name: "Challenges", href: "/dashboard/challenges", icon: Trophy }, // Kept Trophy
+  { name: "Settings", href: "/dashboard/settings", icon: Settings }, // Kept Settings
 ];
 
 export const Sidebar = () => {
@@ -27,7 +20,7 @@ export const Sidebar = () => {
         <div className="flex-1 py-6 space-y-1">
           {navigation.map((item) => {
             const isActive = pathname.startsWith(item.href);
-            
+
             return (
               <Button
                 key={item.name}
