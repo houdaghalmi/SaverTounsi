@@ -64,7 +64,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           variant: "destructive",
         })
       } else {
-        router.push("/dashboard")
+        router.push("/categories")
       }
     } else {
       try {
