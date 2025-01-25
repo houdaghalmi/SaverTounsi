@@ -50,7 +50,6 @@ export const DealCard = ({ deal }: DealCardProps) => {
       <CardFooter className="flex justify-between">
         <Button
           onClick={() => {
-            // Ouvre l'adresse dans Google Maps
             const query = encodeURIComponent(deal.location);
             window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
           }}

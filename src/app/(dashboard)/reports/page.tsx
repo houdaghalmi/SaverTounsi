@@ -20,6 +20,7 @@ export default function ReportsPage() {
   const [spendingViewMode, setSpendingViewMode] = useState<"detailed" | "grouped">("detailed");
   const [savingViewMode, setSavingViewMode] = useState<"detailed" | "grouped">("detailed");
 
+  // Monthly Data
   const monthlyData = {
     saved: 40, // Monthly savings
     spent: 50, // Monthly spending
@@ -37,6 +38,7 @@ export default function ReportsPage() {
     ],
   };
 
+  // Yearly Data
   const yearlyData = {
     saved: 480, // Yearly savings
     spent: 600, // Yearly spending
@@ -82,6 +84,61 @@ export default function ReportsPage() {
     ],
   };
 
+  // Challenge Data
+  const challenges = [
+    {
+      id: "1",
+      title: "Collect 100 DT",
+      description: "Save 100 DT to complete this challenge.",
+      target: 100,
+      current: 60,
+      progress: 60, // Progress percentage
+      status: "active",
+      progressData: [
+        { day: "Day 1", amount: 10 },
+        { day: "Day 2", amount: 20 },
+        { day: "Day 3", amount: 30 },
+        { day: "Day 4", amount: 40 },
+        { day: "Day 5", amount: 50 },
+        { day: "Day 6", amount: 60 },
+      ],
+    },
+    {
+      id: "2",
+      title: "Collect 50 DT",
+      description: "Save 50 DT to complete this challenge.",
+      target: 50,
+      current: 50,
+      progress: 100, // Progress percentage
+      status: "completed",
+      progressData: [
+        { day: "Day 1", amount: 5 },
+        { day: "Day 2", amount: 10 },
+        { day: "Day 3", amount: 20 },
+        { day: "Day 4", amount: 30 },
+        { day: "Day 5", amount: 40 },
+        { day: "Day 6", amount: 50 },
+      ],
+    },
+    {
+      id: "3",
+      title: "Collect 500 DT",
+      description: "Save 500 DT to complete this challenge.",
+      target: 500,
+      current: 0,
+      progress: 0, // Progress percentage
+      status: "upcoming",
+      progressData: [],
+    },
+  ];
+
+  // Format challenge data for the chart
+  const challengeChartData = challenges.map((challenge) => ({
+    name: challenge.title,
+    progress: challenge.progress,
+    fill: challenge.status === "active" ? "#82ca9d" : challenge.status === "completed" ? "#8884d8" : "#ccc",
+  }));
+
   // Group spending categories by group
   const groupSpendingCategories = (categories: { name: string; amount: number; group: string }[]) => {
     return categories.reduce((acc, category) => {
@@ -120,13 +177,15 @@ export default function ReportsPage() {
         <TabsList>
           <TabsTrigger value="monthly">Monthly Report</TabsTrigger>
           <TabsTrigger value="yearly">Yearly Report</TabsTrigger>
+          <TabsTrigger value="challenges">Challenge Report</TabsTrigger>
         </TabsList>
 
         <div className="mt-4">
           {/* Monthly Report */}
           <TabsContent value="monthly">
-            <div className="flex justify-end"> {/* Align all cards to the right */}
-              <div className="w-full max-w-3xl"> {/* Set a max-width for the cards */}
+            <h2 className="text-xl font-semibold mb-4">Monthly Report</h2>
+            <div className="flex justify-end">
+              <div className="w-full max-w-3xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Monthly Spending Card */}
                   <Card>
@@ -293,8 +352,9 @@ export default function ReportsPage() {
 
           {/* Yearly Report */}
           <TabsContent value="yearly">
-            <div className="flex justify-end"> {/* Align all cards to the right */}
-              <div className="w-full max-w-3xl"> {/* Set a max-width for the cards */}
+            <h2 className="text-xl font-semibold mb-4">Yearly Report</h2>
+            <div className="flex justify-end">
+              <div className="w-full max-w-3xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Yearly Spending Card */}
                   <Card>
@@ -404,6 +464,7 @@ export default function ReportsPage() {
                     </CardContent>
                   </Card>
                 </div>
+
                 {/* Yearly Charts */}
                 <div className="mt-6">
                   {/* Yearly Spending Chart */}
@@ -464,6 +525,48 @@ export default function ReportsPage() {
                     </CardContent>
                   </Card>
                 </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Challenge Report */}
+          <TabsContent value="challenges">
+            <h2 className="text-xl font-semibold mb-4">Challenge Progress</h2>
+            <div className="flex justify-end">
+              <div className="w-full max-w-3xl space-y-6">
+                {challenges.map((challenge) => (
+                  <Card key={challenge.id}>
+                    <CardHeader>
+                      <CardTitle>{challenge.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-lg font-semibold">
+                        Progress: {challenge.progress}%
+                      </p>
+                      <div className="h-64 mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart
+                            data={challenge.progressData}
+                            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="day" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Line
+                              type="monotone"
+                              dataKey="amount"
+                              stroke="#82ca9d"
+                              strokeWidth={2}
+                              name="Amount Saved"
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </div>
           </TabsContent>

@@ -1,4 +1,3 @@
-// src/lib/auth.ts
 import { NextAuthOptions } from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
@@ -45,6 +44,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
+          isOnboarded: user.isOnboarded
         }
       }
     })
@@ -55,6 +55,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id
         session.user.name = token.name
         session.user.email = token.email
+        session.user.isOnboarded = token.isOnboarded
       }
 
       return session
@@ -63,6 +64,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.email = user.email
+        token.isOnboarded = user.isOnboarded
       }
 
       return token

@@ -1,109 +1,35 @@
-// src/components/transactions/transaction-list.tsx
-import { formatCurrency } from "@/lib/utils"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { MoreHorizontal, TrendingDown, TrendingUp } from "lucide-react"
-import { format } from "date-fns"
-
-interface Transaction {
-  id: string
-  type: "INCOME" | "EXPENSE"
-  amount: number
-  category: string
-  date: Date
-  description?: string
-  budgetTitle?: string
-}
+// src/components/transactions/TransactionList.tsx
+import { Transaction } from "@/types/transaction";
+import { format } from "date-fns";
 
 interface TransactionListProps {
-  transactions: Transaction[]
-  onEdit?: (transaction: Transaction) => void
-  onDelete?: (transactionId: string) => void
+  transactions: Transaction[];
 }
 
-export function TransactionList({
-  transactions,
-  onEdit,
-  onDelete,
-}: TransactionListProps) {
+export default function TransactionList({ transactions }: TransactionListProps) {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Type</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead>Category</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
-          <TableHead>Budget</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {transactions.map((transaction) => (
-          <TableRow key={transaction.id}>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                {transaction.type === "INCOME" ? (
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                ) : (
-                  <TrendingDown className="h-4 w-4 text-red-500" />
-                )}
-                {transaction.type.charAt(0) + transaction.type.slice(1).toLowerCase()}
-              </div>
-            </TableCell>
-            <TableCell>{format(new Date(transaction.date), "PP")}</TableCell>
-            <TableCell>
-              <span className="capitalize">{transaction.category}</span>
-            </TableCell>
-            <TableCell className={`text-right ${
+    <div className="space-y-4">
+      {transactions.map((transaction) => (
+        <div
+          key={transaction.id}
+          className="p-4 bg-white rounded-lg shadow-md flex justify-between items-center"
+        >
+          <div>
+            <p className="font-semibold">{transaction.category}</p>
+            <p className="text-sm text-gray-600">{transaction.description}</p>
+            <p className="text-sm text-gray-500">
+              {format(new Date(transaction.date), "dd/MM/yyyy")}
+            </p>
+          </div>
+          <p
+            className={`font-semibold ${
               transaction.type === "INCOME" ? "text-green-600" : "text-red-600"
-            }`}>
-              {formatCurrency(transaction.amount)}
-            </TableCell>
-            <TableCell>
-              {transaction.budgetTitle || "-"}
-            </TableCell>
-            <TableCell className="text-right">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuItem
-                    onClick={() => onEdit?.(transaction)}
-                  >
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-red-600"
-                    onClick={() => onDelete?.(transaction.id)}
-                  >
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
+            }`}
+          >
+            {transaction.type === "INCOME" ? "+" : "-"} TND {transaction.amount}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
 }

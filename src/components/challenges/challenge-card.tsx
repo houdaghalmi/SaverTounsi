@@ -1,3 +1,6 @@
+// src/components/challenges/challenge-card.tsx
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Users } from "lucide-react";
@@ -10,16 +13,20 @@ interface ChallengeCardProps {
     id: string;
     title: string;
     description: string;
-    progress: number;
+    target: number; // Target amount (e.g., 100 DT)
+    current: number; // Current amount saved (e.g., 60 DT)
+    progress: number; // Progress percentage
     participants: number;
-    reward: string;
     deadline: string;
     status: string;
   };
-  onUpdateProgress: (id: string, newProgress: number) => void;
+  onUpdateProgress: (id: string, newCurrent: number) => void;
 }
 
-export const ChallengeCard = ({ challenge: initialChallenge, onUpdateProgress }: ChallengeCardProps) => {
+export const ChallengeCard = ({
+  challenge: initialChallenge,
+  onUpdateProgress,
+}: ChallengeCardProps) => {
   const [challenge, setChallenge] = useState(initialChallenge);
   const [amount, setAmount] = useState("");
 
@@ -30,9 +37,11 @@ export const ChallengeCard = ({ challenge: initialChallenge, onUpdateProgress }:
       return;
     }
 
-    const newProgress = Math.min(challenge.progress + amountValue, 100);
-    setChallenge({ ...challenge, progress: newProgress });
-    onUpdateProgress(challenge.id, newProgress); // Notify parent component
+    const newCurrent = Math.min(challenge.current + amountValue, challenge.target);
+    const newProgress = (newCurrent / challenge.target) * 100;
+
+    setChallenge({ ...challenge, current: newCurrent, progress: newProgress });
+    onUpdateProgress(challenge.id, newCurrent); // Notify parent component
     setAmount(""); // Reset input
   };
 
@@ -51,7 +60,7 @@ export const ChallengeCard = ({ challenge: initialChallenge, onUpdateProgress }:
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Progress</span>
-            <span>{challenge.progress}%</span>
+            <span>{Math.round(challenge.progress)}/100%</span> {/* Display percentage as X/100% */}
           </div>
           <Progress value={challenge.progress} />
         </div>
@@ -65,15 +74,16 @@ export const ChallengeCard = ({ challenge: initialChallenge, onUpdateProgress }:
           <span>Ends {challenge.deadline}</span>
         </div>
 
-        {/* Reward Section */}
-        <div className="mt-4 p-3 bg-primary/10 rounded-lg">
-          <div className="text-sm font-medium">Reward</div>
-          <div className="text-primary">{challenge.reward}</div>
-        </div>
-
         {/* Status */}
         <div className="text-sm text-gray-600">
-          Status: <span className="font-medium">{challenge.status}</span>
+          Status:{" "}
+          <span
+            className={`font-medium ${
+              challenge.status === "active" ? "text-green-600" : "text-gray-600"
+            }`}
+          >
+            {challenge.status}
+          </span>
         </div>
 
         {/* Amount Input and Upgrade Progress Button */}

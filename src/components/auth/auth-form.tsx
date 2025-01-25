@@ -49,7 +49,6 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
-
     if (mode === "signin") {
       const result = await signIn("credentials", {
         email: values.email,

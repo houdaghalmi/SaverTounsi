@@ -1,38 +1,44 @@
+// src/app/dashboard/bon-plans/page.tsx
 "use client";
 import { DealCard } from "@/components/bon-plans/deal-card";
 import { DealFilters } from "@/components/bon-plans/deal-filters";
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import  ReviewForm  from "@/components/bon-plans/ReviewForm";
+import  ReviewList  from "@/components/bon-plans/ReviewList";
 import { menzelBourguibaDeals } from "@/data/menzel-bourguiba-deals";
 import { useEffect, useState } from "react";
 import { BonPlan } from "@/types/bon-plan";
+import { Review } from "@/types/review";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function BonPlansPage() {
   const [filteredDeals, setFilteredDeals] = useState<BonPlan[]>([]);
+  const [selectedDealId, setSelectedDealId] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
 
-  // Chargez les données initiales au montage du composant
+  // Load initial deals on component mount
   useEffect(() => {
     setFilteredDeals(menzelBourguibaDeals);
   }, []);
 
-  // Fonction pour gérer les changements de filtres
+  // Handle filter changes
   const handleFilterChange = (filters: any) => {
     const { search, categories } = filters;
     let filtered = menzelBourguibaDeals;
 
-    // Filtrage par recherche
+    // Filter by search
     if (search) {
       filtered = filtered.filter((deal) =>
         deal.title.toLowerCase().includes(search.toLowerCase())
       );
     }
 
-    // Filtrage par catégories
+    // Filter by categories
     if (categories.length > 0) {
       filtered = filtered.filter((deal) =>
         categories.every((category: string) =>
@@ -41,9 +47,28 @@ export default function BonPlansPage() {
       );
     }
 
-    // Mettre à jour les deals filtrés
+    // Update filtered deals
     setFilteredDeals(filtered);
   };
+
+  // Handle review submission
+  const handleSubmitReview = (review: { rating: number; comment: string; userName: string }) => {
+    if (!selectedDealId) return;
+
+    const newReview: Review = {
+      id: reviews.length + 1,
+      userId: "user123", // Replace with actual user ID
+      userName: review.userName, // Use the provided username or "Anonymous"
+      rating: review.rating,
+      comment: review.comment,
+      date: new Date(),
+    };
+
+    setReviews([...reviews, newReview]);
+  };
+
+  // Get the selected deal object
+  const selectedDeal = filteredDeals.find((deal) => deal.id === selectedDealId);
 
   return (
     <div className="space-y-6">
@@ -51,21 +76,17 @@ export default function BonPlansPage() {
         <h1 className="text-2xl font-bold">Bon Plans</h1>
       </div>
 
-      {/* Supprimer les onglets et ne garder que la vue liste */}
+      {/* Filters and Deal List */}
       <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Filtres */}
+        {/* Filters */}
         <div className="lg:col-span-1">
-          <DealFilters 
-            onFilterChange={handleFilterChange} 
-            categories={[
-              "Food & Dining",
-              "Shopping",
-              "Entertainment"
-            ]} 
+          <DealFilters
+            onFilterChange={handleFilterChange}
+            categories={["Food & Dining", "Shopping", "Entertainment"]}
           />
         </div>
-        
-        {/* Contenu principal (Liste) */}
+
+        {/* Main Content (Deal List) */}
         <div className="lg:col-span-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredDeals.map((deal) => (
@@ -73,6 +94,38 @@ export default function BonPlansPage() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">Submit a Review</h2>
+
+        {/* Deal Selection Dropdown */}
+        <div className="mb-6">
+          <Select onValueChange={(value) => setSelectedDealId(value)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a deal to review" />
+            </SelectTrigger>
+            <SelectContent>
+              {filteredDeals.map((deal) => (
+                <SelectItem key={deal.id} value={deal.id}>
+                  {deal.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Review Form */}
+        {selectedDealId && (
+          <>
+            <ReviewForm onSubmit={handleSubmitReview} />
+            <h3 className="text-lg font-semibold mt-6 mb-4">
+              Reviews for {selectedDeal?.title}
+            </h3>
+            <ReviewList reviews={reviews} />
+          </>
+        )}
       </div>
     </div>
   );

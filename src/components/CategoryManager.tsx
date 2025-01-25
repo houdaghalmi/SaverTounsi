@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { PlusCircle, MinusCircle, Edit2 } from 'lucide-react';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 interface Category {
   id: string;
@@ -18,6 +19,7 @@ interface CategoryGroup {
 }
 
 const CategoryManager = () => {
+  const router = useRouter(); // Initialize useRouter
   const [totalBudget, setTotalBudget] = useState<number>(0);
   const [categoryGroups, setCategoryGroups] = useState<CategoryGroup[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -29,7 +31,6 @@ const CategoryManager = () => {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newBudgetAmount, setNewBudgetAmount] = useState('');
   const [categoryBudgetAmount, setCategoryBudgetAmount] = useState('');
-  const [transactionAmount, setTransactionAmount] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
@@ -115,34 +116,6 @@ const CategoryManager = () => {
       setShowEditCategoryBudgetModal(false);
       setEditingCategory(null);
       setCategoryBudgetAmount('');
-    }
-  };
-
-  const addTransaction = (category: Category) => {
-    const amount = parseFloat(transactionAmount);
-    const remainingPercentage = ((category.budget - category.spent) / category.budget) * 100;
-
-    // Check if the remaining percentage is 0%
-    if (remainingPercentage <= 0) {
-      alert("Cannot add transaction: Budget is already fully spent.");
-      return;
-    }
-
-    if (!isNaN(amount) && amount >= 0) {
-      setCategoryGroups(categoryGroups.map(group => ({
-        ...group,
-        categories: group.categories.map(cat => {
-          if (cat.id === category.id) {
-            return {
-              ...cat,
-              spent: cat.spent + amount
-            };
-          }
-          return cat;
-        })
-      })));
-      setTransactionAmount('');
-      setSelectedCategory(null);
     }
   };
 
@@ -409,25 +382,18 @@ const CategoryManager = () => {
                 </span>
               ) : null}
             </div>
-            <input
-              type="number"
-              className="w-full border rounded p-2 mb-4"
-              placeholder="Transaction amount"
-              value={transactionAmount}
-              onChange={(e) => setTransactionAmount(e.target.value)}
-            />
             <div className="flex justify-end space-x-2">
               <button
                 className="px-4 py-2 text-gray-600"
                 onClick={() => setSelectedCategory(null)}
               >
-                Cancel
+                Close
               </button>
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded"
-                onClick={() => addTransaction(selectedCategory)}
+                onClick={() => router.push('/transactions')} // Redirect to Transactions Page
               >
-                Add Transaction
+                Go to Transactions
               </button>
             </div>
           </div>

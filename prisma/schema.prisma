@@ -8,17 +8,20 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String    @unique
+  email         String         @unique
   emailVerified DateTime?
   password      String
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  isOnboarded   Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
+  // Relationships
   accounts      Account[]
   sessions      Session[]
+  categoryGroups CategoryGroup[]
   budgets       Budget[]
   transactions  Transaction[]
   bonPlans      BonPlan[]
@@ -32,14 +35,15 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?  @db.Text
   session_state     String?
 
+  // Relationships
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -53,6 +57,32 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model CategoryGroup {
+  id          String      @id @default(cuid())
+  name        String
+  userId      String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relationships
+  user        User        @relation(fields: [userId], references: [id])
+  categories  Category[]
+}
+
+model Category {
+  id          String      @id @default(cuid())
+  name        String
+  budget      Float       @default(0)
+  spent       Float       @default(0)
+  groupId     String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relationships
+  group       CategoryGroup @relation(fields: [groupId], references: [id])
+  transactions Transaction[]
+}
+
 model Budget {
   id          String        @id @default(cuid())
   name        String
@@ -61,11 +91,11 @@ model Budget {
   startDate   DateTime
   endDate     DateTime
   type        BudgetType
-  category    String
   userId      String
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
+  // Relationships
   user        User          @relation(fields: [userId], references: [id])
   transactions Transaction[]
 }
@@ -74,7 +104,7 @@ model Transaction {
   id          String    @id @default(cuid())
   amount      Float
   type        TransactionType
-  category    String
+  categoryId  String?
   description String?
   date        DateTime
   userId      String
@@ -82,8 +112,10 @@ model Transaction {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  // Relationships
   user        User      @relation(fields: [userId], references: [id])
   budget      Budget?   @relation(fields: [budgetId], references: [id])
+  category    Category? @relation(fields: [categoryId], references: [id])
 }
 
 model BonPlan {
@@ -100,6 +132,7 @@ model BonPlan {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  // Relationships
   user        User      @relation(fields: [userId], references: [id])
 }
 
@@ -114,6 +147,7 @@ model Challenge {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
+  // Relationships
   participants UserChallenge[]
 }
 
@@ -126,6 +160,7 @@ model UserChallenge {
   completed   Boolean   @default(false)
   completedAt DateTime?
 
+  // Relationships
   user        User      @relation(fields: [userId], references: [id])
   challenge   Challenge @relation(fields: [challengeId], references: [id])
 }
@@ -138,6 +173,7 @@ model UserSettings {
   notifications   Boolean   @default(true)
   theme           String    @default("light")
 
+  // Relationships
   user            User      @relation(fields: [userId], references: [id])
 }
 

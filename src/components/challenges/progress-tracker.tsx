@@ -1,3 +1,4 @@
+// src/components/challenges/progress-tracker.tsx
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -7,6 +8,7 @@ interface ProgressTrackerProps {
     target: number;
     current: number;
     unit: string;
+    isCompleted: boolean;
   }[];
 }
 

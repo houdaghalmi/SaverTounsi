@@ -1,9 +1,10 @@
 // src/components/transactions/transaction-form.tsx
-import { useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
+"use client";
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,26 +13,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Textarea } from "@/components/ui/textarea"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
+} from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
+// Zod schema for transaction form validation
 const transactionFormSchema = z.object({
   type: z.enum(["INCOME", "EXPENSE"]),
   amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
@@ -45,8 +47,9 @@ const transactionFormSchema = z.object({
   }),
   description: z.string().optional(),
   budgetId: z.string().optional(),
-})
+});
 
+// Categories for expenses and incomes
 const expenseCategories = [
   { value: "food", label: "Food & Groceries" },
   { value: "transport", label: "Transportation" },
@@ -56,7 +59,7 @@ const expenseCategories = [
   { value: "health", label: "Health" },
   { value: "education", label: "Education" },
   { value: "other", label: "Other" },
-]
+];
 
 const incomeCategories = [
   { value: "salary", label: "Salary" },
@@ -64,25 +67,27 @@ const incomeCategories = [
   { value: "investment", label: "Investment" },
   { value: "gift", label: "Gift" },
   { value: "other", label: "Other" },
-]
+];
 
+// Props for the TransactionForm component
 interface TransactionFormProps {
-  initialData?: z.infer<typeof transactionFormSchema>
-  onSubmit: (data: z.infer<typeof transactionFormSchema>) => void
-  isLoading?: boolean
-  budgets?: Array<{ id: string; title: string }>
+  initialData?: z.infer<typeof transactionFormSchema>;
+  onSubmit: (data: z.infer<typeof transactionFormSchema>) => void;
+  isLoading?: boolean;
+  budgets?: Array<{ id: string; title: string }>;
 }
 
-export function TransactionForm({ 
-  initialData, 
-  onSubmit, 
+export function TransactionForm({
+  initialData,
+  onSubmit,
   isLoading,
-  budgets = []
+  budgets = [],
 }: TransactionFormProps) {
   const [transactionType, setTransactionType] = useState<"INCOME" | "EXPENSE">(
     initialData?.type || "EXPENSE"
-  )
+  );
 
+  // Initialize the form with React Hook Form
   const form = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: initialData || {
@@ -93,13 +98,15 @@ export function TransactionForm({
       description: "",
       budgetId: "",
     },
-  })
+  });
 
-  const categories = transactionType === "INCOME" ? incomeCategories : expenseCategories
+  // Determine which categories to display based on the transaction type
+  const categories = transactionType === "INCOME" ? incomeCategories : expenseCategories;
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Transaction Type Field */}
         <FormField
           control={form.control}
           name="type"
@@ -108,9 +115,9 @@ export function TransactionForm({
               <FormLabel>Transaction Type</FormLabel>
               <Select
                 onValueChange={(value: "INCOME" | "EXPENSE") => {
-                  field.onChange(value)
-                  setTransactionType(value)
-                  form.setValue("category", "") // Reset category when type changes
+                  field.onChange(value);
+                  setTransactionType(value);
+                  form.setValue("category", ""); // Reset category when type changes
                 }}
                 defaultValue={field.value}
               >
@@ -129,6 +136,7 @@ export function TransactionForm({
           )}
         />
 
+        {/* Amount Field */}
         <FormField
           control={form.control}
           name="amount"
@@ -143,6 +151,7 @@ export function TransactionForm({
           )}
         />
 
+        {/* Category Field */}
         <FormField
           control={form.control}
           name="category"
@@ -168,6 +177,7 @@ export function TransactionForm({
           )}
         />
 
+        {/* Date Field */}
         <FormField
           control={form.control}
           name="date"
@@ -206,6 +216,7 @@ export function TransactionForm({
           )}
         />
 
+        {/* Budget Field (Optional for Expenses) */}
         {transactionType === "EXPENSE" && budgets.length > 0 && (
           <FormField
             control={form.control}
@@ -236,6 +247,7 @@ export function TransactionForm({
           />
         )}
 
+        {/* Description Field (Optional) */}
         <FormField
           control={form.control}
           name="description"
@@ -243,7 +255,7 @@ export function TransactionForm({
             <FormItem>
               <FormLabel>Description (Optional)</FormLabel>
               <FormControl>
-                <Textarea 
+                <Textarea
                   placeholder="Add notes about this transaction"
                   className="resize-none"
                   {...field}
@@ -254,10 +266,11 @@ export function TransactionForm({
           )}
         />
 
+        {/* Submit Button */}
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Saving..." : "Save Transaction"}
         </Button>
       </form>
     </Form>
-  )
+  );
 }

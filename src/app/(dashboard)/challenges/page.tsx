@@ -1,3 +1,4 @@
+// src/app/challenges/page.tsx
 "use client";
 import { ChallengeCard } from "@/components/challenges/challenge-card";
 import { ProgressTracker } from "@/components/challenges/progress-tracker";
@@ -12,9 +13,10 @@ export default function ChallengesPage() {
       id: "1",
       title: "Collect 100 DT",
       description: "Save 100 DT to complete this challenge.",
-      progress: 60, // Example progress
+      target: 100,
+      current: 60,
+      progress: 60,
       participants: 120,
-      reward: "5 DT bonus",
       deadline: "in 5 days",
       status: "active",
     },
@@ -22,9 +24,10 @@ export default function ChallengesPage() {
       id: "2",
       title: "Collect 50 DT",
       description: "Save 50 DT to complete this challenge.",
-      progress: 100, // Completed
+      target: 50,
+      current: 50,
+      progress: 100,
       participants: 200,
-      reward: "3 DT bonus",
       deadline: "ended 2 days ago",
       status: "completed",
     },
@@ -32,22 +35,24 @@ export default function ChallengesPage() {
       id: "3",
       title: "Collect 500 DT",
       description: "Save 500 DT to complete this challenge.",
-      progress: 0, // Not started
+      target: 500,
+      current: 0,
+      progress: 0,
       participants: 50,
-      reward: "20 DT bonus",
       deadline: "starts in 7 days",
       status: "upcoming",
     },
   ]);
 
-  const handleUpdateProgress = (id: string, newProgress: number) => {
+  const handleUpdateProgress = (id: string, newCurrent: number) => {
     setChallenges((prevChallenges) =>
       prevChallenges.map((challenge) =>
         challenge.id === id
           ? {
               ...challenge,
-              progress: newProgress,
-              status: newProgress >= 100 ? "completed" : challenge.status,
+              current: newCurrent,
+              progress: (newCurrent / challenge.target) * 100,
+              status: newCurrent >= challenge.target ? "completed" : challenge.status,
             }
           : challenge
       )
@@ -80,20 +85,23 @@ export default function ChallengesPage() {
           {
             title: "Collect 100 DT",
             target: 100,
-            current: challenges.find((c) => c.id === "1")?.progress || 0,
+            current: challenges.find((c) => c.id === "1")?.current || 0,
             unit: "DT",
+            isCompleted: challenges.find((c) => c.id === "1")?.progress === 100,
           },
           {
             title: "Collect 50 DT",
             target: 50,
-            current: challenges.find((c) => c.id === "2")?.progress || 0,
+            current: challenges.find((c) => c.id === "2")?.current || 0,
             unit: "DT",
+            isCompleted: challenges.find((c) => c.id === "2")?.progress === 100,
           },
           {
             title: "Collect 500 DT",
             target: 500,
-            current: challenges.find((c) => c.id === "3")?.progress || 0,
+            current: challenges.find((c) => c.id === "3")?.current || 0,
             unit: "DT",
+            isCompleted: challenges.find((c) => c.id === "3")?.progress === 100,
           },
         ]}
       />
