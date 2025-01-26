@@ -1,5 +1,6 @@
-// src/components/transactions/transaction-form.tsx
+// components/transactions/transaction-form.tsx
 "use client";
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -8,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -33,13 +33,12 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
-// Zod schema for transaction form validation
 const transactionFormSchema = z.object({
   type: z.enum(["INCOME", "EXPENSE"]),
   amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
     message: "Amount must be a positive number.",
   }),
-  category: z.string({
+  categoryId: z.string({
     required_error: "Please select a category.",
   }),
   date: z.date({
@@ -49,59 +48,34 @@ const transactionFormSchema = z.object({
   budgetId: z.string().optional(),
 });
 
-// Categories for expenses and incomes
-const expenseCategories = [
-  { value: "food", label: "Food & Groceries" },
-  { value: "transport", label: "Transportation" },
-  { value: "utilities", label: "Utilities" },
-  { value: "rent", label: "Rent" },
-  { value: "shopping", label: "Shopping" },
-  { value: "health", label: "Health" },
-  { value: "education", label: "Education" },
-  { value: "other", label: "Other" },
-];
-
-const incomeCategories = [
-  { value: "salary", label: "Salary" },
-  { value: "freelance", label: "Freelance" },
-  { value: "investment", label: "Investment" },
-  { value: "gift", label: "Gift" },
-  { value: "other", label: "Other" },
-];
-
-// Props for the TransactionForm component
 interface TransactionFormProps {
   initialData?: z.infer<typeof transactionFormSchema>;
   onSubmit: (data: z.infer<typeof transactionFormSchema>) => void;
   isLoading?: boolean;
-  budgets?: Array<{ id: string; title: string }>;
+  categories: Array<{ id: string; name: string; group: { id: string; name: string } }>;
 }
 
 export function TransactionForm({
   initialData,
   onSubmit,
   isLoading,
-  budgets = [],
+  categories = [],
 }: TransactionFormProps) {
   const [transactionType, setTransactionType] = useState<"INCOME" | "EXPENSE">(
     initialData?.type || "EXPENSE"
   );
 
-  // Initialize the form with React Hook Form
   const form = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: initialData || {
       type: "EXPENSE",
       amount: "",
-      category: "",
+      categoryId: "",
       date: new Date(),
       description: "",
       budgetId: "",
     },
   });
-
-  // Determine which categories to display based on the transaction type
-  const categories = transactionType === "INCOME" ? incomeCategories : expenseCategories;
 
   return (
     <Form {...form}>
@@ -117,7 +91,7 @@ export function TransactionForm({
                 onValueChange={(value: "INCOME" | "EXPENSE") => {
                   field.onChange(value);
                   setTransactionType(value);
-                  form.setValue("category", ""); // Reset category when type changes
+                  form.setValue("categoryId", ""); // Reset category when type changes
                 }}
                 defaultValue={field.value}
               >
@@ -154,7 +128,7 @@ export function TransactionForm({
         {/* Category Field */}
         <FormField
           control={form.control}
-          name="category"
+          name="categoryId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
@@ -166,8 +140,8 @@ export function TransactionForm({
                 </FormControl>
                 <SelectContent>
                   {categories.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.label}
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name} ({category.group.name})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -215,37 +189,6 @@ export function TransactionForm({
             </FormItem>
           )}
         />
-
-        {/* Budget Field (Optional for Expenses) */}
-        {transactionType === "EXPENSE" && budgets.length > 0 && (
-          <FormField
-            control={form.control}
-            name="budgetId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Associated Budget (Optional)</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a budget" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {budgets.map((budget) => (
-                      <SelectItem key={budget.id} value={budget.id}>
-                        {budget.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  Link this expense to a budget for better tracking
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
 
         {/* Description Field (Optional) */}
         <FormField

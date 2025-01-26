@@ -1,9 +1,9 @@
-// src/app/dashboard/bon-plans/page.tsx
+// src/app/bon-plans/page.tsx
 "use client";
 import { DealCard } from "@/components/bon-plans/deal-card";
 import { DealFilters } from "@/components/bon-plans/deal-filters";
-import  ReviewForm  from "@/components/bon-plans/ReviewForm";
-import  ReviewList  from "@/components/bon-plans/ReviewList";
+import ReviewForm from "@/components/bon-plans/ReviewForm";
+import ReviewList from "@/components/bon-plans/ReviewList";
 import { menzelBourguibaDeals } from "@/data/menzel-bourguiba-deals";
 import { useEffect, useState } from "react";
 import { BonPlan } from "@/types/bon-plan";
@@ -51,20 +51,55 @@ export default function BonPlansPage() {
     setFilteredDeals(filtered);
   };
 
-  // Handle review submission
-  const handleSubmitReview = (review: { rating: number; comment: string; userName: string }) => {
-    if (!selectedDealId) return;
-
-    const newReview: Review = {
-      id: reviews.length + 1,
-      userId: "user123", // Replace with actual user ID
-      userName: review.userName, // Use the provided username or "Anonymous"
-      rating: review.rating,
-      comment: review.comment,
-      date: new Date(),
+  // Fetch reviews for the selected deal
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (selectedDealId) {
+        try {
+          const response = await fetch(`/api/reviews?bonPlanId=${selectedDealId}`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch reviews: ${response.statusText}`);
+          }
+          const reviews = await response.json();
+          setReviews(reviews);
+        } catch (error) {
+          console.error("Failed to fetch reviews:", error);
+        }
+      }
     };
 
-    setReviews([...reviews, newReview]);
+    fetchReviews();
+  }, [selectedDealId]);
+
+  // Handle review submission
+  const handleSubmitReview = async (review: {
+    rating: number;
+    comment: string;
+    userName: string;
+  }) => {
+    if (!selectedDealId) return;
+
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...review,
+          bonPlanId: selectedDealId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to submit review: ${response.statusText}`);
+      }
+
+      const newReview = await response.json();
+      setReviews([...reviews, newReview]);
+    } catch (error) {
+      console.error("Failed to submit review:", error);
+    }
   };
 
   // Get the selected deal object
@@ -75,7 +110,6 @@ export default function BonPlansPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Bon Plans</h1>
       </div>
-
       {/* Filters and Deal List */}
       <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Filters */}
@@ -85,7 +119,6 @@ export default function BonPlansPage() {
             categories={["Food & Dining", "Shopping", "Entertainment"]}
           />
         </div>
-
         {/* Main Content (Deal List) */}
         <div className="lg:col-span-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -95,11 +128,9 @@ export default function BonPlansPage() {
           </div>
         </div>
       </div>
-
       {/* Reviews Section */}
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Submit a Review</h2>
-
         {/* Deal Selection Dropdown */}
         <div className="mb-6">
           <Select onValueChange={(value) => setSelectedDealId(value)}>
@@ -115,7 +146,6 @@ export default function BonPlansPage() {
             </SelectContent>
           </Select>
         </div>
-
         {/* Review Form */}
         {selectedDealId && (
           <>

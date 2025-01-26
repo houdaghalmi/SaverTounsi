@@ -58,7 +58,7 @@ export default function Navbar() {
               } hover:text-gray-900`}
             >
               <Star className="w-4 h-4 mr-1" /> {/* Added Star icon */}
-              bon plan
+              bon plan 
             </Link>
             <Link
               href="/bon-plans"

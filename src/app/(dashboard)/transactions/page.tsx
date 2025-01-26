@@ -1,6 +1,7 @@
-// src/app/dashboard/transactions/page.tsx
+// app/transactions/page.tsx
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { TransactionForm } from "@/components/transactions/transaction-form";
 import { Button } from "@/components/ui/button";
@@ -8,38 +9,60 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import TransactionList from "@/components/transactions/transaction-list";
 import TransactionFilters from "@/components/transactions/transaction-filters";
 
+interface Category {
+  id: string;
+  name: string;
+  group: {
+    id: string;
+    name: string;
+  };
+}
+
 export default function TransactionsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [transactions, setTransactions] = useState([
-    {
-      id: 1,
-      type: "EXPENSE",
-      category: "Food & Groceries",
-      amount: 200,
-      date: new Date("2023-10-01"),
-      description: "Weekly groceries",
-    },
-    {
-      id: 2,
-      type: "INCOME",
-      category: "Salary",
-      amount: 1500,
-      date: new Date("2023-10-01"),
-      description: "Monthly salary",
-    },
-  ]);
-
+  const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [filter, setFilter] = useState<"all" | "INCOME" | "EXPENSE">("all");
 
+  // Fetch categories from the API
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("/api/categories");
+      if (!response.ok) {
+        throw new Error("Failed to fetch categories");
+      }
+      const data = await response.json();
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   // Handle form submission
-  const handleAddTransaction = (data) => {
-    const newTransaction = {
-      id: transactions.length + 1, // Generate a unique ID
-      ...data,
-      amount: parseFloat(data.amount), // Convert amount to a number
-    };
-    setTransactions([...transactions, newTransaction]); // Update transactions state
-    setIsModalOpen(false); // Close the modal
+  const handleAddTransaction = async (data) => {
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add transaction");
+      }
+
+      const newTransaction = await response.json();
+      setTransactions([...transactions, newTransaction]);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+    }
   };
 
   // Filter transactions based on the selected filter
@@ -72,7 +95,7 @@ export default function TransactionsPage() {
           <DialogHeader>
             <DialogTitle>Add Transaction</DialogTitle>
           </DialogHeader>
-          <TransactionForm onSubmit={handleAddTransaction} />
+          <TransactionForm onSubmit={handleAddTransaction} categories={categories} />
         </DialogContent>
       </Dialog>
     </div>

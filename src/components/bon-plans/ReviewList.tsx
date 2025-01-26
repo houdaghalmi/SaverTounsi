@@ -24,7 +24,7 @@ export default function ReviewList({ reviews }: ReviewListProps) {
               ))}
             </div>
             <p className="text-sm text-gray-500">
-              {format(new Date(review.date), "dd/MM/yyyy")}
+              {format(new Date(review.createdAt), "dd/MM/yyyy")}
             </p>
           </div>
           <p className="mt-2 text-gray-800">{review.comment}</p>

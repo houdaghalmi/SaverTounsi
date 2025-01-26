@@ -1,9 +1,9 @@
-// src/types/transaction.ts
 export interface Transaction {
-  id: number;
+  id: string;
   type: "INCOME" | "EXPENSE";
   category: string;
   amount: number;
   date: Date;
-  description: string;
+  description?: string;
+  budgetId?: string;
 }

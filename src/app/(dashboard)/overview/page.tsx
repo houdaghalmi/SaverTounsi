@@ -6,15 +6,15 @@ import Link from "next/link"; // Import the Link component
 
 export default function Overview() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff] container mx-auto px-4">
       {/* Hero Section */}
       <section className="w-full py-20 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white text-center">
         <h1 className="text-5xl font-bold mb-4">Overview</h1>
         <p className="text-xl mb-8">Get a snapshot of your financial health.</p>
         <div className="space-x-4">
-          <Link href="/signup">
+          <Link href="/logout">
             <Button variant="secondary" className="bg-[#fdbb2d] text-[#1a2a6c] hover:bg-[#b21f1f] hover:text-white">
-              Sign Up
+              log out
             </Button>
           </Link>
           <Link href="/about">
@@ -125,9 +125,9 @@ export default function Overview() {
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold mb-8">Ready to Take Control of Your Finances?</h2>
           <p className="text-xl mb-8">Join SaverTounsi today and start your journey toward financial freedom.</p>
-          <Link href="/signup">
+          <Link href="/categories">
             <Button variant="secondary" className="bg-[#fdbb2d] text-[#1a2a6c] hover:bg-[#b21f1f] hover:text-white">
-              Sign Up Now
+              manage your budget now
             </Button>
           </Link>
         </div>

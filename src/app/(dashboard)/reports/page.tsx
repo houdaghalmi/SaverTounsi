@@ -416,7 +416,7 @@ export default function ReportsPage() {
                       <CardTitle>Yearly Savings</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-lg font-semibold">
+                      <p className="text-lg font-semibold ">
                         Total Saved: {yearlyData.saved} DT
                       </p>
                       <div className="space-y-2 mt-4">
@@ -530,9 +530,9 @@ export default function ReportsPage() {
           </TabsContent>
 
           {/* Challenge Report */}
-          <TabsContent value="challenges">
-            <h2 className="text-xl font-semibold mb-4">Challenge Progress</h2>
-            <div className="flex justify-end">
+          <TabsContent value="challenges" >
+            <h2 className="text-xl font-semibold mb-4 ">Challenge Progress</h2>
+            <div className="flex justify-end ">
               <div className="w-full max-w-3xl space-y-6">
                 {challenges.map((challenge) => (
                   <Card key={challenge.id}>

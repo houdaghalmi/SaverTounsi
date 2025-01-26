@@ -1,4 +1,4 @@
-import { Home, Folder, BarChart, Star, MessageCircle, Settings } from "lucide-react"; // Updated icons
+import { Home, Folder, BarChart, Star, CreditCard, Trophy, MessageCircle } from "lucide-react"; // Updated icons
 
 import {
   Sidebar,
@@ -15,7 +15,7 @@ import {
 const items = [
   {
     title: "Home",
-    url: "/",
+    url: "/overview",
     icon: Home, // Kept Home
   },
   {
@@ -38,6 +38,16 @@ const items = [
     url: "/feedback",
     icon: MessageCircle, // Changed to MessageCircle
   },
+  {
+    title: "transaction",
+    url: "/transactions",
+    icon: CreditCard, // Changed to CreditCard
+  },
+  {
+    title: "challenge",
+    url: "/challenges",
+    icon: Trophy, // Changed to Trophy
+  },
 ];
 
 export function AppSidebar() {
@@ -51,8 +61,8 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
+                    <a href={item.url} className="flex items-center p-2 hover:bg-gray-100 rounded">
+                      <item.icon className="w-5 h-5 mr-2" /> {/* Added icon styling */}
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>

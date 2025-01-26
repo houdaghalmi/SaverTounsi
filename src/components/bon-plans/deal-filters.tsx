@@ -1,5 +1,5 @@
+// src/components/bon-plans/deal-filters.tsx
 "use client";
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,6 @@ export const DealFilters = ({ onFilterChange, categories }: DealFiltersProps) =>
           onChange={(e) => handleFilterChange({ search: e.target.value })}
         />
       </div>
-
       {/* Filtres par catégories */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Categories</label>

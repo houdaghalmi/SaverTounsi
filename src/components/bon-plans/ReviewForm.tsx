@@ -37,7 +37,6 @@ export default function ReviewForm({ onSubmit }: ReviewFormProps) {
           className="mt-1"
         />
       </div>
-
       {/* Rating Field */}
       <div>
         <label className="block text-sm font-medium text-gray-700">Rating</label>
@@ -56,7 +55,6 @@ export default function ReviewForm({ onSubmit }: ReviewFormProps) {
           ))}
         </div>
       </div>
-
       {/* Comment Field */}
       <div>
         <label className="block text-sm font-medium text-gray-700">Comment</label>
@@ -68,7 +66,6 @@ export default function ReviewForm({ onSubmit }: ReviewFormProps) {
           required
         />
       </div>
-
       {/* Submit Button */}
       <Button type="submit" className="bg-blue-600 text-white hover:bg-blue-700">
         Submit Review
