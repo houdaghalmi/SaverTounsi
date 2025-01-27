@@ -10,7 +10,7 @@
     "docker": "docker compose up -d",
     "prisma:push": "npx prisma db push",
     "prisma:migrate": "npx prisma migrate dev",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate && prisma db push"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
