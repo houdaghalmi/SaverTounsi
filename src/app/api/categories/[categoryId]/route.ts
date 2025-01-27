@@ -1,14 +1,14 @@
-// app/api/categories/[categoryId]/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: Promise<{ categoryId: string }> }
 ) {
   try {
+    const categoryId = (await params).categoryId ;
     await prisma.category.delete({
-      where: { id: params.categoryId },
+      where: { id: categoryId },
     });
     return NextResponse.json({ message: "Category deleted" });
   } catch (error) {

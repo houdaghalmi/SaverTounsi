@@ -1,5 +1,5 @@
 // lib/auth.ts
-import { NextAuthOptions } from 'next-auth';
+import { NextAuthOptions, Session } from 'next-auth';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcrypt';
@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ token, session }) {
+    async session({ token, session }: {token: any, session: Session}) {
       if (token) {
         session.user.id = token.id;
         session.user.name = token.name;
@@ -60,7 +60,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.isOnboarded = user.isOnboarded;
+        // token.isOnboarded = user.isOnboarded;
       }
       return token;
     },

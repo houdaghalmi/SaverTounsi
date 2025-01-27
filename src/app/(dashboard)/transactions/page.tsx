@@ -58,7 +58,7 @@ export default function TransactionsPage() {
   }, []);
 
   // Handle form submission
-  const handleAddTransaction = async (data) => {
+  const handleAddTransaction = async (data: any) => {
     try {
       const response = await fetch("/api/transactions", {
         method: "POST",
@@ -94,7 +94,7 @@ export default function TransactionsPage() {
       <TransactionFilters filter={filter} setFilter={setFilter} />
 
       {/* Transaction List */}
-      <TransactionList transactions={filteredTransactions} />
+      <TransactionList transactions={filteredTransactions as any} />
 
       {/* Add Transaction Button */}
       <div className="fixed bottom-6 right-6">

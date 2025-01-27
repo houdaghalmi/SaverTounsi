@@ -1,4 +1,3 @@
-// src/components/bon-plans/deal-filters.tsx
 "use client";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -11,10 +10,7 @@ interface DealFiltersProps {
 }
 
 export const DealFilters = ({ onFilterChange, categories }: DealFiltersProps) => {
-  const [filters, setFilters] = useState({
-    search: "",
-    categories: [],
-  });
+  const [filters, setFilters] = useState({categories, })
 
   const handleFilterChange = (newFilters: any) => {
     const updated = { ...filters, ...newFilters };

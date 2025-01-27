@@ -12,11 +12,11 @@ export async function GET(
       } 
       const categories= await prisma.category.findMany({
           include: {
-            group: trues
+            group: true
           },
           where: { 
             group:{
-              userId : session.user.id,
+              userId : session.user?.id,
             }
           },
       });

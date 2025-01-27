@@ -65,7 +65,7 @@ export async function POST(request: Request) {
         },
         user:{
           connect:{
-            id:session.user.id
+            id:session.user?.id
           }
         }
       },
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
     console.log("Created review:", newReview);
     return NextResponse.json(newReview, { status: 201 });
   } catch (error) {
-    console.error("Failed to submit review:", error.stack);
+    console.error("Failed to submit review:", (error as Error).stack);
     return NextResponse.json(
       { error: "Failed to submit review" },
       { status: 500 }

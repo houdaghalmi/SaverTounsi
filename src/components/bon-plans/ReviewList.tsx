@@ -1,5 +1,5 @@
 // src/components/bon-plans/ReviewList.tsx
-import { Review } from "@/types/review";
+import { Review } from "@prisma/client";
 import { format } from "date-fns";
 import { Star } from "lucide-react";
 

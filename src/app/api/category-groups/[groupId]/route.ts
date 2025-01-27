@@ -4,12 +4,13 @@ import prisma from "@/lib/prisma";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { groupId: string } }
+  { params }: { params: Promise<{ groupId: string }> }
 ) {
   try {
+    const groupId = (await params).groupId
     // Delete the category group and its associated categories
     await prisma.categoryGroup.delete({
-      where: { id: params.groupId },
+      where: { id: groupId },
     });
     return NextResponse.json({ message: "Category group deleted" });
   } catch (error) {

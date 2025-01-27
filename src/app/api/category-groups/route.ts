@@ -11,7 +11,7 @@ export async function GET() {
 
   try {
     const categoryGroups = await prisma.categoryGroup.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user?.id },
       include: { categories: true },
     });
     return NextResponse.json(categoryGroups);

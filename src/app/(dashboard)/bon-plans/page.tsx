@@ -158,7 +158,7 @@ export default function BonPlansPage() {
             <h3 className="text-lg font-semibold mt-6 mb-4">
               Reviews for {selectedDeal?.title}
             </h3>
-            <ReviewList reviews={reviews} />
+            <ReviewList reviews={reviews as any} />
           </>
         )}
       </div>

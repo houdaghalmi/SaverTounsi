@@ -4,10 +4,10 @@ import { getSession } from "@/lib/auth-utils";
 
 export async function GET(
     req: Request,
-    opts: { params: { name: string } }
+    {params}: { params: Promise<{ name: string }>}
 ) {
     try {
-        const params = await opts.params;
+        const name = (await params).name;
         const session = await getSession();
         if (!session) {
             return new NextResponse("Unauthorized", { status: 401 });
@@ -17,9 +17,9 @@ export async function GET(
                 name: true
             },
             where: { 
-                name: params.name,
+                name,
                 AND: {
-                    userId : session.user.id,
+                    userId : session.user?.id,
                 }
             },
         });

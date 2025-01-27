@@ -14,12 +14,12 @@ export async function GET(req: Request) {
         category: true
       },
       where: {
-        userId: session.user.id
+        userId: session.user?.id
       }
     })
     return NextResponse.json(transactions)
   } catch (err) {
-    console.error("Error creating transaction:", error.stack);
+    console.error("Error creating transaction:", (err as Error).stack);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 
@@ -58,14 +58,14 @@ export async function POST(req: Request) {
         }},
         user: {
           connect: {
-            id: session.user.id
+            id: session.user?.id
           }
         }
       },
     });
     return NextResponse.json(transaction);
   } catch (error) {
-    console.error("Error creating transaction:", error.stack);
+    console.error("Error creating transaction:", (error as Error).stack);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
