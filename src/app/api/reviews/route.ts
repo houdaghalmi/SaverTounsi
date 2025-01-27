@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getSession } from "@/lib/auth-utils";
+import { connect } from "http2";
 
 // GET: Fetch reviews for a specific BonPlan
 export async function GET(request: Request) {
@@ -33,6 +35,10 @@ export async function GET(request: Request) {
 
 // POST: Submit a new review
 export async function POST(request: Request) {
+  const session = await getSession();
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
   const body = await request.json();
   const { rating, comment, userName, bonPlanId } = body;
 
@@ -46,19 +52,28 @@ export async function POST(request: Request) {
   }
 
   try {
+    console.log(session.user)
     const newReview = await prisma.review.create({
       data: {
         rating,
         comment,
         userName: userName || "Anonymous",
-        bonPlanId,
-        userId: "user123", // Replace with actual user ID (if authenticated)
+        bonPlan:{
+          connect:{
+            id:bonPlanId,
+          }
+        },
+        user:{
+          connect:{
+            id:session.user.id
+          }
+        }
       },
     });
     console.log("Created review:", newReview);
     return NextResponse.json(newReview, { status: 201 });
   } catch (error) {
-    console.error("Failed to submit review:", error);
+    console.error("Failed to submit review:", error.stack);
     return NextResponse.json(
       { error: "Failed to submit review" },
       { status: 500 }

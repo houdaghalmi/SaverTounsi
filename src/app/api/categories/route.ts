@@ -2,6 +2,32 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth-utils";
 
+export async function GET(
+  req: Request,
+) {
+  try {
+      const session = await getSession();
+      if (!session) {
+          return new NextResponse("Unauthorized", { status: 401 });
+      } 
+      const categories= await prisma.category.findMany({
+          include: {
+            group: trues
+          },
+          where: { 
+            group:{
+              userId : session.user.id,
+            }
+          },
+      });
+     
+      return NextResponse.json(categories);
+  } catch (error) {
+      console.error("Error deleting category group:", error);
+      return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session) {

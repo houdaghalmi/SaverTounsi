@@ -24,13 +24,14 @@ export async function GET() {
 // Function 2: POST - Add a new category group (create)
 export async function POST(req: Request) {
   const session = await getSession();
-  if (!session) {
+  if (!session || !session.user) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
   const { name } = await req.json();
 
   try {
+    console.log(session)
     const categoryGroup = await prisma.categoryGroup.create({
       data: {
         name,

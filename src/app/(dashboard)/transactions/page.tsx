@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import TransactionList from "@/components/transactions/transaction-list";
 import TransactionFilters from "@/components/transactions/transaction-filters";
+import { Transaction } from "@prisma/client";
 
 interface Category {
   id: string;
@@ -20,7 +21,7 @@ interface Category {
 
 export default function TransactionsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filter, setFilter] = useState<"all" | "INCOME" | "EXPENSE">("all");
 
@@ -37,9 +38,23 @@ export default function TransactionsPage() {
       console.error("Error fetching categories:", error);
     }
   };
+  // Fetch categories from the API
+  const fetchTransactions = async () => {
+    try {
+      const response = await fetch("/api/transactions");
+      if (!response.ok) {
+        throw new Error("Failed to fetch transactions");
+      }
+      const data = await response.json();
+      setTransactions(data);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
 
   useEffect(() => {
     fetchCategories();
+    fetchTransactions();
   }, []);
 
   // Handle form submission

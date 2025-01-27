@@ -45,7 +45,6 @@ const transactionFormSchema = z.object({
     required_error: "Date is required.",
   }),
   description: z.string().optional(),
-  budgetId: z.string().optional(),
 });
 
 interface TransactionFormProps {
@@ -73,7 +72,6 @@ export function TransactionForm({
       categoryId: "",
       date: new Date(),
       description: "",
-      budgetId: "",
     },
   });
 

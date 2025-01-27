@@ -60,15 +60,17 @@ model Session {
 }
 
 model CategoryGroup {
-  id        String     @id @default(cuid())
-  name      String
+  id        String     @id() @default(cuid())
+  name      String     
   userId    String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
+
   // Relationships
   user      User       @relation(fields: [userId], references: [id])
   categories Category[]
+  @@unique(name:"userCategoryName",[userId,name])
 }
 
 model Category {
@@ -119,6 +121,7 @@ model Review {
   rating      Int        @default(0)
   comment     String?
   userId      String
+  userName    String
   bonPlanId   String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt

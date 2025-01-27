@@ -63,27 +63,32 @@ const CategoryManager = () => {
 
   // Add a new category group
   const addCategoryGroup = async () => {
-    if (newGroupName.trim()) {
-      try {
-        const response = await fetch("/api/category-groups", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name: newGroupName }),
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to add category group: ${response.statusText}`);
-        }
-        const newGroup = await response.json();
-        console.log("New category group:", newGroup); // Log the new group
-        setCategoryGroups([...categoryGroups, newGroup]);
-        setNewGroupName("");
-        setShowNewGroupModal(false);
-      } catch (error) {
-        console.error("Error adding category group:", error);
-        setError(error instanceof Error ? error.message : "An unknown error occurred");
+    try {
+      const isValid = await fetch(`/api/category-groups/findByName/${newGroupName}`,{
+        method:"GET",
+      }).then(d=> d.json()).then(d=>d.valid);
+      console.log(isValid)
+      if(!isValid){
+        return ;
       }
+      const response = await fetch("/api/category-groups", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newGroupName }),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to add category group: ${response.statusText}`);
+      }
+      const newGroup = await response.json();
+      console.log("New category group:", newGroup); // Log the new group
+      setCategoryGroups([...categoryGroups, newGroup]);
+      setNewGroupName("");
+      setShowNewGroupModal(false);
+    } catch (error) {
+      console.error("Error adding category group:", error);
+      setError(error instanceof Error ? error.message : "An unknown error occurred");
     }
   };
 
@@ -112,7 +117,7 @@ const CategoryManager = () => {
             if (group.id === selectedGroupId) {
               return {
                 ...group,
-                categories: [...group.categories, newCategory],
+                categories: [...(group?.categories || []), newCategory],
               };
             }
             return group;
@@ -362,7 +367,7 @@ const CategoryManager = () => {
               </button>
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded"
-                onClick={addCategoryGroup}
+                onClick={e => newGroupName.trim() && addCategoryGroup(e)}
               >
                 Add
               </button>

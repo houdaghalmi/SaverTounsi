@@ -19,13 +19,18 @@ import {
 export default function BonPlansPage() {
   const [filteredDeals, setFilteredDeals] = useState<BonPlan[]>([]);
   const [selectedDealId, setSelectedDealId] = useState<string | null>(null);
+  const [selectedDeal, setSelectedDeal] = useState<BonPlan|null>(null)
   const [reviews, setReviews] = useState<Review[]>([]);
 
   // Load initial deals on component mount
   useEffect(() => {
-    setFilteredDeals(menzelBourguibaDeals);
+    fetchFilteredDeals();
+    // setFilteredDeals(menzelBourguibaDeals);
   }, []);
-
+  const fetchFilteredDeals = async () => {
+    const deals = await fetch("/api/deals").then(d=> d.json());
+    setFilteredDeals(deals)
+  }
   // Handle filter changes
   const handleFilterChange = (filters: any) => {
     const { search, categories } = filters;
@@ -103,7 +108,7 @@ export default function BonPlansPage() {
   };
 
   // Get the selected deal object
-  const selectedDeal = filteredDeals.find((deal) => deal.id === selectedDealId);
+  // const selectedDeal = filteredDeals.find((deal) => deal.id === selectedDealId);
 
   return (
     <div className="space-y-6">
