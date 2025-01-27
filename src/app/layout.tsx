@@ -1,5 +1,5 @@
 "use server";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import React from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
@@ -19,7 +19,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
           
           <Toaster />
           <Footer />
-
+          <SpeedInsights/>
       </body>
     </html>
   )
