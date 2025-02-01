@@ -1,48 +1,42 @@
-// src/app/challenges/page.tsx
 "use client";
 import { ChallengeCard } from "@/components/challenges/challenge-card";
 import { ProgressTracker } from "@/components/challenges/progress-tracker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Trophy } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ChallengesPage() {
-  const [challenges, setChallenges] = useState([
-    {
-      id: "1",
-      title: "Collect 100 DT",
-      description: "Save 100 DT to complete this challenge.",
-      target: 100,
-      current: 60,
-      progress: 60,
-      participants: 120,
-      deadline: "in 5 days",
-      status: "active",
-    },
-    {
-      id: "2",
-      title: "Collect 50 DT",
-      description: "Save 50 DT to complete this challenge.",
-      target: 50,
-      current: 50,
-      progress: 100,
-      participants: 200,
-      deadline: "ended 2 days ago",
-      status: "completed",
-    },
-    {
-      id: "3",
-      title: "Collect 500 DT",
-      description: "Save 500 DT to complete this challenge.",
-      target: 500,
-      current: 0,
-      progress: 0,
-      participants: 50,
-      deadline: "starts in 7 days",
-      status: "upcoming",
-    },
-  ]);
+  const [challenges, setChallenges] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [joinedChallenges, setJoinedChallenges] = useState(new Set()); // Track joined challenges
+
+  // Fetch challenges from the API
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      try {
+        const response = await fetch("/api/challenges");
+        if (!response.ok) throw new Error("Failed to fetch challenges");
+        const data = await response.json();
+        setChallenges(data.map((challenge) => ({ ...challenge, current: 0 }))); // Initialize current progress
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChallenges();
+  }, []);
+
+  // Calculate status for a challenge
+  const getChallengeStatus = (challenge) => {
+    if (joinedChallenges.has(challenge.id)) {
+      return challenge.current >= challenge.goal ? "completed" : "active";
+    }
+    return "upcoming"; // Not joined yet
+  };
 
   const handleUpdateProgress = (id: string, newCurrent: number) => {
     setChallenges((prevChallenges) =>
@@ -51,8 +45,7 @@ export default function ChallengesPage() {
           ? {
               ...challenge,
               current: newCurrent,
-              progress: (newCurrent / challenge.target) * 100,
-              status: newCurrent >= challenge.target ? "completed" : challenge.status,
+              progress: (newCurrent / challenge.goal) * 100,
             }
           : challenge
       )
@@ -60,50 +53,27 @@ export default function ChallengesPage() {
   };
 
   const handleJoinChallenge = (id: string) => {
-    setChallenges((prevChallenges) =>
-      prevChallenges.map((challenge) =>
-        challenge.id === id
-          ? { ...challenge, status: "active" }
-          : challenge
-      )
-    );
+    setJoinedChallenges((prev) => new Set(prev).add(id)); // Add to joined challenges
   };
+
+  if (loading) return <div>Loading challenges...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Challenges</h1>
-        <Button onClick={() => handleJoinChallenge("3")}>
-          <Trophy className="w-4 h-4 mr-2" />
-          Join New Challenge
-        </Button>
       </div>
 
       {/* Progress Tracker */}
       <ProgressTracker
-        milestones={[
-          {
-            title: "Collect 100 DT",
-            target: 100,
-            current: challenges.find((c) => c.id === "1")?.current || 0,
-            unit: "DT",
-            isCompleted: challenges.find((c) => c.id === "1")?.progress === 100,
-          },
-          {
-            title: "Collect 50 DT",
-            target: 50,
-            current: challenges.find((c) => c.id === "2")?.current || 0,
-            unit: "DT",
-            isCompleted: challenges.find((c) => c.id === "2")?.progress === 100,
-          },
-          {
-            title: "Collect 500 DT",
-            target: 500,
-            current: challenges.find((c) => c.id === "3")?.current || 0,
-            unit: "DT",
-            isCompleted: challenges.find((c) => c.id === "3")?.progress === 100,
-          },
-        ]}
+        milestones={challenges.map((challenge) => ({
+          title: challenge.title,
+          target: challenge.goal,
+          current: challenge.current,
+          unit: "DT",
+          isCompleted: challenge.current >= challenge.goal,
+        }))}
       />
 
       {/* Tabs for Active, Completed, and Available Challenges */}
@@ -118,12 +88,16 @@ export default function ChallengesPage() {
         <TabsContent value="active" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {challenges
-              .filter((c) => c.status === "active")
+              .filter((c) => getChallengeStatus(c) === "active")
               .map((challenge) => (
                 <ChallengeCard
                   key={challenge.id}
-                  challenge={challenge}
+                  challenge={{
+                    ...challenge,
+                    status: getChallengeStatus(challenge),
+                  }}
                   onUpdateProgress={handleUpdateProgress}
+                  onJoinChallenge={handleJoinChallenge}
                 />
               ))}
           </div>
@@ -133,12 +107,16 @@ export default function ChallengesPage() {
         <TabsContent value="completed" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {challenges
-              .filter((c) => c.status === "completed")
+              .filter((c) => getChallengeStatus(c) === "completed")
               .map((challenge) => (
                 <ChallengeCard
                   key={challenge.id}
-                  challenge={challenge}
+                  challenge={{
+                    ...challenge,
+                    status: getChallengeStatus(challenge),
+                  }}
                   onUpdateProgress={handleUpdateProgress}
+                  onJoinChallenge={handleJoinChallenge}
                 />
               ))}
           </div>
@@ -148,12 +126,15 @@ export default function ChallengesPage() {
         <TabsContent value="available" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {challenges
-              .filter((c) => c.status === "upcoming")
+              .filter((c) => getChallengeStatus(c) === "upcoming")
               .map((challenge) => (
                 <ChallengeCard
                   key={challenge.id}
-                  challenge={challenge}
+                  challenge={{...challenge,
+                    status: getChallengeStatus(challenge),
+                  }}
                   onUpdateProgress={handleUpdateProgress}
+                  onJoinChallenge={handleJoinChallenge}
                 />
               ))}
           </div>

@@ -1,6 +1,4 @@
-// src/components/challenges/challenge-card.tsx
 "use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Users } from "lucide-react";
@@ -13,22 +11,30 @@ interface ChallengeCardProps {
     id: string;
     title: string;
     description: string;
-    target: number; // Target amount (e.g., 100 DT)
-    current: number; // Current amount saved (e.g., 60 DT)
-    progress: number; // Progress percentage
+    goal: number;
+    current: number;
+    progress: number;
     participants: number;
-    deadline: string;
+    duration: number;
+    reward?: string;
     status: string;
   };
   onUpdateProgress: (id: string, newCurrent: number) => void;
+  onJoinChallenge: (id: string) => void;
 }
 
 export const ChallengeCard = ({
   challenge: initialChallenge,
   onUpdateProgress,
+  onJoinChallenge,
 }: ChallengeCardProps) => {
   const [challenge, setChallenge] = useState(initialChallenge);
   const [amount, setAmount] = useState("");
+
+  // Ensure current and goal are valid numbers
+  const current = isNaN(challenge.current) ? 0 : challenge.current;
+  const goal = isNaN(challenge.goal) ? 0 : challenge.goal;
+  const progress = (current / goal) * 100 || 0; // Default to 0 if NaN
 
   const handleUpgradeProgress = () => {
     const amountValue = parseFloat(amount);
@@ -36,10 +42,8 @@ export const ChallengeCard = ({
       alert("Please enter a valid amount.");
       return;
     }
-
-    const newCurrent = Math.min(challenge.current + amountValue, challenge.target);
-    const newProgress = (newCurrent / challenge.target) * 100;
-
+    const newCurrent = Math.min(current + amountValue, goal);
+    const newProgress = (newCurrent / goal) * 100;
     setChallenge({ ...challenge, current: newCurrent, progress: newProgress });
     onUpdateProgress(challenge.id, newCurrent); // Notify parent component
     setAmount(""); // Reset input
@@ -60,18 +64,20 @@ export const ChallengeCard = ({
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Progress</span>
-            <span>{Math.round(challenge.progress)}/100%</span> {/* Display percentage as X/100% */}
+            <span>
+              {Math.round(progress)}/100% {/* Always show progress as 0/100% */}
+            </span>
           </div>
-          <Progress value={challenge.progress} />
+          <Progress value={progress} />
         </div>
 
-        {/* Participants and Deadline */}
+        {/* Participants and Duration */}
         <div className="flex items-center justify-between text-sm text-gray-600">
           <div className="flex items-center gap-1">
             <Users className="w-4 h-4" />
             <span>{challenge.participants} participants</span>
           </div>
-          <span>Ends {challenge.deadline}</span>
+          <span>{challenge.duration} days</span>
         </div>
 
         {/* Status */}
@@ -79,29 +85,46 @@ export const ChallengeCard = ({
           Status:{" "}
           <span
             className={`font-medium ${
-              challenge.status === "active" ? "text-green-600" : "text-gray-600"
+              challenge.status === "active"
+                ? "text-green-600"
+                : challenge.status === "completed"
+                ? "text-blue-600"
+                : "text-gray-600"
             }`}
           >
             {challenge.status}
           </span>
         </div>
 
-        {/* Amount Input and Upgrade Progress Button */}
-        <div className="mt-4 space-y-2">
-          <Input
-            type="number"
-            placeholder="Enter amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
+        {/* Join Challenge Button (for upcoming challenges) */}
+        {challenge.status === "upcoming" && (
           <Button
-            onClick={handleUpgradeProgress}
-            disabled={challenge.progress >= 100} // Disable if progress is 100%
-            className="w-full"
+            onClick={() => onJoinChallenge(challenge.id)}
+            className="w-full mt-4"
           >
-            Add Amount
+            <Trophy className="w-4 h-4 mr-2" />
+            Join Challenge
           </Button>
-        </div>
+        )}
+
+        {/* Amount Input and Add Progress Button (for active challenges) */}
+        {challenge.status === "active" && (
+          <div className="mt-4 space-y-2">
+            <Input
+              type="number"
+              placeholder="Enter amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+            <Button
+              onClick={handleUpgradeProgress}
+              disabled={progress >= 100}
+              className="w-full"
+            >
+              Add Amount
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
