@@ -6,11 +6,26 @@ import { Button } from "@/components/ui/button";
 import { Trophy } from "lucide-react";
 import { useState, useEffect } from "react";
 
+// Define the Challenge type
+interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  goal: number;
+  current: number;
+  progress: number;
+  participants: number;
+  duration: number;
+  reward?: string;
+  status: string;
+}
+
 export default function ChallengesPage() {
-  const [challenges, setChallenges] = useState([]);
+  // Explicitly type the challenges state
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [joinedChallenges, setJoinedChallenges] = useState(new Set()); // Track joined challenges
+  const [error, setError] = useState<string | null>(null); // Explicitly type error as string or null
+  const [joinedChallenges, setJoinedChallenges] = useState<Set<string>>(new Set()); // Track joined challenges
 
   // Fetch challenges from the API
   useEffect(() => {
@@ -19,9 +34,21 @@ export default function ChallengesPage() {
         const response = await fetch("/api/challenges");
         if (!response.ok) throw new Error("Failed to fetch challenges");
         const data = await response.json();
-        setChallenges(data.map((challenge) => ({ ...challenge, current: 0 }))); // Initialize current progress
+        // Initialize current progress for each challenge
+        setChallenges(
+          data.map((challenge: Challenge) => ({
+            ...challenge,
+            current: 0,
+            progress: 0,
+          }))
+        );
       } catch (error) {
-        setError(error.message);
+        // Type-check the error
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("An unknown error occurred");
+        }
       } finally {
         setLoading(false);
       }
@@ -31,7 +58,7 @@ export default function ChallengesPage() {
   }, []);
 
   // Calculate status for a challenge
-  const getChallengeStatus = (challenge) => {
+  const getChallengeStatus = (challenge: Challenge) => {
     if (joinedChallenges.has(challenge.id)) {
       return challenge.current >= challenge.goal ? "completed" : "active";
     }
@@ -130,7 +157,8 @@ export default function ChallengesPage() {
               .map((challenge) => (
                 <ChallengeCard
                   key={challenge.id}
-                  challenge={{...challenge,
+                  challenge={{
+                    ...challenge,
                     status: getChallengeStatus(challenge),
                   }}
                   onUpdateProgress={handleUpdateProgress}
