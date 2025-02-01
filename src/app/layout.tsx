@@ -10,7 +10,8 @@ export default async function Layout({ children }: { children: React.ReactNode }
   return (
     <html>
       <head>
-        <title>saverTounsi</title>
+      <link rel="icon"  href="./images/logo/logo.png" />
+      <title>saverTounsi</title>
       </head>
       <body>            
           <main>
