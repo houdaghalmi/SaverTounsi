@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    // Create the category
+    // Create the transaction
     const transaction = await prisma.transaction.create({
       data: {
         amount: +amount,
@@ -63,7 +63,21 @@ export async function POST(req: Request) {
         }
       },
     });
-    return NextResponse.json(transaction);
+    const fullTransaction = await prisma.transaction.findUnique({
+      where :{
+        id:transaction.id
+      },
+      include :{
+        category:{
+          select:{
+            id:true,
+            name:true
+          }
+        }
+        
+      }
+    })
+    return NextResponse.json(fullTransaction);
   } catch (error) {
     console.error("Error creating transaction:", (error as Error).stack);
     return new NextResponse("Internal Server Error", { status: 500 });

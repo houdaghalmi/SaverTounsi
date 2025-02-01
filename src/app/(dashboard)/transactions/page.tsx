@@ -73,6 +73,7 @@ export default function TransactionsPage() {
       }
 
       const newTransaction = await response.json();
+      console.log(newTransaction)
       setTransactions([...transactions, newTransaction]);
       setIsModalOpen(false);
     } catch (error) {

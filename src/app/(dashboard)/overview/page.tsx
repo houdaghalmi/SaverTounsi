@@ -18,7 +18,7 @@ export default function Overview() {
             </Button>
           </Link>
           <Link href="/about">
-            <Button variant="outline" className="text-white border-white hover:bg-[#fdbb2d] hover:text-[#1a2a6c]">
+            <Button variant="outline" className="text-black border-white hover:bg-[#fdbb2d] hover:text-[#1a2a6c]">
               Learn More
             </Button>
           </Link>

@@ -66,4 +66,8 @@ async function seedBonPlans() {
     console.log("BonPlan Data Seeded correctly")
 }
 console.log("Seeding BonPlan Data")
-seedBonPlans()
+async function main (){
+    await prisma.bonPlan.deleteMany()
+    seedBonPlans()
+}
+main()
