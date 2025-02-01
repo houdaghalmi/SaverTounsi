@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { ChallengeType } from "@prisma/client";
 
 async function seedBonPlans() {
     const data = [{
@@ -66,8 +67,59 @@ async function seedBonPlans() {
     console.log("BonPlan Data Seeded correctly")
 }
 console.log("Seeding BonPlan Data")
-async function main (){
+async function mainBonPlan (){
     await prisma.bonPlan.deleteMany()
     seedBonPlans()
+}
+mainBonPlan()
+async function seedchallenges() {
+    const data = [
+        {
+            id: "1",
+            title: "Save 100 DT",
+            description: "Save 100 DT this month to build your emergency fund.",
+            type: ChallengeType.SAVINGS, // Enum value
+            goal: 100,
+            duration: 30,
+            reward: "A sense of financial security!"
+        },
+        {
+            id: "2",
+            title: "Save 50 DT",
+            description: "Spend less than 50 DT on dining out this month.",
+            type: ChallengeType.SPENDING_REDUCTION, // Enum value
+            goal: 50,
+            duration: 30,
+            reward: "Save money and cook more at home!"
+        },
+        {
+            id: "3",
+            title: "500 DT Savings Challenge",
+            description: "Save 500 DT over the next 3 months for investment.",
+            type: ChallengeType.SAVINGS, // Enum value
+            goal: 500,
+            duration: 90,
+            reward: "Achieve your financial goals!"
+        },
+        {
+            id: "4",
+            title: "No Coffee Shops for a Week",
+            description: "Avoid buying coffee from cafes for 7 days and save money.",
+            type:ChallengeType.NO_SPEND, // Enum value
+            goal: 0,
+            duration: 7,
+            reward: "Save money and discover homemade coffee!"
+        }
+    ]
+
+    await prisma.challenge.createMany({
+        data
+    })
+    console.log("challenges Data Seeded correctly")
+}
+console.log("Seeding challenges Data")
+async function main (){
+    await prisma.challenge.deleteMany()
+    seedchallenges()
 }
 main()

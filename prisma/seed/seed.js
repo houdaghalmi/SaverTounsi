@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,13 +48,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var prisma_1 = require("@/lib/prisma");
+var client_1 = require("@prisma/client");
 function seedBonPlans() {
     return __awaiter(this, void 0, void 0, function () {
         var data;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    data = [{
+                    data = [
+                        {
                             id: "1",
                             title: "Tech Jungle",
                             description: "Un magasin spécialisé dans les produits technologiques et électroniques.",
@@ -109,5 +122,125 @@ function seedBonPlans() {
         });
     });
 }
-console.log("Seeding BonPlan Data");
-seedBonPlans();
+function main() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    console.log("Seeding BonPlan Data");
+                    return [4 /*yield*/, prisma_1.default.bonPlan.deleteMany()];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, seedBonPlans()];
+                case 2:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+var challenges = [
+    {
+        id: "1",
+        title: "Save 100 DT",
+        description: "Save 100 DT this month to build your emergency fund.",
+        type: client_1.ChallengeType.SAVINGS, // Enum value
+        goal: 100,
+        duration: 30,
+        reward: "A sense of financial security!"
+    },
+    {
+        id: "2",
+        title: "Save 50 DT",
+        description: "Spend less than 50 DT on dining out this month.",
+        type: client_1.ChallengeType.SPENDING_REDUCTION, // Enum value
+        goal: 50,
+        duration: 30,
+        reward: "Save money and cook more at home!"
+    },
+    {
+        id: "3",
+        title: "500 DT Savings Challenge",
+        description: "Save 500 DT over the next 3 months for investment.",
+        type: client_1.ChallengeType.SAVINGS, // Enum value
+        goal: 500,
+        duration: 90,
+        reward: "Achieve your financial goals!"
+    },
+    {
+        id: "4",
+        title: "No Coffee Shops for a Week",
+        description: "Avoid buying coffee from cafes for 7 days and save money.",
+        type: client_1.ChallengeType.NO_SPEND, // Enum value
+        goal: 0,
+        duration: 7,
+        reward: "Save money and discover homemade coffee!"
+    }
+];
+function seedChallenges() {
+    return __awaiter(this, void 0, void 0, function () {
+        var data_c;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    data_c = challenges.map(function (challenge) { return (__assign(__assign({}, challenge), { createdAt: new Date(), updatedAt: new Date() })); });
+                    return [4 /*yield*/, prisma_1.default.challenge.createMany({
+                            data: data_c // Corrected here
+                        })];
+                case 1:
+                    _a.sent();
+                    console.log("Challenge Data Seeded correctly");
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function mainChallenges() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    console.log("Seeding Challenges Data");
+                    // Clear existing challenges first
+                    return [4 /*yield*/, prisma_1.default.challenge.deleteMany()];
+                case 1:
+                    // Clear existing challenges first
+                    _a.sent();
+                    return [4 /*yield*/, seedChallenges()];
+                case 2:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function run() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, main()];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, mainChallenges()];
+                case 2:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+run()
+    .catch(function (e) {
+    console.error(e);
+    process.exit(1);
+})
+    .finally(function () { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, prisma_1.default.$disconnect()];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); });
