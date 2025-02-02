@@ -16,12 +16,59 @@ import {
 } from "recharts";
 import { useState, useEffect } from "react";
 
+interface Category {
+  id: string;
+  name: string;
+  amount: number;
+  group: string;
+}
+
+interface GroupCategory {
+  id: string;
+  name: string;
+}
+
+interface SavingsDetail {
+  source: string;
+  amount: number;
+}
+interface SpendingsDetail {
+  source: string;
+  amount: number;
+}
+interface MonthlyData {
+  month: string;
+  amount: number;
+}
+
+interface Challenge {
+  id: string;
+  title: string;
+  progress: number;
+  progressData: Array<{
+    day: string;
+    amount: number;
+  }>;
+}
+
+interface Data {
+  spent: number;
+  saved: number;
+  categories: Category[];
+  groupCategories: GroupCategory[];
+  savingsDetails: SavingsDetail[];
+  spendingDetails: any[];
+  monthlySpending?: MonthlyData[];
+  monthlySavings?: MonthlyData[];
+  groupedCategories?: { [key: string]: { category: string; amount: number } };
+}
+
 export default function ReportsPage() {
   const [spendingViewMode, setSpendingViewMode] = useState<"detailed" | "grouped">("detailed");
   const [savingViewMode, setSavingViewMode] = useState<"detailed" | "grouped">("detailed");
-  const [monthlyData, setMonthlyData] = useState(null);
-  const [yearlyData, setYearlyData] = useState(null);
-  const [challenges, setChallenges] = useState([]);
+  const [monthlyData, setMonthlyData] = useState<Data | null>(null);
+  const [yearlyData, setYearlyData] = useState<Data | null>(null);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,70 +83,79 @@ export default function ReportsPage() {
           throw new Error("Failed to fetch data");
         }
 
-        const categoriesData = await categoriesResponse.json();
-        const groupCategoriesData = await groupCategoriesResponse.json();
-        const challengesData = await challengesResponse.json();
+        const categoriesData: Category[] = await categoriesResponse.json();
+        const groupCategoriesData: GroupCategory[] = await groupCategoriesResponse.json();
+        const challengesData: Challenge[] = await challengesResponse.json();
 
-        const monthlyData = {
-          spent: categoriesData.reduce((acc, category) => acc + category.amount, 0),
-          saved: 0, // Calculate saved amount based on your logic
-          categories: categoriesData,
-          groupCategories: groupCategoriesData,
-          savingsDetails: [], // Fetch savings details based on your logic
+        const groupByCategory = (data: Category[]) => {
+          if (!data) return {};
+          return data.reduce<{ [key: string]: { category: string; amount: number } }>((acc, item) => {
+            const category = item.group || item.name;
+            if (!acc[category]) {
+              acc[category] = { category, amount: 0 };
+            }
+            acc[category].amount += item.amount;
+            return acc;
+          }, {});
         };
 
-        const yearlyData = {
+        const monthlyData: Data = {
           spent: categoriesData.reduce((acc, category) => acc + category.amount, 0),
           saved: 0, // Calculate saved amount based on your logic
           categories: categoriesData,
           groupCategories: groupCategoriesData,
           savingsDetails: [], // Fetch savings details based on your logic
+          spendingDetails: [], // Fetch spending details based on your logic
+          groupedCategories: groupByCategory(categoriesData),
+        };
+
+        const yearlyData: Data = {
+          spent: categoriesData.reduce((acc, category) => acc + category.amount, 0),
+          saved: 0, // Calculate saved amount based on your logic
+          categories: categoriesData,
+          groupCategories: groupCategoriesData,
+          savingsDetails: [], // Fetch savings details based on your logic
+          spendingDetails: [], // Fetch spending details based on your logic
           monthlySpending: [], // Fetch monthly spending based on your logic
           monthlySavings: [], // Fetch monthly savings based on your logic
+          groupedCategories: groupByCategory(categoriesData),
         };
 
         setMonthlyData(monthlyData);
         setYearlyData(yearlyData);
         setChallenges(challengesData);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error(error);
       }
     };
 
     fetchData();
   }, []);
 
-  if (!monthlyData || !yearlyData || challenges.length === 0) {
-    return <div>Loading...</div>;
-  }
-
-  // Group spending categories by group
-  const groupSpendingCategories = (categories) => {
-    return categories.reduce((acc, category) => {
-      if (!acc[category.group]) {
-        acc[category.group] = 0;
-      }
-      acc[category.group] += category.amount;
-      return acc;
-    }, {});
-  };
-
-  // Group savings details by source (if needed)
-  const groupSavings = (savings) => {
-    return savings.reduce((acc, saving) => {
+  const groupSavings = (savings: SavingsDetail[], groupCategories: GroupCategory[]) => {
+    const grouped = savings.reduce<{ [key: string]: number }>((acc, saving) => {
       if (!acc[saving.source]) {
         acc[saving.source] = 0;
       }
       acc[saving.source] += saving.amount;
       return acc;
     }, {});
+
+    // Add default value of 0 DT for each group
+    groupCategories.forEach((group) => {
+      if (!grouped[group.name]) {
+        grouped[group.name] = 0;
+      }
+    });
+
+    return grouped;
   };
 
-  const monthlyGroupedCategories = groupSpendingCategories(monthlyData.categories);
-  const yearlyGroupedCategories = groupSpendingCategories(yearlyData.categories);
+  const monthlyGroupedCategories = monthlyData?.groupedCategories ?? {};
+  const yearlyGroupedCategories = yearlyData?.groupedCategories ?? {};
 
-  const monthlyGroupedSavings = groupSavings(monthlyData.savingsDetails);
-  const yearlyGroupedSavings = groupSavings(yearlyData.savingsDetails);
+  const monthlyGroupedSavings = monthlyData ? groupSavings(monthlyData.savingsDetails, monthlyData.groupCategories) : {};
+  const yearlyGroupedSavings = yearlyData ? groupSavings(yearlyData.savingsDetails, yearlyData.groupCategories) : {};
 
   return (
     <div className="space-y-6">
@@ -128,7 +184,7 @@ export default function ReportsPage() {
                     </CardHeader>
                     <CardContent>
                       <p className="text-lg font-semibold">
-                        Total Spent: {monthlyData.spent} DT
+                        Total Spent: {monthlyData?.spent || 0} DT
                       </p>
                       <div className="space-y-2 mt-4">
                         <div className="flex gap-4">
@@ -158,14 +214,16 @@ export default function ReportsPage() {
                         </h3>
                         <ul className="space-y-1">
                           {spendingViewMode === "detailed"
-                            ? monthlyData.categories.map((category) => (
+                            ? monthlyData?.categories.map((category) => (
                                 <li key={category.id} className="flex justify-between">
                                   <span>{category.name}</span>
+                                  <span>{category.amount || 0} DT</span>
                                 </li>
                               ))
-                            : monthlyData.groupCategories.map((group) => (
-                                <li key={group.id} className="flex justify-between">
-                                  <span>{group.name}</span>
+                            : Object.entries(monthlyGroupedCategories).map(([group, data]) => (
+                                <li key={group} className="flex justify-between">
+                                  <span>{group}</span>
+                                  <span>{data.amount || 0} DT</span>
                                 </li>
                               ))}
                         </ul>
@@ -180,7 +238,7 @@ export default function ReportsPage() {
                     </CardHeader>
                     <CardContent>
                       <p className="text-lg font-semibold">
-                        Total Saved: {monthlyData.saved} DT
+                        Total Saved: {monthlyData?.saved || 0} DT
                       </p>
                       <div className="space-y-2 mt-4">
                         <div className="flex gap-4">
@@ -206,18 +264,20 @@ export default function ReportsPage() {
                           </button>
                         </div>
                         <h3 className="text-md font-medium">
-                          {savingViewMode === "detailed" ? "Savings by Category" : "Savings by Group"}
+                          {savingViewMode === "detailed" ? "Savings by Source" : "Savings by Group"}
                         </h3>
                         <ul className="space-y-1">
                           {savingViewMode === "detailed"
-                            ? monthlyData.categories.map((category) => (
-                                <li key={category.id} className="flex justify-between">
-                                  <span>{category.name}</span>
+                            ? monthlyData?.savingsDetails.map((saving, index) => (
+                                <li key={index} className="flex justify-between">
+                                  <span>{saving.source}</span>
+                                  <span>{saving.amount || 0} DT</span>
                                 </li>
                               ))
-                            : monthlyData.groupCategories.map((group) => (
-                                <li key={group.id} className="flex justify-between">
-                                  <span>{group.name}</span>
+                            : Object.entries(monthlyGroupedSavings).map(([group, amount]) => (
+                                <li key={group} className="flex justify-between">
+                                  <span>{group}</span>
+                                  <span>{amount || 0} DT</span>
                                 </li>
                               ))}
                         </ul>
@@ -237,7 +297,7 @@ export default function ReportsPage() {
                       <div className="h-96">
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart
-                            data={monthlyData.categories}
+                            data={monthlyData?.categories}
                             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                           >
                             <CartesianGrid strokeDasharray="3 3" />
@@ -261,7 +321,7 @@ export default function ReportsPage() {
                       <div className="h-96">
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart
-                            data={monthlyData.savingsDetails}
+                            data={monthlyData?.savingsDetails}
                             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                           >
                             <CartesianGrid strokeDasharray="3 3" />
@@ -293,7 +353,7 @@ export default function ReportsPage() {
                     </CardHeader>
                     <CardContent>
                       <p className="text-lg font-semibold">
-                        Total Spent: {yearlyData.spent} DT
+                        Total Spent: {yearlyData?.spent || 0} DT
                       </p>
                       <div className="space-y-2 mt-4">
                         <div className="flex gap-4">
@@ -323,15 +383,17 @@ export default function ReportsPage() {
                         </h3>
                         <ul className="space-y-1">
                           {spendingViewMode === "detailed"
-                            ? yearlyData.categories.map((category) => (
+                            ? yearlyData?.categories.map((category) => (
                                 <li key={category.id} className="flex justify-between">
                                   <span>{category.name}</span>
+                                  <span>{category.amount || 0} DT</span>
                                 </li>
                               ))
-                            : yearlyData.groupCategories.map((group) => (
-                                <li key={group.id} className="flex justify-between">
-                                  <span>{group.name}</span>
-                                </li>
+                            : Object.entries(yearlyGroupedCategories).map(([group, amount]) => (
+                                <li key={group} className="flex justify-between">
+                                  <span>{group}</span>
+                                  <span>{amount?.toLocaleString() || "0"} DT</span>
+                                  </li>
                               ))}
                         </ul>
                       </div>
@@ -344,8 +406,8 @@ export default function ReportsPage() {
                       <CardTitle>Yearly Savings</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-lg font-semibold ">
-                        Total Saved: {yearlyData.saved} DT
+                      <p className="text-lg font-semibold">
+                        Total Saved: {yearlyData?.saved || 0} DT
                       </p>
                       <div className="space-y-2 mt-4">
                         <div className="flex gap-4">
@@ -371,18 +433,20 @@ export default function ReportsPage() {
                           </button>
                         </div>
                         <h3 className="text-md font-medium">
-                          {savingViewMode === "detailed" ? "Savings by Category" : "Savings by Group"}
+                          {savingViewMode === "detailed" ? "Savings by Source" : "Savings by Group"}
                         </h3>
                         <ul className="space-y-1">
                           {savingViewMode === "detailed"
-                            ? yearlyData.categories.map((category) => (
-                                <li key={category.id} className="flex justify-between">
-                                  <span>{category.name}</span>
+                            ? yearlyData?.savingsDetails.map((saving, index) => (
+                                <li key={index} className="flex justify-between">
+                                  <span>{saving.source}</span>
+                                  <span>{saving.amount || 0} DT</span>
                                 </li>
                               ))
-                            : yearlyData.groupCategories.map((group) => (
-                                <li key={group.id} className="flex justify-between">
-                                  <span>{group.name}</span>
+                            : Object.entries(yearlyGroupedSavings).map(([group, amount]) => (
+                                <li key={group} className="flex justify-between">
+                                  <span>{group}</span>
+                                  <span>{amount || 0} DT</span>
                                 </li>
                               ))}
                         </ul>
@@ -402,7 +466,7 @@ export default function ReportsPage() {
                       <div className="h-96">
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart
-                            data={yearlyData.monthlySpending}
+                            data={yearlyData?.monthlySpending}
                             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                           >
                             <CartesianGrid strokeDasharray="3 3" />
@@ -431,7 +495,7 @@ export default function ReportsPage() {
                       <div className="h-96">
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart
-                            data={yearlyData.monthlySavings}
+                            data={yearlyData?.monthlySavings}
                             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                           >
                             <CartesianGrid strokeDasharray="3 3" />
@@ -456,9 +520,9 @@ export default function ReportsPage() {
           </TabsContent>
 
           {/* Challenge Report */}
-          <TabsContent value="challenges" >
-            <h2 className="text-xl font-semibold mb-4 ">Challenge Progress</h2>
-            <div className="flex justify-end ">
+          <TabsContent value="challenges">
+            <h2 className="text-xl font-semibold mb-4">Challenge Progress</h2>
+            <div className="flex justify-end">
               <div className="w-full max-w-3xl space-y-6">
                 {challenges.map((challenge) => (
                   <Card key={challenge.id}>
@@ -467,9 +531,9 @@ export default function ReportsPage() {
                     </CardHeader>
                     <CardContent>
                       <p className="text-lg font-semibold">
-                        Progress: {challenge.progress}%
+                        Progress: {challenge.progress}
                       </p>
-                      <div className="h-64 mt-4">
+                      <div className="h-96">
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart
                             data={challenge.progressData}
@@ -483,9 +547,8 @@ export default function ReportsPage() {
                             <Line
                               type="monotone"
                               dataKey="amount"
-                              stroke="#82ca9d"
+                              stroke="#8884d8"
                               strokeWidth={2}
-                              name="Amount Saved"
                             />
                           </LineChart>
                         </ResponsiveContainer>
