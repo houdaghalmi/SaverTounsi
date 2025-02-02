@@ -32,10 +32,12 @@ interface SavingsDetail {
   source: string;
   amount: number;
 }
+
 interface SpendingsDetail {
   source: string;
   amount: number;
 }
+
 interface MonthlyData {
   month: string;
   amount: number;
@@ -57,7 +59,7 @@ interface Data {
   categories: Category[];
   groupCategories: GroupCategory[];
   savingsDetails: SavingsDetail[];
-  spendingDetails: any[];
+  spendingDetails: SpendingsDetail[];
   monthlySpending?: MonthlyData[];
   monthlySavings?: MonthlyData[];
   groupedCategories?: { [key: string]: { category: string; amount: number } };
@@ -220,10 +222,10 @@ export default function ReportsPage() {
                                   <span>{category.amount || 0} DT</span>
                                 </li>
                               ))
-                            : Object.entries(monthlyGroupedCategories).map(([group, data]) => (
+                              : Object.entries(monthlyGroupedSavings).map(([group, amount]) => (
                                 <li key={group} className="flex justify-between">
                                   <span>{group}</span>
-                                  <span>{data.amount || 0} DT</span>
+                                  <span>{amount || 0} DT</span>
                                 </li>
                               ))}
                         </ul>
@@ -389,11 +391,11 @@ export default function ReportsPage() {
                                   <span>{category.amount || 0} DT</span>
                                 </li>
                               ))
-                            : Object.entries(yearlyGroupedCategories).map(([group, amount]) => (
+                            : Object.entries(yearlyGroupedCategories).map(([group, data]) => (
                                 <li key={group} className="flex justify-between">
                                   <span>{group}</span>
-                                  <span>{amount?.toLocaleString() || "0"} DT</span>
-                                  </li>
+                                  <span>{data.amount || 0} DT</span>
+                                </li>
                               ))}
                         </ul>
                       </div>
