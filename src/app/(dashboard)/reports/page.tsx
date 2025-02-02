@@ -14,151 +14,85 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ReportsPage() {
   const [spendingViewMode, setSpendingViewMode] = useState<"detailed" | "grouped">("detailed");
   const [savingViewMode, setSavingViewMode] = useState<"detailed" | "grouped">("detailed");
+  const [monthlyData, setMonthlyData] = useState(null);
+  const [yearlyData, setYearlyData] = useState(null);
+  const [challenges, setChallenges] = useState([]);
 
-  // Monthly Data
-  const monthlyData = {
-    saved: 40, // Monthly savings
-    spent: 50, // Monthly spending
-    categories: [
-      { name: "Food", amount: 30, group: "Essentials" },
-      { name: "Transport", amount: 10, group: "Essentials" },
-      { name: "Health", amount: 0, group: "Essentials" },
-      { name: "Entertainment", amount: 5, group: "Lifestyle" },
-      { name: "Shopping", amount: 5, group: "Lifestyle" },
-    ],
-    savingsDetails: [
-      { source: "Discounts", amount: 20 },
-      { source: "Bon Plans", amount: 15 },
-      { source: "Cashback", amount: 5 },
-    ],
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [categoriesResponse, groupCategoriesResponse, challengesResponse] = await Promise.all([
+          fetch("/api/categories"),
+          fetch("/api/category-groups"),
+          fetch("/api/challenges"),
+        ]);
 
-  // Yearly Data
-  const yearlyData = {
-    saved: 480, // Yearly savings
-    spent: 600, // Yearly spending
-    categories: [
-      { name: "Food", amount: 360, group: "Essentials" },
-      { name: "Transport", amount: 120, group: "Essentials" },
-      { name: "Health", amount: 0, group: "Essentials" },
-      { name: "Entertainment", amount: 60, group: "Lifestyle" },
-      { name: "Shopping", amount: 60, group: "Lifestyle" },
-    ],
-    savingsDetails: [
-      { source: "Discounts", amount: 240 },
-      { source: "Bon Plans", amount: 180 },
-      { source: "Cashback", amount: 60 },
-    ],
-    monthlySpending: [
-      { month: "Jan", amount: 50 },
-      { month: "Feb", amount: 60 },
-      { month: "Mar", amount: 55 },
-      { month: "Apr", amount: 65 },
-      { month: "May", amount: 70 },
-      { month: "Jun", amount: 75 },
-      { month: "Jul", amount: 80 },
-      { month: "Aug", amount: 85 },
-      { month: "Sep", amount: 90 },
-      { month: "Oct", amount: 95 },
-      { month: "Nov", amount: 100 },
-      { month: "Dec", amount: 105 },
-    ],
-    monthlySavings: [
-      { month: "Jan", amount: 40 },
-      { month: "Feb", amount: 45 },
-      { month: "Mar", amount: 50 },
-      { month: "Apr", amount: 55 },
-      { month: "May", amount: 60 },
-      { month: "Jun", amount: 65 },
-      { month: "Jul", amount: 70 },
-      { month: "Aug", amount: 75 },
-      { month: "Sep", amount: 80 },
-      { month: "Oct", amount: 85 },
-      { month: "Nov", amount: 90 },
-      { month: "Dec", amount: 95 },
-    ],
-  };
+        if (!categoriesResponse.ok || !groupCategoriesResponse.ok || !challengesResponse.ok) {
+          throw new Error("Failed to fetch data");
+        }
 
-  // Challenge Data
-  const challenges = [
-    {
-      id: "1",
-      title: "Collect 100 DT",
-      description: "Save 100 DT to complete this challenge.",
-      target: 100,
-      current: 60,
-      progress: 60, // Progress percentage
-      status: "active",
-      progressData: [
-        { day: "Day 1", amount: 10 },
-        { day: "Day 2", amount: 20 },
-        { day: "Day 3", amount: 30 },
-        { day: "Day 4", amount: 40 },
-        { day: "Day 5", amount: 50 },
-        { day: "Day 6", amount: 60 },
-      ],
-    },
-    {
-      id: "2",
-      title: "Collect 50 DT",
-      description: "Save 50 DT to complete this challenge.",
-      target: 50,
-      current: 50,
-      progress: 100, // Progress percentage
-      status: "completed",
-      progressData: [
-        { day: "Day 1", amount: 5 },
-        { day: "Day 2", amount: 10 },
-        { day: "Day 3", amount: 20 },
-        { day: "Day 4", amount: 30 },
-        { day: "Day 5", amount: 40 },
-        { day: "Day 6", amount: 50 },
-      ],
-    },
-    {
-      id: "3",
-      title: "Collect 500 DT",
-      description: "Save 500 DT to complete this challenge.",
-      target: 500,
-      current: 0,
-      progress: 0, // Progress percentage
-      status: "upcoming",
-      progressData: [],
-    },
-  ];
+        const categoriesData = await categoriesResponse.json();
+        const groupCategoriesData = await groupCategoriesResponse.json();
+        const challengesData = await challengesResponse.json();
 
-  // Format challenge data for the chart
-  const challengeChartData = challenges.map((challenge) => ({
-    name: challenge.title,
-    progress: challenge.progress,
-    fill: challenge.status === "active" ? "#82ca9d" : challenge.status === "completed" ? "#8884d8" : "#ccc",
-  }));
+        const monthlyData = {
+          spent: categoriesData.reduce((acc, category) => acc + category.amount, 0),
+          saved: 0, // Calculate saved amount based on your logic
+          categories: categoriesData,
+          groupCategories: groupCategoriesData,
+          savingsDetails: [], // Fetch savings details based on your logic
+        };
+
+        const yearlyData = {
+          spent: categoriesData.reduce((acc, category) => acc + category.amount, 0),
+          saved: 0, // Calculate saved amount based on your logic
+          categories: categoriesData,
+          groupCategories: groupCategoriesData,
+          savingsDetails: [], // Fetch savings details based on your logic
+          monthlySpending: [], // Fetch monthly spending based on your logic
+          monthlySavings: [], // Fetch monthly savings based on your logic
+        };
+
+        setMonthlyData(monthlyData);
+        setYearlyData(yearlyData);
+        setChallenges(challengesData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (!monthlyData || !yearlyData || challenges.length === 0) {
+    return <div>Loading...</div>;
+  }
 
   // Group spending categories by group
-  const groupSpendingCategories = (categories: { name: string; amount: number; group: string }[]) => {
+  const groupSpendingCategories = (categories) => {
     return categories.reduce((acc, category) => {
       if (!acc[category.group]) {
         acc[category.group] = 0;
       }
       acc[category.group] += category.amount;
       return acc;
-    }, {} as Record<string, number>);
+    }, {});
   };
 
   // Group savings details by source (if needed)
-  const groupSavings = (savings: { source: string; amount: number }[]) => {
+  const groupSavings = (savings) => {
     return savings.reduce((acc, saving) => {
       if (!acc[saving.source]) {
         acc[saving.source] = 0;
       }
       acc[saving.source] += saving.amount;
       return acc;
-    }, {} as Record<string, number>);
+    }, {});
   };
 
   const monthlyGroupedCategories = groupSpendingCategories(monthlyData.categories);
@@ -225,15 +159,13 @@ export default function ReportsPage() {
                         <ul className="space-y-1">
                           {spendingViewMode === "detailed"
                             ? monthlyData.categories.map((category) => (
-                                <li key={category.name} className="flex justify-between">
+                                <li key={category.id} className="flex justify-between">
                                   <span>{category.name}</span>
-                                  <span>{category.amount} DT</span>
                                 </li>
                               ))
-                            : Object.entries(monthlyGroupedCategories).map(([group, amount]) => (
-                                <li key={group} className="flex justify-between">
-                                  <span>{group}</span>
-                                  <span>{amount} DT</span>
+                            : monthlyData.groupCategories.map((group) => (
+                                <li key={group.id} className="flex justify-between">
+                                  <span>{group.name}</span>
                                 </li>
                               ))}
                         </ul>
@@ -274,20 +206,18 @@ export default function ReportsPage() {
                           </button>
                         </div>
                         <h3 className="text-md font-medium">
-                          {savingViewMode === "detailed" ? "Savings by Source" : "Savings by Group"}
+                          {savingViewMode === "detailed" ? "Savings by Category" : "Savings by Group"}
                         </h3>
                         <ul className="space-y-1">
                           {savingViewMode === "detailed"
-                            ? monthlyData.savingsDetails.map((saving) => (
-                                <li key={saving.source} className="flex justify-between">
-                                  <span>{saving.source}</span>
-                                  <span>{saving.amount} DT</span>
+                            ? monthlyData.categories.map((category) => (
+                                <li key={category.id} className="flex justify-between">
+                                  <span>{category.name}</span>
                                 </li>
                               ))
-                            : Object.entries(monthlyGroupedSavings).map(([source, amount]) => (
-                                <li key={source} className="flex justify-between">
-                                  <span>{source}</span>
-                                  <span>{amount} DT</span>
+                            : monthlyData.groupCategories.map((group) => (
+                                <li key={group.id} className="flex justify-between">
+                                  <span>{group.name}</span>
                                 </li>
                               ))}
                         </ul>
@@ -394,15 +324,13 @@ export default function ReportsPage() {
                         <ul className="space-y-1">
                           {spendingViewMode === "detailed"
                             ? yearlyData.categories.map((category) => (
-                                <li key={category.name} className="flex justify-between">
+                                <li key={category.id} className="flex justify-between">
                                   <span>{category.name}</span>
-                                  <span>{category.amount} DT</span>
                                 </li>
                               ))
-                            : Object.entries(yearlyGroupedCategories).map(([group, amount]) => (
-                                <li key={group} className="flex justify-between">
-                                  <span>{group}</span>
-                                  <span>{amount} DT</span>
+                            : yearlyData.groupCategories.map((group) => (
+                                <li key={group.id} className="flex justify-between">
+                                  <span>{group.name}</span>
                                 </li>
                               ))}
                         </ul>
@@ -443,20 +371,18 @@ export default function ReportsPage() {
                           </button>
                         </div>
                         <h3 className="text-md font-medium">
-                          {savingViewMode === "detailed" ? "Savings by Source" : "Savings by Group"}
+                          {savingViewMode === "detailed" ? "Savings by Category" : "Savings by Group"}
                         </h3>
                         <ul className="space-y-1">
                           {savingViewMode === "detailed"
-                            ? yearlyData.savingsDetails.map((saving) => (
-                                <li key={saving.source} className="flex justify-between">
-                                  <span>{saving.source}</span>
-                                  <span>{saving.amount} DT</span>
+                            ? yearlyData.categories.map((category) => (
+                                <li key={category.id} className="flex justify-between">
+                                  <span>{category.name}</span>
                                 </li>
                               ))
-                            : Object.entries(yearlyGroupedSavings).map(([source, amount]) => (
-                                <li key={source} className="flex justify-between">
-                                  <span>{source}</span>
-                                  <span>{amount} DT</span>
+                            : yearlyData.groupCategories.map((group) => (
+                                <li key={group.id} className="flex justify-between">
+                                  <span>{group.name}</span>
                                 </li>
                               ))}
                         </ul>
