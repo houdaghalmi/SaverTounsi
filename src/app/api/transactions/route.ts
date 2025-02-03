@@ -31,67 +31,46 @@ export async function POST(req: Request) {
   }
 
   try {
-    const {
-      amount,
-      date,
-      categoryId,
-      description,
-      type 
-    } = await req.json();
+    const { amount, date, categoryId, description, type } = await req.json();
 
-    // Validate required fields
     if (!amount || !date || !type) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    // Create the transaction
-    const transaction = await prisma.transaction.create({
-      data: {
-        amount: +amount,
-        date,
-        type,
-        description,
-        category: {
-          connect: {
-            id: categoryId
-          }
+    const result = await prisma.$transaction(async (tx) => {
+      // Create the transaction
+      const transaction = await tx.transaction.create({
+        data: {
+          amount: +amount,
+          date,
+          type,
+          description,
+          category: { connect: { id: categoryId } },
+          user: { connect: { id: session.user?.id } }
         },
-        user: {
-          connect: {
-            id: session.user?.id
-          }
-        }
-      },
-    });
+      });
 
-    // Update category budget or spent based on transaction type
-    if (categoryId) {
-      try {
-        if (type === "income") {
-          await prisma.category.update({
+      // Update category based on transaction type
+      if (categoryId) {
+        if (type === "INCOME") {
+          await tx.category.update({
             where: { id: categoryId },
             data: { budget: { increment: +amount } }
           });
-          console.log("Category budget updated successfully");
-        } else if (type === "expense") {
-          await prisma.category.update({
+        } else if (type === "EXPENSE") {
+          await tx.category.update({
             where: { id: categoryId },
             data: { spent: { increment: +amount } }
           });
-          console.log("Category spent updated successfully");
         }
-      } catch (error) {
-        console.error("Prisma update error:", error);
-        throw error; // Re-throw the error to be caught by the outer catch block
       }
-    } else {
-      console.error("Invalid categoryId");
-    }
 
+      return transaction;
+    });
+
+    // Fetch the complete transaction with category details
     const fullTransaction = await prisma.transaction.findUnique({
-      where: {
-        id: transaction.id
-      },
+      where: { id: result.id },
       include: {
         category: {
           select: {

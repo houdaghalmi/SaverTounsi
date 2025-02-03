@@ -1,6 +1,5 @@
 import { Metadata } from "next"
 import Link from "next/link"
-
 import { AuthForm } from "@/components/auth/auth-form"
 
 export const metadata: Metadata = {
@@ -10,23 +9,35 @@ export const metadata: Metadata = {
 
 export default function SignUpPage() {
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
-      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-        <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Create an account
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Enter your email below to create your account
-          </p>
+    <main className="min-h-screen bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] py-20">
+      <div className="container px-4 mx-auto">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
+          {/* Header Section */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-[#1a2a6c] mb-2">
+              Create an account
+            </h1>
+            <p className="text-base text-gray-600">
+              Enter your email below to create your account
+            </p>
+          </div>
+
+          {/* Auth Form */}
+          <div className="mb-8">
+            <AuthForm mode="signup" />
+          </div>
+
+          {/* Sign In Link */}
+          <div className="text-center">
+            <Link 
+              href="/signin" 
+              className="text-[#b21f1f] hover:text-[#fdbb2d] transition-colors font-medium"
+            >
+              Already have an account? <span className="underline">Sign In</span>
+            </Link>
+          </div>
         </div>
-        <AuthForm mode="signup" />
-        <p className="px-8 text-center text-sm text-muted-foreground">
-          <Link href="/signin" className="hover:text-brand underline underline-offset-4">
-            Already have an account? Sign In
-          </Link>
-        </p>
       </div>
-    </div>
+    </main>
   )
 }

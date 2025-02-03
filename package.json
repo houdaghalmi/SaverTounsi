@@ -10,7 +10,8 @@
     "docker": "docker compose up -d",
     "prisma:push": "npx prisma db push",
     "prisma:migrate": "npx prisma migrate dev",
-    "postinstall": "prisma generate && prisma db push"
+    "postinstall": "prisma generate && prisma db push",
+    "db:seed": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
@@ -67,6 +68,8 @@
     "postcss": "^8",
     "prisma": "^6.3.0",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
   }
 }
