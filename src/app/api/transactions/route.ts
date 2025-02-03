@@ -16,15 +16,13 @@ export async function GET(req: Request) {
       where: {
         userId: session.user?.id
       }
-    })
-    return NextResponse.json(transactions)
+    });
+    return NextResponse.json(transactions);
   } catch (err) {
-    console.error("Error creating transaction:", (err as Error).stack);
+    console.error("Error fetching transactions:", (err as Error).stack);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
-
 }
-
 
 export async function POST(req: Request) {
   const session = await getSession();
@@ -42,7 +40,7 @@ export async function POST(req: Request) {
     } = await req.json();
 
     // Validate required fields
-    if (!amount  || !date || !type) {
+    if (!amount || !date || !type) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
@@ -53,9 +51,11 @@ export async function POST(req: Request) {
         date,
         type,
         description,
-        category: {connect: {
-          id: categoryId
-        }},
+        category: {
+          connect: {
+            id: categoryId
+          }
+        },
         user: {
           connect: {
             id: session.user?.id
@@ -63,20 +63,45 @@ export async function POST(req: Request) {
         }
       },
     });
+
+    // Update category budget or spent based on transaction type
+    if (categoryId) {
+      try {
+        if (type === "income") {
+          await prisma.category.update({
+            where: { id: categoryId },
+            data: { budget: { increment: +amount } }
+          });
+          console.log("Category budget updated successfully");
+        } else if (type === "expense") {
+          await prisma.category.update({
+            where: { id: categoryId },
+            data: { spent: { increment: +amount } }
+          });
+          console.log("Category spent updated successfully");
+        }
+      } catch (error) {
+        console.error("Prisma update error:", error);
+        throw error; // Re-throw the error to be caught by the outer catch block
+      }
+    } else {
+      console.error("Invalid categoryId");
+    }
+
     const fullTransaction = await prisma.transaction.findUnique({
-      where :{
-        id:transaction.id
+      where: {
+        id: transaction.id
       },
-      include :{
-        category:{
-          select:{
-            id:true,
-            name:true
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true
           }
         }
-        
       }
-    })
+    });
+
     return NextResponse.json(fullTransaction);
   } catch (error) {
     console.error("Error creating transaction:", (error as Error).stack);

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { PlusCircle, Edit2, Trash2 } from "lucide-react";
+import { PlusCircle, Edit2, Trash2 } from "lucide-react"; // Import Trash2 icon
 import { useRouter } from "next/navigation";
 
 interface Category {
@@ -17,19 +17,10 @@ interface CategoryGroup {
   categories: Category[];
 }
 
-interface Transaction {
-  id: string;
-  amount: number;
-  categoryId: string;
-  type: 'income' | 'expense';
-}
-
 const CategoryManager = () => {
   const router = useRouter();
   const [totalBudget, setTotalBudget] = useState<number>(0);
-  const [soldLeft, setSoldLeft] = useState<number>(0);
   const [categoryGroups, setCategoryGroups] = useState<CategoryGroup[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [showNewGroupModal, setShowNewGroupModal] = useState(false);
   const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
@@ -44,11 +35,12 @@ const CategoryManager = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch category groups on component mount
   useEffect(() => {
     fetchCategoryGroups();
-    fetchTransactions();
   }, []);
 
+  // Fetch all category groups from the API
   const fetchCategoryGroups = async () => {
     try {
       const response = await fetch("/api/category-groups");
@@ -56,6 +48,7 @@ const CategoryManager = () => {
         throw new Error(`Failed to fetch category groups: ${response.statusText}`);
       }
       const data = await response.json();
+      console.log("API Response:", data); // Log the API response
       if (!Array.isArray(data)) {
         throw new Error("Invalid data format: expected an array");
       }
@@ -68,72 +61,16 @@ const CategoryManager = () => {
     }
   };
 
-  const fetchTransactions = async () => {
-    try {
-      const response = await fetch("/api/transactions");
-      if (!response.ok) {
-        throw new Error(`Failed to fetch transactions: ${response.statusText}`);
-      }
-      const data = await response.json();
-      if (!Array.isArray(data)) {
-        throw new Error("Invalid data format: expected an array");
-      }
-      setTransactions(data);
-
-      // Calculate total budget based on transaction types
-      let calculatedBudget = 0;
-      data.forEach((transaction: Transaction) => {
-        if (transaction.type === 'income') {
-          calculatedBudget += transaction.amount;
-        } else if (transaction.type === 'expense') {
-          calculatedBudget -= transaction.amount;
-        }
-      });
-      setTotalBudget(calculatedBudget);
-      setSoldLeft(calculatedBudget);
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-      setError(error instanceof Error ? error.message : "An unknown error occurred");
-    }
-  };
-
-  useEffect(() => {
-    if (transactions.length > 0) {
-      let currentSoldLeft = totalBudget;
-      transactions.forEach((transaction: Transaction) => {
-        if (transaction.type === 'expense') {
-          currentSoldLeft -= transaction.amount;
-        }
-      });
-      setSoldLeft(currentSoldLeft);
-
-      // Update category spent amounts
-      if (categoryGroups.length > 0) {
-        const updatedCategoryGroups = categoryGroups.map((group) => ({
-          ...group,
-          categories: group.categories.map((category) => {
-            const categoryTransactions = transactions.filter(
-              (transaction) => transaction.categoryId === category.id && transaction.type === 'expense'
-            );
-            const spent = categoryTransactions.reduce((acc, transaction) => acc + transaction.amount, 0);
-            return { ...category, spent };
-          }),
-        }));
-        setCategoryGroups(updatedCategoryGroups);
-      }
-    }
-  }, [transactions, totalBudget, categoryGroups]);
-
+  // Add a new category group
   const addCategoryGroup = async () => {
     try {
-      const isValid = await fetch(`/api/category-groups/findByName/${newGroupName}`, {
-        method: "GET",
-      }).then((d) => d.json()).then((d) => d.valid);
-      
-      if (!isValid) {
-        return;
+      const isValid = await fetch(`/api/category-groups/findByName/${newGroupName}`,{
+        method:"GET",
+      }).then(d=> d.json()).then(d=>d.valid);
+      console.log(isValid)
+      if(!isValid){
+        return ;
       }
-      
       const response = await fetch("/api/category-groups", {
         method: "POST",
         headers: {
@@ -141,12 +78,11 @@ const CategoryManager = () => {
         },
         body: JSON.stringify({ name: newGroupName }),
       });
-      
       if (!response.ok) {
         throw new Error(`Failed to add category group: ${response.statusText}`);
       }
-      
       const newGroup = await response.json();
+      console.log("New category group:", newGroup); // Log the new group
       setCategoryGroups([...categoryGroups, newGroup]);
       setNewGroupName("");
       setShowNewGroupModal(false);
@@ -156,6 +92,7 @@ const CategoryManager = () => {
     }
   };
 
+  // Add a new category to a group
   const addCategory = async () => {
     if (newCategoryName.trim() && selectedGroupId) {
       try {
@@ -166,16 +103,15 @@ const CategoryManager = () => {
           },
           body: JSON.stringify({
             name: newCategoryName,
-            budget: totalBudget * 0.2,
+            budget: totalBudget * 0.2, // Default to 20% of total budget
             groupId: selectedGroupId,
           }),
         });
-        
         if (!response.ok) {
           throw new Error(`Failed to add category: ${response.statusText}`);
         }
-        
         const newCategory = await response.json();
+        console.log("New category:", newCategory); // Log the new category
         setCategoryGroups(
           categoryGroups.map((group) => {
             if (group.id === selectedGroupId) {
@@ -197,6 +133,7 @@ const CategoryManager = () => {
     }
   };
 
+  // Update the budget for a specific category
   const updateCategoryBudget = async () => {
     if (!editingCategory) return;
 
@@ -213,12 +150,11 @@ const CategoryManager = () => {
             budget: amount,
           }),
         });
-        
         if (!response.ok) {
           throw new Error(`Failed to update category budget: ${response.statusText}`);
         }
-        
         const updatedCategory = await response.json();
+        console.log("Updated category:", updatedCategory); // Log the updated category
         setCategoryGroups(
           categoryGroups.map((group) => ({
             ...group,
@@ -240,6 +176,7 @@ const CategoryManager = () => {
     }
   };
 
+  // Update the total budget
   const updateBudget = () => {
     const amount = parseFloat(newBudgetAmount);
     if (!isNaN(amount) && amount >= 0) {
@@ -249,11 +186,13 @@ const CategoryManager = () => {
     }
   };
 
+  // Handle clicking the "Add Category" button for a specific group
   const handleAddCategoryClick = (groupId: string) => {
     setSelectedGroupId(groupId);
     setShowNewCategoryModal(true);
   };
 
+  // Handle editing a category's budget
   const handleEditCategoryBudget = (category: Category, e: React.MouseEvent) => {
     e.stopPropagation();
     setEditingCategory(category);
@@ -261,6 +200,7 @@ const CategoryManager = () => {
     setShowEditCategoryBudgetModal(true);
   };
 
+  // Remove a category group
   const removeCategoryGroup = async (groupId: string) => {
     try {
       const response = await fetch(`/api/category-groups/${groupId}`, {
@@ -276,6 +216,7 @@ const CategoryManager = () => {
     }
   };
 
+  // Remove a category
   const removeCategory = async (categoryId: string) => {
     try {
       const response = await fetch(`/api/categories/${categoryId}`, {
@@ -296,19 +237,23 @@ const CategoryManager = () => {
     }
   };
 
+  // Get the progress bar color based on the remaining budget
   const getProgressColor = (category: Category) => {
     const percentage = ((category.budget - category.spent) / category.budget) * 100;
     return percentage <= 40 ? "bg-red-500" : "bg-green-500";
   };
 
+  // Render loading state
   if (loading) {
     return <div>Loading...</div>;
   }
 
+  // Render error state
   if (error) {
     return <div>Error: {error}</div>;
   }
 
+  // Render the component
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-8">
@@ -321,20 +266,8 @@ const CategoryManager = () => {
           Edit Budget
         </button>
       </div>
-      
       <div className="mb-8">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 bg-white rounded-lg shadow">
-            <div className="text-lg font-semibold">Total Budget</div>
-            <div className="text-2xl text-blue-600">{totalBudget.toFixed(2)} DT</div>
-          </div>
-          <div className="p-4 bg-white rounded-lg shadow">
-            <div className="text-lg font-semibold">Sold Left</div>
-            <div className={`text-2xl ${soldLeft >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {soldLeft.toFixed(2)} DT
-            </div>
-          </div>
-        </div>
+        <div className="text-xl">Total Budget: {totalBudget} DT</div>
         <button
           className="mt-4 flex items-center text-blue-500"
           onClick={() => setShowNewGroupModal(true)}
@@ -344,6 +277,7 @@ const CategoryManager = () => {
         </button>
       </div>
 
+      {/* Category Groups */}
       <div className="space-y-6">
         {categoryGroups && categoryGroups.length > 0 ? (
           categoryGroups.map((group) => (
@@ -412,7 +346,6 @@ const CategoryManager = () => {
         )}
       </div>
 
-    
       {/* New Group Modal */}
       {showNewGroupModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -434,7 +367,7 @@ const CategoryManager = () => {
               </button>
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded"
-                onClick={(e) => newGroupName.trim() && addCategoryGroup()}
+                onClick={e => newGroupName.trim() && addCategoryGroup()}
               >
                 Add
               </button>
