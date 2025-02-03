@@ -19,7 +19,7 @@ export const Sidebar = () => {
       <div className="flex flex-col h-full">
         <div className="flex-1 py-6 space-y-1">
           {navigation.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = pathname ? pathname.startsWith(item.href) : false;
 
             return (
               <Button
