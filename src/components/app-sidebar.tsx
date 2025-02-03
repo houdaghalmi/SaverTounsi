@@ -29,11 +29,11 @@ import {
 // Main menu items.
 const items = [
   { title: "Home", url: "/overview", icon: Home },
-  { title: "categorie manager", url: "/categories", icon: Folder },
-  { title: "reports", url: "/reports", icon: BarChart },
-  { title: "bon-plans", url: "/bon-plans", icon: Star },
-  { title: "transaction", url: "/transactions", icon: CreditCard },
-  { title: "challenge", url: "/challenges", icon: Trophy },
+  { title: "Categorie manager", url: "/categories", icon: Folder },
+  { title: "Reports", url: "/reports", icon: BarChart },
+  { title: "Bon-plans", url: "/bon-plans", icon: Star },
+  { title: "Transaction", url: "/transactions", icon: CreditCard },
+  { title: "Challenge", url: "/challenges", icon: Trophy },
 ];
 
 // Submenu items for Help
@@ -53,15 +53,20 @@ export function AppSidebar() {
       <SidebarContent>
         {/* Main menu group */}
         <SidebarGroup>
-          <SidebarGroupLabel>saverTounsi</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            saverTounsi
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url} className="flex items-center p-2 hover:bg-gray-100 rounded">
-                      <item.icon className="w-5 h-5 mr-2" />
-                      <span>{item.title}</span>
+                    <Link 
+                      href={item.url} 
+                      className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 transition-colors duration-200 rounded-lg hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200"
+                    >
+                      <item.icon className="w-5 h-5 mr-3 text-gray-500" />
+                      <span className="font-medium">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

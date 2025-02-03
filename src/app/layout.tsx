@@ -1,26 +1,40 @@
 "use server";
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import React from 'react';
+import { Metadata } from "next"
+import { Inter } from "next/font/google"
+import { getServerSession } from "next-auth"
 import { Toaster } from "@/components/ui/toaster"
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { authOptions } from "@/lib/auth"
+import Footer from '@/components/layout/footer'
 import "../styles/globals.css"
-import Footer from '@/components/layout/footer';
-export default async function Layout({ children }: { children: React.ReactNode }) {
+
+const inter = Inter({ subsets: ['latin'] })
+
+const metadata: Metadata = {
+  title: 'Saver Tounsi',
+  description: 'Your personal finance companion',
+  icons: {
+    icon: './images/logo/logo.png',
+  },
+}
+
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const session = await getServerSession(authOptions)
+
   return (
-    <html>
-      <head>
-      <link rel="icon"  href="./images/logo/logo.png" />
-      <title>saverTounsi</title>
-      </head>
-      <body>            
-          <main>
-            {children}
-          </main>
-          
-          <Toaster />
-          <Footer />
-          <SpeedInsights/>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <main className="min-h-screen">
+          {children}
+        </main>
+        
+        <Toaster />
+        {!session && <Footer />}
+        <SpeedInsights />
       </body>
     </html>
   )
