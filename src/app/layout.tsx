@@ -1,4 +1,3 @@
-"use server";
 import { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { getServerSession } from "next-auth"
@@ -10,7 +9,7 @@ import "../styles/globals.css"
 
 const inter = Inter({ subsets: ['latin'] })
 
-const metadata: Metadata = {
+export const metadata: Metadata = {
   title: 'Saver Tounsi',
   description: 'Your personal finance companion',
   icons: {
