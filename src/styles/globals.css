@@ -86,3 +86,23 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.page-transition {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.page-transitioning {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.navigating {
+  opacity: 0.7;
+  pointer-events: none;
+}

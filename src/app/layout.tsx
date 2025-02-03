@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { authOptions } from "@/lib/auth"
 import Footer from '@/components/layout/footer'
+import { NavigationProvider } from "@/providers/navigation-provider"
 import "../styles/globals.css"
 
 const inter = Inter({ subsets: ['latin'] })
@@ -27,13 +28,14 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <main className="min-h-screen">
-          {children}
-        </main>
-        
-        <Toaster />
-        {!session && <Footer />}
-        <SpeedInsights />
+        <NavigationProvider>
+          <main className="min-h-screen transition-opacity duration-300">
+            {children}
+          </main>
+          <Toaster />
+          {!session && <Footer />}
+          <SpeedInsights />
+        </NavigationProvider>
       </body>
     </html>
   )
