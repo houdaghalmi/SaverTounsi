@@ -19,7 +19,7 @@ interface ChallengeCardProps {
     reward?: string;
     status: string;
   };
-  onUpdateProgress: (id: string, newProgress: number) => void;
+  onUpdateProgress: (id: string, newAmount: number) => void;
   onJoinChallenge: (id: string) => void;
 }
 
@@ -36,9 +36,8 @@ export const ChallengeCard = ({
       alert("Please enter a valid amount.");
       return;
     }
-    
-    const newProgress = Math.min(challenge.current + amountValue, challenge.goal);
-    onUpdateProgress(challenge.id, newProgress);
+
+    onUpdateProgress(challenge.id, amountValue);
     setAmount("");
   };
 
@@ -57,10 +56,10 @@ export const ChallengeCard = ({
           <div className="flex justify-between text-sm">
             <span>Progress</span>
             <span>
-              {challenge.current}/{challenge.goal} DT
+              {Math.min(Math.round(challenge.progress), 100)}/100%
             </span>
           </div>
-          <Progress value={challenge.progress} />
+          <Progress value={Math.min(Math.round(challenge.progress), 100)} />
         </div>
 
         <div className="flex items-center justify-between text-sm text-gray-600">
@@ -100,7 +99,9 @@ export const ChallengeCard = ({
           <div className="mt-4 space-y-2">
             <Input
               type="number"
-              placeholder="Enter amount"
+              step="0.01"
+              min="0"
+              placeholder="Enter amount in DT"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />

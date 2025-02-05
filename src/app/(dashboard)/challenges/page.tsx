@@ -18,7 +18,7 @@ interface UserChallenge {
   id: string;
   userId: string;
   challengeId: string;
-  progress: number;
+  progress: number; // This is now the actual money amount
   startDate: Date;
   completed: boolean;
   completedAt?: Date;
@@ -31,7 +31,6 @@ export default function ChallengesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch both challenges and user challenges
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -78,7 +77,7 @@ export default function ChallengesPage() {
     }
   };
 
-  const handleUpdateProgress = async (challengeId: string, newProgress: number) => {
+  const handleUpdateProgress = async (challengeId: string, newAmount: number) => {
     try {
       const userChallenge = userChallenges.find(
         (uc) => uc.challengeId === challengeId
@@ -86,13 +85,17 @@ export default function ChallengesPage() {
 
       if (!userChallenge) return;
 
+      // Calculate new total progress by adding the new amount
+      const newProgress = userChallenge.progress + newAmount;
+      const isCompleted = newProgress >= userChallenge.challenge.goal;
+
       const response = await fetch(`/api/user-challenges/${userChallenge.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           progress: newProgress,
-          completed: newProgress >= userChallenge.challenge.goal,
-          completedAt: newProgress >= userChallenge.challenge.goal ? new Date() : null,
+          completed: isCompleted,
+          completedAt: isCompleted ? new Date() : null,
         }),
       });
 
@@ -127,6 +130,10 @@ export default function ChallengesPage() {
     return userChallenge?.progress || 0;
   };
 
+  const calculateProgressPercentage = (current: number, goal: number) => {
+    return (current / goal) * 100;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -154,45 +161,52 @@ export default function ChallengesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {challenges
               .filter((c) => getChallengeStatus(c) === "active")
-              .map((challenge) => (
-                <ChallengeCard
-                  key={challenge.id}
-                  challenge={{
-                    ...challenge,
-                    current: getCurrentProgress(challenge.id),
-                    progress: (getCurrentProgress(challenge.id) / challenge.goal) * 100,
-                    participants: userChallenges.filter(
-                      (uc) => uc.challengeId === challenge.id
-                    ).length,
-                    status: getChallengeStatus(challenge),
-                  }}
-                  onUpdateProgress={handleUpdateProgress}
-                  onJoinChallenge={handleJoinChallenge}
-                />
-              ))}
+              .map((challenge) => {
+                const currentProgress = getCurrentProgress(challenge.id);
+                return (
+                  <ChallengeCard
+                    key={challenge.id}
+                    challenge={{
+                      ...challenge,
+                      current: currentProgress,
+                      progress: calculateProgressPercentage(currentProgress, challenge.goal),
+                      participants: userChallenges.filter(
+                        (uc) => uc.challengeId === challenge.id
+                      ).length,
+                      status: getChallengeStatus(challenge),
+                    }}
+                    onUpdateProgress={handleUpdateProgress}
+                    onJoinChallenge={handleJoinChallenge}
+                  />
+                );
+              })}
           </div>
         </TabsContent>
 
+        {/* Similar updates for completed and available tabs */}
         <TabsContent value="completed" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {challenges
               .filter((c) => getChallengeStatus(c) === "completed")
-              .map((challenge) => (
-                <ChallengeCard
-                  key={challenge.id}
-                  challenge={{
-                    ...challenge,
-                    current: getCurrentProgress(challenge.id),
-                    progress: (getCurrentProgress(challenge.id) / challenge.goal) * 100,
-                    participants: userChallenges.filter(
-                      (uc) => uc.challengeId === challenge.id
-                    ).length,
-                    status: getChallengeStatus(challenge),
-                  }}
-                  onUpdateProgress={handleUpdateProgress}
-                  onJoinChallenge={handleJoinChallenge}
-                />
-              ))}
+              .map((challenge) => {
+                const currentProgress = getCurrentProgress(challenge.id);
+                return (
+                  <ChallengeCard
+                    key={challenge.id}
+                    challenge={{
+                      ...challenge,
+                      current: currentProgress,
+                      progress: calculateProgressPercentage(currentProgress, challenge.goal),
+                      participants: userChallenges.filter(
+                        (uc) => uc.challengeId === challenge.id
+                      ).length,
+                      status: getChallengeStatus(challenge),
+                    }}
+                    onUpdateProgress={handleUpdateProgress}
+                    onJoinChallenge={handleJoinChallenge}
+                  />
+                );
+              })}
           </div>
         </TabsContent>
 
@@ -200,22 +214,25 @@ export default function ChallengesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {challenges
               .filter((c) => getChallengeStatus(c) === "upcoming")
-              .map((challenge) => (
-                <ChallengeCard
-                  key={challenge.id}
-                  challenge={{
-                    ...challenge,
-                    current: getCurrentProgress(challenge.id),
-                    progress: (getCurrentProgress(challenge.id) / challenge.goal) * 100,
-                    participants: userChallenges.filter(
-                      (uc) => uc.challengeId === challenge.id
-                    ).length,
-                    status: getChallengeStatus(challenge),
-                  }}
-                  onUpdateProgress={handleUpdateProgress}
-                  onJoinChallenge={handleJoinChallenge}
-                />
-              ))}
+              .map((challenge) => {
+                const currentProgress = getCurrentProgress(challenge.id);
+                return (
+                  <ChallengeCard
+                    key={challenge.id}
+                    challenge={{
+                      ...challenge,
+                      current: currentProgress,
+                      progress: calculateProgressPercentage(currentProgress, challenge.goal),
+                      participants: userChallenges.filter(
+                        (uc) => uc.challengeId === challenge.id
+                      ).length,
+                      status: getChallengeStatus(challenge),
+                    }}
+                    onUpdateProgress={handleUpdateProgress}
+                    onJoinChallenge={handleJoinChallenge}
+                  />
+                );
+              })}
           </div>
         </TabsContent>
       </Tabs>
