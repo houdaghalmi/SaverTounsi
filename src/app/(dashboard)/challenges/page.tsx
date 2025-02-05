@@ -2,89 +2,130 @@
 import { ChallengeCard } from "@/components/challenges/challenge-card";
 import { ProgressTracker } from "@/components/challenges/progress-tracker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Trophy } from "lucide-react";
 import { useState, useEffect } from "react";
 
-// Define the Challenge type
 interface Challenge {
   id: string;
   title: string;
   description: string;
   goal: number;
-  current: number;
-  progress: number;
-  participants: number;
   duration: number;
   reward?: string;
-  status: string;
+  type: string;
+}
+
+interface UserChallenge {
+  id: string;
+  userId: string;
+  challengeId: string;
+  progress: number;
+  startDate: Date;
+  completed: boolean;
+  completedAt?: Date;
+  challenge: Challenge;
 }
 
 export default function ChallengesPage() {
-  // Explicitly type the challenges state
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [userChallenges, setUserChallenges] = useState<UserChallenge[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); // Explicitly type error as string or null
-  const [joinedChallenges, setJoinedChallenges] = useState<Set<string>>(new Set()); // Track joined challenges
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch challenges from the API
+  // Fetch both challenges and user challenges
   useEffect(() => {
-    const fetchChallenges = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/api/challenges");
-        if (!response.ok) throw new Error("Failed to fetch challenges");
-        const data = await response.json();
-        // Initialize current progress for each challenge
-        setChallenges(
-          data.map((challenge: Challenge) => ({
-            ...challenge,
-            current: 0,
-            progress: 0,
-          }))
-        );
-      } catch (error) {
-        // Type-check the error
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError("An unknown error occurred");
+        const [challengesRes, userChallengesRes] = await Promise.all([
+          fetch("/api/challenges"),
+          fetch("/api/user-challenges"),
+        ]);
+
+        if (!challengesRes.ok || !userChallengesRes.ok) {
+          throw new Error("Failed to fetch data");
         }
+
+        const [challengesData, userChallengesData] = await Promise.all([
+          challengesRes.json(),
+          userChallengesRes.json(),
+        ]);
+
+        setChallenges(challengesData);
+        setUserChallenges(userChallengesData);
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "An unknown error occurred");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchChallenges();
+    fetchData();
   }, []);
 
-  // Calculate status for a challenge
-  const getChallengeStatus = (challenge: Challenge) => {
-    if (joinedChallenges.has(challenge.id)) {
-      return challenge.current >= challenge.goal ? "completed" : "active";
+  const handleJoinChallenge = async (challengeId: string) => {
+    try {
+      const response = await fetch("/api/user-challenges", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challengeId }),
+      });
+
+      if (!response.ok) throw new Error("Failed to join challenge");
+
+      const newUserChallenge = await response.json();
+      setUserChallenges((prev) => [...prev, newUserChallenge]);
+    } catch (error) {
+      console.error("Error joining challenge:", error);
     }
-    return "upcoming"; // Not joined yet
   };
 
-  const handleUpdateProgress = (id: string, newCurrent: number) => {
-    setChallenges((prevChallenges) =>
-      prevChallenges.map((challenge) =>
-        challenge.id === id
-          ? {
-              ...challenge,
-              current: newCurrent,
-              progress: (newCurrent / challenge.goal) * 100,
-            }
-          : challenge
-      )
-    );
-  };
+  const handleUpdateProgress = async (challengeId: string, newProgress: number) => {
+    try {
+      const userChallenge = userChallenges.find(
+        (uc) => uc.challengeId === challengeId
+      );
 
-  const handleJoinChallenge = (id: string) => {
-    setJoinedChallenges((prev) => new Set(prev).add(id)); // Add to joined challenges
+      if (!userChallenge) return;
+
+      const response = await fetch(`/api/user-challenges/${userChallenge.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          progress: newProgress,
+          completed: newProgress >= userChallenge.challenge.goal,
+          completedAt: newProgress >= userChallenge.challenge.goal ? new Date() : null,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update progress");
+
+      const updatedUserChallenge = await response.json();
+      setUserChallenges((prev) =>
+        prev.map((uc) =>
+          uc.id === updatedUserChallenge.id ? updatedUserChallenge : uc
+        )
+      );
+    } catch (error) {
+      console.error("Error updating progress:", error);
+    }
   };
 
   if (loading) return <div>Loading challenges...</div>;
   if (error) return <div>Error: {error}</div>;
+
+  const getChallengeStatus = (challenge: Challenge) => {
+    const userChallenge = userChallenges.find(
+      (uc) => uc.challengeId === challenge.id
+    );
+    if (!userChallenge) return "upcoming";
+    return userChallenge.completed ? "completed" : "active";
+  };
+
+  const getCurrentProgress = (challengeId: string) => {
+    const userChallenge = userChallenges.find(
+      (uc) => uc.challengeId === challengeId
+    );
+    return userChallenge?.progress || 0;
+  };
 
   return (
     <div className="space-y-6">
@@ -92,18 +133,16 @@ export default function ChallengesPage() {
         <h1 className="text-2xl font-bold">Challenges</h1>
       </div>
 
-      {/* Progress Tracker */}
       <ProgressTracker
-        milestones={challenges.map((challenge) => ({
-          title: challenge.title,
-          target: challenge.goal,
-          current: challenge.current,
+        milestones={userChallenges.map((uc) => ({
+          title: uc.challenge.title,
+          target: uc.challenge.goal,
+          current: uc.progress,
           unit: "DT",
-          isCompleted: challenge.current >= challenge.goal,
+          isCompleted: uc.completed,
         }))}
       />
 
-      {/* Tabs for Active, Completed, and Available Challenges */}
       <Tabs defaultValue="active">
         <TabsList>
           <TabsTrigger value="active">Active</TabsTrigger>
@@ -111,7 +150,6 @@ export default function ChallengesPage() {
           <TabsTrigger value="available">Available</TabsTrigger>
         </TabsList>
 
-        {/* Active Challenges */}
         <TabsContent value="active" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {challenges
@@ -121,6 +159,11 @@ export default function ChallengesPage() {
                   key={challenge.id}
                   challenge={{
                     ...challenge,
+                    current: getCurrentProgress(challenge.id),
+                    progress: (getCurrentProgress(challenge.id) / challenge.goal) * 100,
+                    participants: userChallenges.filter(
+                      (uc) => uc.challengeId === challenge.id
+                    ).length,
                     status: getChallengeStatus(challenge),
                   }}
                   onUpdateProgress={handleUpdateProgress}
@@ -130,7 +173,6 @@ export default function ChallengesPage() {
           </div>
         </TabsContent>
 
-        {/* Completed Challenges */}
         <TabsContent value="completed" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {challenges
@@ -140,6 +182,11 @@ export default function ChallengesPage() {
                   key={challenge.id}
                   challenge={{
                     ...challenge,
+                    current: getCurrentProgress(challenge.id),
+                    progress: (getCurrentProgress(challenge.id) / challenge.goal) * 100,
+                    participants: userChallenges.filter(
+                      (uc) => uc.challengeId === challenge.id
+                    ).length,
                     status: getChallengeStatus(challenge),
                   }}
                   onUpdateProgress={handleUpdateProgress}
@@ -149,7 +196,6 @@ export default function ChallengesPage() {
           </div>
         </TabsContent>
 
-        {/* Available Challenges */}
         <TabsContent value="available" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {challenges
@@ -159,6 +205,11 @@ export default function ChallengesPage() {
                   key={challenge.id}
                   challenge={{
                     ...challenge,
+                    current: getCurrentProgress(challenge.id),
+                    progress: (getCurrentProgress(challenge.id) / challenge.goal) * 100,
+                    participants: userChallenges.filter(
+                      (uc) => uc.challengeId === challenge.id
+                    ).length,
                     status: getChallengeStatus(challenge),
                   }}
                   onUpdateProgress={handleUpdateProgress}

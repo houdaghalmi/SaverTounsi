@@ -19,22 +19,16 @@ interface ChallengeCardProps {
     reward?: string;
     status: string;
   };
-  onUpdateProgress: (id: string, newCurrent: number) => void;
+  onUpdateProgress: (id: string, newProgress: number) => void;
   onJoinChallenge: (id: string) => void;
 }
 
 export const ChallengeCard = ({
-  challenge: initialChallenge,
+  challenge,
   onUpdateProgress,
   onJoinChallenge,
 }: ChallengeCardProps) => {
-  const [challenge, setChallenge] = useState(initialChallenge);
   const [amount, setAmount] = useState("");
-
-  // Ensure current and goal are valid numbers
-  const current = isNaN(challenge.current) ? 0 : challenge.current;
-  const goal = isNaN(challenge.goal) ? 0 : challenge.goal;
-  const progress = (current / goal) * 100 || 0; // Default to 0 if NaN
 
   const handleUpgradeProgress = () => {
     const amountValue = parseFloat(amount);
@@ -42,11 +36,10 @@ export const ChallengeCard = ({
       alert("Please enter a valid amount.");
       return;
     }
-    const newCurrent = Math.min(current + amountValue, goal);
-    const newProgress = (newCurrent / goal) * 100;
-    setChallenge({ ...challenge, current: newCurrent, progress: newProgress });
-    onUpdateProgress(challenge.id, newCurrent); // Notify parent component
-    setAmount(""); // Reset input
+    
+    const newProgress = Math.min(challenge.current + amountValue, challenge.goal);
+    onUpdateProgress(challenge.id, newProgress);
+    setAmount("");
   };
 
   return (
@@ -60,18 +53,16 @@ export const ChallengeCard = ({
       <CardContent className="space-y-4">
         <p className="text-sm text-gray-600">{challenge.description}</p>
 
-        {/* Progress Bar */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Progress</span>
             <span>
-              {Math.round(progress)}/100% {/* Always show progress as 0/100% */}
+              {challenge.current}/{challenge.goal} DT
             </span>
           </div>
-          <Progress value={progress} />
+          <Progress value={challenge.progress} />
         </div>
 
-        {/* Participants and Duration */}
         <div className="flex items-center justify-between text-sm text-gray-600">
           <div className="flex items-center gap-1">
             <Users className="w-4 h-4" />
@@ -80,7 +71,6 @@ export const ChallengeCard = ({
           <span>{challenge.duration} days</span>
         </div>
 
-        {/* Status */}
         <div className="text-sm text-gray-600">
           Status:{" "}
           <span
@@ -96,7 +86,6 @@ export const ChallengeCard = ({
           </span>
         </div>
 
-        {/* Join Challenge Button (for upcoming challenges) */}
         {challenge.status === "upcoming" && (
           <Button
             onClick={() => onJoinChallenge(challenge.id)}
@@ -107,7 +96,6 @@ export const ChallengeCard = ({
           </Button>
         )}
 
-        {/* Amount Input and Add Progress Button (for active challenges) */}
         {challenge.status === "active" && (
           <div className="mt-4 space-y-2">
             <Input
@@ -118,11 +106,17 @@ export const ChallengeCard = ({
             />
             <Button
               onClick={handleUpgradeProgress}
-              disabled={progress >= 100}
+              disabled={challenge.progress >= 100}
               className="w-full"
             >
               Add Amount
             </Button>
+          </div>
+        )}
+
+        {challenge.reward && (
+          <div className="text-sm text-gray-600">
+            Reward: <span className="font-medium">{challenge.reward}</span>
           </div>
         )}
       </CardContent>

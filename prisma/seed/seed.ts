@@ -97,13 +97,32 @@ async function seedChallenges() {
         },
         {
             id: "4",
-            title: "No Coffee Shops for a Week",
-            description: "Avoid buying coffee from cafes for 7 days and save money.",
-            type:ChallengeType.NO_SPEND, // Enum value
-            goal: 0,
-            duration: 7,
-            reward: "Save money and discover homemade coffee!"
-        }
+            title: "Reduce Grocery Spending",
+            description: "Cut your grocery bill by 30 DT this month by planning meals and avoiding unplanned buys.",
+            type: ChallengeType.SPENDING_REDUCTION,
+            goal: 30,
+            duration: 30,
+            reward: "Save money and waste less food!",
+        },
+        {
+            id: "5",
+            title: "Save for a Rainy Day",
+            description: "Save 200 DT over the next 2 months for unexpected expenses.",
+            type: ChallengeType.SAVINGS,
+            goal: 200,
+            duration: 60,
+            reward: "Be prepared for life's surprises!",
+        },
+        {
+            id: "6",
+            title: "Reduce Online Shopping",
+            description: "Cut your online shopping expenses by 60 DT this month.",
+            type: ChallengeType.SPENDING_REDUCTION,
+            goal: 60,
+            duration: 30,
+            reward: "Save money and avoid unnecessary purchases!",
+        },
+     
 
     ];
 
