@@ -383,7 +383,238 @@ export default function ReportsPage() {
 
 
           
+{/* Yearly Report */}
+<TabsContent value="yearly">
+            <h2 className="text-xl font-semibold mb-4">Yearly Report</h2>
+            <div className="flex justify-end">
+              <div className="w-full max-w-3xl">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Yearly Spending Card */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Yearly Spending</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-lg font-semibold">
+                        Total Spent: {yearlyData.spent} DT
+                      </p>
+                      <div className="space-y-2 mt-4">
+                        <div className="flex gap-4">
+                          <button
+                            onClick={() => setSpendingViewMode("detailed")}
+                            className={`px-4 py-2 rounded-md ${
+                              spendingViewMode === "detailed"
+                                ? "bg-primary text-white"
+                                : "bg-gray-100"
+                            }`}
+                          >
+                            Detailed
+                          </button>
+                          <button
+                            onClick={() => setSpendingViewMode("grouped")}
+                            className={`px-4 py-2 rounded-md ${
+                              spendingViewMode === "grouped"
+                                ? "bg-primary text-white"
+                                : "bg-gray-100"
+                            }`}
+                          >
+                            Grouped
+                          </button>
+                        </div>
+                        <h3 className="text-md font-medium">
+                          {spendingViewMode === "detailed" ? "Spending by Category" : "Spending by Group"}
+                        </h3>
+                        <ul className="space-y-1">
+                          {spendingViewMode === "detailed"
+                            ? yearlyData.categories.map((category) => (
+                                <li key={category.id} className="flex justify-between">
+                                  <span>{category.name}</span>
+                                  <span>{category.spent} DT</span>
+                                </li>
+                              ))
+                            : yearlyGroupedCategories.map((group) => (
+                                <li key={group.groupName} className="flex justify-between">
+                                  <span>{group.groupName}</span>
+                                  <span>{group.amount} DT</span>
+                                </li>
+                              ))}
+                        </ul>
+                      </div>
+                    </CardContent>
+                  </Card>
 
+                  {/* Yearly Savings Card */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Yearly Savings</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-lg font-semibold">
+                        Total Saved: {yearlyData.saved} DT
+                      </p>
+                      <div className="space-y-2 mt-4">
+                        <div className="flex gap-4">
+                          <button
+                            onClick={() => setSavingViewMode("detailed")}
+                            className={`px-4 py-2 rounded-md ${
+                              savingViewMode === "detailed"
+                                ? "bg-primary text-white"
+                                : "bg-gray-100"
+                            }`}
+                          >
+                            Detailed
+                          </button>
+                          <button
+                            onClick={() => setSavingViewMode("grouped")}
+                            className={`px-4 py-2 rounded-md ${
+                              savingViewMode === "grouped"
+                                ? "bg-primary text-white"
+                                : "bg-gray-100"
+                            }`}
+                          >
+                            Grouped
+                          </button>
+                        </div>
+                        <h3 className="text-md font-medium">
+                          {savingViewMode === "detailed" ? "Savings by Category" : "Savings by Group"}
+                        </h3>
+                        <ul className="space-y-1">
+                          {savingViewMode === "detailed"
+                            ? yearlyData.savingsData.map((savings) => (
+                                <li key={savings.categoryName} className="flex justify-between">
+                                  <span>{savings.categoryName}</span>
+                                  <span>{savings.saved} DT</span>
+                                </li>
+                              ))
+                            : yearlyGroupedSavings.map((group) => (
+                                <li key={group.groupName} className="flex justify-between">
+                                  <span>{group.groupName}</span>
+                                  <span>{group.amount} DT</span>
+                                </li>
+                              ))}
+                        </ul>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Yearly Charts */}
+                <div className="mt-6">
+                  {/* Yearly Category/Group Chart */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>
+                        {spendingViewMode === "detailed" 
+                          ? "Yearly Spending by Category"
+                          : "Yearly Spending by Group"}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-96">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart
+                            data={spendingViewMode === "detailed" 
+                              ? yearlyData.categories
+                              : yearlyGroupedCategories}
+                            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis 
+                              dataKey={spendingViewMode === "detailed" ? "name" : "groupName"}
+                              angle={-45}
+                              textAnchor="end"
+                              height={70}
+                            />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar 
+                              dataKey={spendingViewMode === "detailed" ? "spent" : "amount"}
+                              fill="#8884d8" 
+                              name="Spent" 
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Yearly Trend Charts */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    {/* Yearly Spending Trend */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Yearly Spending Trend</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-96">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart
+                              data={yearlyData.monthlySpending}
+                              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis 
+                                dataKey="month"
+                                angle={-45}
+                                textAnchor="end"
+                                height={70}
+                              />
+                              <YAxis />
+                              <Tooltip />
+                              <Legend />
+                              <Line
+                                type="monotone"
+                                dataKey="amount"
+                                stroke="#8884d8"
+                                strokeWidth={2}
+                                name="Monthly Spending"
+                              />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Yearly Savings Trend */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Yearly Savings Trend</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-96">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart
+                              data={yearlyData.monthlySavings}
+                              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis 
+                                dataKey="month"
+                                angle={-45}
+                                textAnchor="end"
+                                height={70}
+                              />
+                              <YAxis />
+                              <Tooltip />
+                              <Legend />
+                              <Line
+                                type="monotone"
+                                dataKey="amount"
+                                stroke="#82ca9d"
+                                strokeWidth={2}
+                                name="Monthly Savings"
+                              />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
 
 
           {/* Challenge Report */}
