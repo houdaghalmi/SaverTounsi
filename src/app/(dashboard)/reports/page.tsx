@@ -266,8 +266,13 @@ export default function ReportsPage() {
           };
         });
 
+        const yearlyTotalSpent = categoriesData.reduce((acc, category) => acc + (category.spent * 12), 0);
+        const yearlyTotalSaved = categoriesData.reduce((acc, category) => acc + ((category.budget - category.spent) * 12), 0);
+
         const yearlyData: YearlyReport = {
           ...monthlyData,
+          spent: yearlyTotalSpent,
+          saved: yearlyTotalSaved,
           monthlySpending: realMonthlySpending,
           monthlySavings: realMonthlySavings,
         };
