@@ -1,5 +1,6 @@
 "use client";
 
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -102,6 +103,30 @@ interface ProgressPoint {
   percentage: number;
 }
 
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: {
+      amount: number;
+      percentage: number;
+    };
+  }>;
+}
+
+const CustomTooltip = ({ active, payload }: TooltipProps) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white p-4 rounded-lg shadow-lg border">
+        <p className="font-medium">Progress Details</p>
+        <p className="text-sm">Amount: {data.amount} DT</p>
+        <p className="text-sm">Progress: {data.percentage}%</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function ReportsPage() {
   const [spendingViewMode, setSpendingViewMode] = useState<"detailed" | "grouped">("detailed");
   const [savingViewMode, setSavingViewMode] = useState<"detailed" | "grouped">("detailed");
@@ -115,55 +140,70 @@ export default function ReportsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [categoriesResponse, challengesResponse, userChallengesResponse] = 
+        const [categoriesResponse, challengesResponse, userChallengesResponse, progressResponse] = 
           await Promise.all([
             fetch("/api/categories"),
             fetch("/api/challenges"),
             fetch("/api/user-challenges"),
+            fetch("/api/user-progress")
           ]);
 
-        if (!categoriesResponse.ok || !challengesResponse.ok || !userChallengesResponse.ok) {
+        if (!categoriesResponse.ok || !challengesResponse.ok || 
+            !userChallengesResponse.ok || !progressResponse.ok) {
           throw new Error("Failed to fetch data");
         }
 
         const categoriesData: Category[] = await categoriesResponse.json();
         const challengesData: Challenge[] = await challengesResponse.json();
         const userChallengesData: UserChallenge[] = await userChallengesResponse.json();
+        const progressData = await progressResponse.json();
 
-        // Calculate progress points with history
+        // Calculate progress points with real user data
         const progressPoints = userChallengesData.reduce((acc, challenge) => {
-          const currentAmount = challenge.progress;
           const goalAmount = challenge.challenge.goal;
-          const currentPercentage = (currentAmount / goalAmount) * 100;
           
-          // Get previous progress points
-          const previousProgress = userChallengeProgress
-            .filter(progress => progress.userChallengeId === challenge.id)
-            .map(progress => ({
-              day: new Date(progress.date).toLocaleDateString(),
-              amount: progress.amount,
-              percentage: Math.round((progress.amount / goalAmount) * 100)
-            }))
-            .sort((a, b) => a.percentage - b.percentage);
-
-          acc[challenge.id] = [
-            { day: "0%", amount: 0, percentage: 0 },
-            ...previousProgress,
+          // Create all points array
+          const allPoints = [
+            // Start point
             { 
-              day: "Current", 
-              amount: currentAmount, 
-              percentage: currentPercentage 
+              day: "0%", 
+              amount: 0, 
+              percentage: 0 
             },
-            { 
-              day: "Goal", 
-              amount: goalAmount, 
-              percentage: 100 
-            }
-          ];
+            // Current progress point
+            {
+              day: `${Math.round((challenge.progress / goalAmount) * 100)}%`,
+              amount: challenge.progress,
+              percentage: Math.round((challenge.progress / goalAmount) * 100)
+            },
+            // Goal point
+            {
+              day: "100%",
+              amount: goalAmount,
+              percentage: 100
+            },
+            // Real progress points
+            ...progressData
+              .filter((p: UserChallengeProgress) => p.userChallengeId === challenge.id)
+              .map((p: UserChallengeProgress) => ({
+                day: `${Math.round((p.amount / goalAmount) * 100)}%`,
+                amount: p.amount,
+                percentage: Math.round((p.amount / goalAmount) * 100)
+              }))
+          ]
+          .sort((a, b) => a.percentage - b.percentage)
+          .filter((point, index, array) => 
+            array.findIndex(p => p.percentage === point.percentage) === index
+          );
+
+          acc[challenge.id] = allPoints;
           return acc;
         }, {} as Record<string, ProgressPoint[]>);
 
         setProgressHistory(progressPoints);
+        setUserChallengeProgress(progressData);
+        setChallenges(challengesData);
+        setUserChallenges(userChallengesData);
 
         const monthlyData: MonthlyReport = {
           spent: categoriesData.reduce((acc, category) => acc + category.spent, 0),
@@ -186,8 +226,6 @@ export default function ReportsPage() {
 
         setMonthlyData(monthlyData);
         setYearlyData(yearlyData);
-        setChallenges(challengesData);
-        setUserChallenges(userChallengesData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -706,21 +744,22 @@ export default function ReportsPage() {
               <div className="w-full max-w-3xl space-y-6">
                 {userChallenges.map((userChallenge) => (
                   <Card key={userChallenge.id}>
-                    <CardHeader>
-                      <CardTitle>{userChallenge.challenge.title}</CardTitle>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-xl font-bold">
+                        {userChallenge.challenge.title}
+                      </CardTitle>
+                      <div className="text-lg font-semibold text-primary">
+                        {calculateProgressPercentage(userChallenge)}%
+                      </div>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span>Progress</span>
-                            <span>{calculateProgressPercentage(userChallenge)}%</span>
-                          </div>
-                          <Progress value={calculateProgressPercentage(userChallenge)} className="h-2" />
-                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {userChallenge.challenge.description}
+                        </p>
 
                         {userChallenge.completed && userChallenge.completedAt && (
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-green-600 font-medium">
                             Completed on: {new Date(userChallenge.completedAt).toLocaleDateString()}
                           </p>
                         )}
@@ -733,16 +772,20 @@ export default function ReportsPage() {
                             >
                               <CartesianGrid strokeDasharray="3 3" />
                               <XAxis dataKey="day" />
-                              <YAxis />
-                              <Tooltip />
+                              <YAxis 
+                                domain={[0, userChallenge.challenge.goal]}
+                                label={{ value: 'Amount (DT)', angle: -90, position: 'insideLeft' }}
+                              />
+                              <Tooltip content={<CustomTooltip />} />
                               <Legend />
                               <Line
                                 type="monotone"
                                 dataKey="amount"
                                 stroke="#82ca9d"
                                 strokeWidth={2}
-                                name="Amount Saved"
-                                dot={{ r: 4 }}
+                                name="Progress"
+                                dot={{ r: 6 }}
+                                activeDot={{ r: 8 }}
                               />
                             </LineChart>
                           </ResponsiveContainer>
