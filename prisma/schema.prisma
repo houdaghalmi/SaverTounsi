@@ -158,6 +158,20 @@ model UserChallenge {
   // Relationships
   user        User       @relation(fields: [userId], references: [id])
   challenge   Challenge  @relation(fields: [challengeId], references: [id])
+  progressHistory UserChallengeProgress[] // Add this line
+}
+
+// Add this new model
+model UserChallengeProgress {
+  id              String        @id @default(cuid())
+  userChallengeId String
+  amount          Float
+  date            DateTime      @default(now())
+  
+  // Relationships
+  userChallenge   UserChallenge @relation(fields: [userChallengeId], references: [id], onDelete: Cascade)
+
+  @@index([userChallengeId])
 }
 
 model UserSettings {

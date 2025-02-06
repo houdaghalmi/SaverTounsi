@@ -89,6 +89,21 @@ export default function ChallengesPage() {
       const newProgress = userChallenge.progress + newAmount;
       const isCompleted = newProgress >= userChallenge.challenge.goal;
 
+      // First save the progress point
+      const progressResponse = await fetch('/api/user-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userChallengeId: userChallenge.id,
+          amount: newAmount,
+        }),
+      });
+
+      if (!progressResponse.ok) {
+        throw new Error('Failed to save progress point');
+      }
+
+      // Then update the challenge progress
       const response = await fetch(`/api/user-challenges/${userChallenge.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

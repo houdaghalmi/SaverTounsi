@@ -130,16 +130,35 @@ export default function ReportsPage() {
         const challengesData: Challenge[] = await challengesResponse.json();
         const userChallengesData: UserChallenge[] = await userChallengesResponse.json();
 
-        // Calculate progress points with percentages
+        // Calculate progress points with history
         const progressPoints = userChallengesData.reduce((acc, challenge) => {
-          const currentPercentage = (challenge.progress / challenge.challenge.goal) * 100;
+          const currentAmount = challenge.progress;
+          const goalAmount = challenge.challenge.goal;
+          const currentPercentage = (currentAmount / goalAmount) * 100;
           
+          // Get previous progress points
+          const previousProgress = userChallengeProgress
+            .filter(progress => progress.userChallengeId === challenge.id)
+            .map(progress => ({
+              day: new Date(progress.date).toLocaleDateString(),
+              amount: progress.amount,
+              percentage: Math.round((progress.amount / goalAmount) * 100)
+            }))
+            .sort((a, b) => a.percentage - b.percentage);
+
           acc[challenge.id] = [
             { day: "0%", amount: 0, percentage: 0 },
-            { day: "25%", amount: challenge.challenge.goal * 0.25, percentage: 25 },
-            { day: "50%", amount: challenge.challenge.goal * 0.50, percentage: 50 },
-            { day: "75%", amount: challenge.challenge.goal * 0.75, percentage: 75 },
-            { day: "100%", amount: challenge.challenge.goal, percentage: 100 }
+            ...previousProgress,
+            { 
+              day: "Current", 
+              amount: currentAmount, 
+              percentage: currentPercentage 
+            },
+            { 
+              day: "Goal", 
+              amount: goalAmount, 
+              percentage: 100 
+            }
           ];
           return acc;
         }, {} as Record<string, ProgressPoint[]>);
