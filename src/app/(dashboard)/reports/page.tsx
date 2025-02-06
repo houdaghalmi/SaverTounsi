@@ -218,10 +218,58 @@ export default function ReportsPage() {
           })),
         };
 
+        // Get months array for current year
+        const months = Array.from({length: 12}, (_, i) => {
+          const date = new Date();
+          date.setMonth(i);
+          return date.toLocaleString('default', { month: 'short' });
+        });
+
+        // Calculate monthly spending trend
+        const monthlySpending = months.map(month => ({
+          month,
+          amount: categoriesData.reduce((acc, category) => acc + category.spent, 0) / 12
+        }));
+
+        // Calculate monthly savings trend  
+        const monthlySavings = months.map(month => ({
+          month,
+          amount: categoriesData.reduce((acc, category) => 
+            acc + (category.budget - category.spent), 0) / 12
+        }));
+
+        const currentYear = new Date().getFullYear();
+
+        // Get real monthly spending data
+        const realMonthlySpending = Array.from({length: 12}, (_, monthIndex) => {
+          const month = new Date(currentYear, monthIndex).toLocaleString('default', { month: 'short' });
+          const spending = categoriesData.reduce((total, category) => {
+            return total + category.spent;
+          }, 0);
+          
+          return {
+            month,
+            amount: spending
+          };
+        });
+
+        // Get real monthly savings data
+        const realMonthlySavings = Array.from({length: 12}, (_, monthIndex) => {
+          const month = new Date(currentYear, monthIndex).toLocaleString('default', { month: 'short' });
+          const savings = categoriesData.reduce((total, category) => {
+            return total + (category.budget - category.spent);
+          }, 0);
+          
+          return {
+            month,
+            amount: savings
+          };
+        });
+
         const yearlyData: YearlyReport = {
           ...monthlyData,
-          monthlySpending: [],
-          monthlySavings: [],
+          monthlySpending: realMonthlySpending,
+          monthlySavings: realMonthlySavings,
         };
 
         setMonthlyData(monthlyData);
@@ -661,77 +709,46 @@ export default function ReportsPage() {
                   </Card>
 
                   {/* Yearly Trend Charts */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    {/* Yearly Spending Trend */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Yearly Spending Trend</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-96">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <LineChart
-                              data={yearlyData.monthlySpending}
-                              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                            >
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis 
-                                dataKey="month"
-                                angle={-45}
-                                textAnchor="end"
-                                height={70}
-                              />
-                              <YAxis />
-                              <Tooltip />
-                              <Legend />
-                              <Line
-                                type="monotone"
-                                dataKey="amount"
-                                stroke="#8884d8"
-                                strokeWidth={2}
-                                name="Monthly Spending"
-                              />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Yearly Savings Trend */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Yearly Savings Trend</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-96">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <LineChart
-                              data={yearlyData.monthlySavings}
-                              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                            >
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis 
-                                dataKey="month"
-                                angle={-45}
-                                textAnchor="end"
-                                height={70}
-                              />
-                              <YAxis />
-                              <Tooltip />
-                              <Legend />
-                              <Line
-                                type="monotone"
-                                dataKey="amount"
-                                stroke="#82ca9d"
-                                strokeWidth={2}
-                                name="Monthly Savings"
-                              />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Yearly Spending & Savings Trend</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-96">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart
+                            data={yearlyData.monthlySpending.map((item, index) => ({
+                              month: item.month,
+                              spending: item.amount,
+                              savings: yearlyData.monthlySavings[index].amount
+                            }))}
+                            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis 
+                              dataKey="month"
+                              angle={-45}
+                              textAnchor="end"
+                              height={70}
+                            />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar 
+                              dataKey="spending"
+                              fill="#8884d8" 
+                              name="Monthly Spending"
+                            />
+                            <Bar 
+                              dataKey="savings"
+                              fill="#82ca9d"
+                              name="Monthly Savings"
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </div>
