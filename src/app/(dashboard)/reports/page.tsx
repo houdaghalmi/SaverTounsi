@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import {
   BarChart,
   Bar,
@@ -16,7 +17,7 @@ import {
 } from "recharts";
 import { useState, useEffect } from "react";
 
-// Updated interfaces to match schema
+// Previous interfaces remain the same
 interface CategoryGroup {
   id: string;
   name: string;
@@ -45,14 +46,37 @@ interface MonthlyData {
   amount: number;
 }
 
+// Updated Challenge interfaces
 interface Challenge {
   id: string;
   title: string;
+  description: string;
+  goal: number;
+  duration: number;
+  reward?: string;
+  createdAt: string;
   progress: number;
-  progressData: Array<{
-    day: string;
-    amount: number;
-  }>;
+  startDate: string;
+  completed: boolean;
+  completedAt?: string;
+}
+
+interface UserChallenge {
+  id: string;
+  userId: string;
+  challengeId: string;
+  progress: number;
+  startDate: string;
+  completed: boolean;
+  completedAt?: string;
+  challenge: Challenge;
+}
+
+interface UserChallengeProgress {
+  id: string;
+  date: string;
+  amount: number;
+  userChallengeId: string;
 }
 
 interface MonthlyReport {
@@ -73,26 +97,31 @@ interface GroupedData {
 }
 
 export default function ReportsPage() {
+  // Previous state management remains the same
   const [spendingViewMode, setSpendingViewMode] = useState<"detailed" | "grouped">("detailed");
   const [savingViewMode, setSavingViewMode] = useState<"detailed" | "grouped">("detailed");
   const [monthlyData, setMonthlyData] = useState<MonthlyReport | null>(null);
   const [yearlyData, setYearlyData] = useState<YearlyReport | null>(null);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [userChallenges, setUserChallenges] = useState<UserChallenge[]>([]);
+  const [userChallengeProgress, setUserChallengeProgress] = useState<UserChallengeProgress[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [categoriesResponse, challengesResponse] = await Promise.all([
+        const [categoriesResponse, challengesResponse, userChallengesResponse] = await Promise.all([
           fetch("/api/categories"),
           fetch("/api/challenges"),
+          fetch("/api/user-challenges"),
         ]);
 
-        if (!categoriesResponse.ok || !challengesResponse.ok) {
+        if (!categoriesResponse.ok || !challengesResponse.ok || !userChallengesResponse.ok) {
           throw new Error("Failed to fetch data");
         }
 
         const categoriesData: Category[] = await categoriesResponse.json();
         const challengesData: Challenge[] = await challengesResponse.json();
+        const userChallengesData: UserChallenge[] = await userChallengesResponse.json();
 
         const monthlyData: MonthlyReport = {
           spent: categoriesData.reduce((acc, category) => acc + category.spent, 0),
@@ -116,6 +145,7 @@ export default function ReportsPage() {
         setMonthlyData(monthlyData);
         setYearlyData(yearlyData);
         setChallenges(challengesData);
+        setUserChallenges(userChallengesData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -124,11 +154,7 @@ export default function ReportsPage() {
     fetchData();
   }, []);
 
-  if (!monthlyData || !yearlyData || challenges.length === 0) {
-    return <div>Loading...</div>;
-  }
-
-  // Group spending categories by group
+  // Previous helper functions remain the same
   const groupSpendingCategories = (categories: Category[]): GroupedData[] => {
     const groupedData = categories.reduce((acc: Record<string, number>, category) => {
       const groupName = category.group.name;
@@ -145,7 +171,6 @@ export default function ReportsPage() {
     }));
   };
 
-  // Group savings by category group
   const groupSavings = (categories: Category[]): GroupedData[] => {
     const groupedData = categories.reduce((acc: Record<string, number>, category) => {
       const groupName = category.group.name;
@@ -162,12 +187,30 @@ export default function ReportsPage() {
     }));
   };
 
+  if (!monthlyData || !yearlyData) {
+    return <div>Loading...</div>;
+  }
+
   const monthlyGroupedCategories = groupSpendingCategories(monthlyData.categories);
   const yearlyGroupedCategories = groupSpendingCategories(yearlyData.categories);
-
   const monthlyGroupedSavings = groupSavings(monthlyData.categories);
   const yearlyGroupedSavings = groupSavings(yearlyData.categories);
 
+  // Helper function to calculate days remaining
+  const getDaysRemaining = (startDate: string, duration: number) => {
+    const start = new Date(startDate);
+    const end = new Date(start.getTime() + duration * 24 * 60 * 60 * 1000);
+    const now = new Date();
+    const daysRemaining = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return daysRemaining > 0 ? daysRemaining : 0;
+  };
+
+  // Calculate progress percentage for each user challenge
+  const calculateProgressPercentage = (userChallenge: UserChallenge) => {
+    return Math.round((userChallenge.progress / userChallenge.challenge.goal) * 100);
+  };
+
+  // Previous JSX remains the same until the challenges tab
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -617,45 +660,71 @@ export default function ReportsPage() {
           </TabsContent>
 
 
-          {/* Challenge Report */}
+          {/* Updated Challenge Report */}
           <TabsContent value="challenges">
-            <h2 className="text-xl font-semibold mb-4">Challenge Progress</h2>
-            <div className="flex justify-end">
-              <div className="w-full max-w-3xl space-y-6">
-                {challenges.map((challenge) => (
-                  <Card key={challenge.id}>
-                    <CardHeader>
-                      <CardTitle>{challenge.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-lg font-semibold">
-                        Progress: {challenge.progress}%
-                      </p>
-                      <div className="h-96">
+            <h2 className="text-xl font-semibold mb-4">Active Challenges</h2>
+            <div className="grid gap-6">
+              {userChallenges.map((userChallenge) => (
+                <Card key={userChallenge.id}>
+                  <CardHeader>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>{userChallenge.challenge.title}</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <p className="text-muted-foreground">{userChallenge.challenge.description}</p>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Progress</span>
+                          <span>{calculateProgressPercentage(userChallenge)}%</span>
+                        </div>
+                        <Progress value={calculateProgressPercentage(userChallenge)} className="h-2" />
+                      </div>
+
+                      {userChallenge.completed && userChallenge.completedAt && (
+                        <p className="text-sm text-muted-foreground">
+                          Completed on: {new Date(userChallenge.completedAt).toLocaleDateString()}
+                        </p>
+                      )}
+
+                      {/* Progress Chart */}
+                      <div className="h-64 mt-4">
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart
-                            data={challenge.progressData}
+                            data={userChallengeProgress.filter(progress => progress.userChallengeId === userChallenge.id)}
                             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                           >
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="day" />
+                            <XAxis 
+                              dataKey="date"
+                              tickFormatter={(date) => new Date(date).toLocaleDateString()}
+                            />
                             <YAxis />
-                            <Tooltip />
+                            <Tooltip 
+                              labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                            />
                             <Legend />
                             <Line
                               type="monotone"
                               dataKey="amount"
                               stroke="#82ca9d"
-                              strokeWidth={2}
-                              name="Amount Saved"
+                              name="Progress Amount"
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey={(data) => Math.round((data.amount / userChallenge.challenge.goal) * 100)}
+                              stroke="#8884d8"
+                              name="Progress Percentage"
                             />
                           </LineChart>
                         </ResponsiveContainer>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </TabsContent>
         </div>
