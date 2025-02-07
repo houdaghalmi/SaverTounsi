@@ -1,4 +1,5 @@
 "use client";
+
 import { ChallengeCard } from "@/components/challenges/challenge-card";
 import { ProgressTracker } from "@/components/challenges/progress-tracker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +24,15 @@ interface UserChallenge {
   completed: boolean;
   completedAt?: Date;
   challenge: Challenge;
+}
+
+interface Transaction {
+  id: string;
+  amount: number;
+  type: 'EXPENSE' | 'INCOME';
+  categoryId: string;
+  description: string;
+  date: Date;
 }
 
 export default function ChallengesPage() {
@@ -85,6 +95,9 @@ export default function ChallengesPage() {
 
       if (!userChallenge) return;
 
+      const challenge = challenges.find(c => c.id === challengeId);
+      if (!challenge) return;
+
       // Calculate new total progress by adding the new amount
       const newProgress = userChallenge.progress + newAmount;
       const isCompleted = newProgress >= userChallenge.challenge.goal;
@@ -101,6 +114,23 @@ export default function ChallengesPage() {
 
       if (!progressResponse.ok) {
         throw new Error('Failed to save progress point');
+      }
+
+      // Save the transaction
+      const transactionResponse = await fetch('/api/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: newAmount,
+          type: 'EXPENSE',
+          categoryId: challengeId,
+          description: challenge.description,
+          date: new Date(),
+        }),
+      });
+
+      if (!transactionResponse.ok) {
+        throw new Error('Failed to save transaction');
       }
 
       // Then update the challenge progress
@@ -198,7 +228,6 @@ export default function ChallengesPage() {
           </div>
         </TabsContent>
 
-        {/* Similar updates for completed and available tabs */}
         <TabsContent value="completed" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {challenges
