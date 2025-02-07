@@ -19,10 +19,12 @@ export default function Step4() {
     setSelectedChoice(choice);
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     if (selectedChoice) {
       console.log("Selected:", selectedChoice);
-      router.push("/overview"); // Redirect to the dashboard after onboarding
+      await fetch('/api/onboarding', {
+        method:"POST"
+      }).then(d=>router.push("/overview")); // Redirect to the dashboard after onboarding
     } else {
       alert("Please select an option.");
     }

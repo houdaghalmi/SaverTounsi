@@ -8,43 +8,43 @@ datasource db {
 }
 
 model User {
-  id            String        @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String        @unique
+  email         String    @unique
   emailVerified DateTime?
   password      String
   image         String?
-  isOnboarded   Boolean       @default(false)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  isOnboarded   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Relationships
-  accounts      Account[]
-  sessions      Session[]
+  accounts       Account[]
+  sessions       Session[]
   categoryGroups CategoryGroup[]
-  transactions  Transaction[]
-  challenges    UserChallenge[]
-  settings      UserSettings?
-  feedbacks     Feedback[]
-  reviews       Review[]      // Reviews written by the user
+  transactions   Transaction[]
+  challenges     UserChallenge[]
+  settings       UserSettings?
+  feedbacks      Feedback[]
+  reviews        Review[] // Reviews written by the user
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   // Relationships
-  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -56,134 +56,139 @@ model Session {
   expires      DateTime
 
   // Relationships
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model CategoryGroup {
-  id        String     @id() @default(cuid())
-  name      String     
-  userId    String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
+  id            String   @id() @default(cuid())
+  name          String
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  isSystemGroup Boolean  @default(false)
 
   // Relationships
-  user      User       @relation(fields: [userId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
   categories Category[]
-  @@unique(name:"userCategoryName",[userId,name])
+
+  @@unique(name: "userCategoryName", [userId, name])
 }
 
 model Category {
-  id        String     @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
-  budget    Float      @default(0)
-  spent     Float      @default(0)
+  budget    Float    @default(0)
+  spent     Float    @default(0)
   groupId   String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relationships
-  group     CategoryGroup @relation(fields: [groupId], references: [id])
+  group        CategoryGroup @relation(fields: [groupId], references: [id])
   transactions Transaction[]
+
+  UserChallenge UserChallenge[]
 }
 
 model Transaction {
-  id          String     @id @default(cuid())
+  id          String          @id @default(cuid())
   amount      Float
   type        TransactionType
   categoryId  String?
   description String?
   date        DateTime
   userId      String
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
   // Relationships
-  user        User       @relation(fields: [userId], references: [id])
-  category    Category?  @relation(fields: [categoryId], references: [id])
+  user     User      @relation(fields: [userId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
 }
 
 model BonPlan {
-  id          String     @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
   description String
   location    String?
-  city       String?    // Add this field for the city
-  image       String?    // Image URL (optional)
-  categories  String[]   // Array of categories
+  city        String? // Add this field for the city
+  image       String? // Image URL (optional)
+  categories  String[] // Array of categories
 
   // Relationships
-  reviews     Review[]   // Reviews for this BonPlan
+  reviews Review[] // Reviews for this BonPlan
 }
 
 model Review {
-  id          String     @id @default(cuid())
-  rating      Int        @default(0)
-  comment     String?
-  userId      String
-  userName    String
-  bonPlanId   String
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id        String   @id @default(cuid())
+  rating    Int      @default(0)
+  comment   String?
+  userId    String
+  userName  String
+  bonPlanId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relationships
-  user        User       @relation(fields: [userId], references: [id])
-  bonPlan     BonPlan    @relation(fields: [bonPlanId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  bonPlan BonPlan @relation(fields: [bonPlanId], references: [id])
 }
 
 model Challenge {
-  id          String         @id @default(cuid())
+  id          String        @id @default(cuid())
   title       String
   description String
   type        ChallengeType
   goal        Float
-  duration    Int            // in days
+  duration    Int // in days
   reward      String?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   // Relationships
   participants UserChallenge[] // Users participating in this challenge
 }
 
 model UserChallenge {
-  id          String     @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   challengeId String
-  progress    Float      @default(0)
-  startDate   DateTime   @default(now())
-  completed   Boolean    @default(false)
+  progress    Float     @default(0)
+  startDate   DateTime  @default(now())
+  completed   Boolean   @default(false)
+  categoryId  String
   completedAt DateTime?
 
   // Relationships
-  user        User       @relation(fields: [userId], references: [id])
-  challenge   Challenge  @relation(fields: [challengeId], references: [id])
+  category        Category                @relation(fields: [categoryId], references: [id])
+  user            User                    @relation(fields: [userId], references: [id])
+  challenge       Challenge               @relation(fields: [challengeId], references: [id])
   progressHistory UserChallengeProgress[] // Add this line
 }
 
 // Add this new model
 model UserChallengeProgress {
-  id              String        @id @default(cuid())
+  id              String   @id @default(cuid())
   userChallengeId String
   amount          Float
-  date            DateTime      @default(now())
-  
+  date            DateTime @default(now())
+
   // Relationships
-  userChallenge   UserChallenge @relation(fields: [userChallengeId], references: [id], onDelete: Cascade)
+  userChallenge UserChallenge @relation(fields: [userChallengeId], references: [id], onDelete: Cascade)
 
   @@index([userChallengeId])
 }
 
 model UserSettings {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  language     String   @default("fr")
-  currency     String   @default("TND")
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  language      String  @default("fr")
+  currency      String  @default("TND")
   notifications Boolean @default(true)
-  theme        String   @default("light")
+  theme         String  @default("light")
 
   // Relationships
-  user         User     @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Feedback {
@@ -194,7 +199,7 @@ model Feedback {
   updatedAt DateTime @updatedAt
 
   // Relationships
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum TransactionType {

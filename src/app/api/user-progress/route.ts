@@ -12,7 +12,7 @@ export async function GET(req: Request) {
     const progress = await prisma.userChallengeProgress.findMany({
       where: {
         userChallenge: {
-          userId: session.userId
+          userId: session.user.id
         }
       },
       include: {
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     const userChallenge = await prisma.userChallenge.findFirst({
       where: {
         id: userChallengeId,
-        userId: session.userId
+        userId: session.user.id
       }
     });
 

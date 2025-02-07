@@ -56,11 +56,11 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user }:{ token: any, user: any} ) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        // token.isOnboarded = user.isOnboarded;
+        token.isOnboarded = user.isOnboarded;
       }
       return token;
     },

@@ -20,7 +20,7 @@ interface ChallengeCardProps {
     status: string;
   };
   onUpdateProgress: (id: string, newAmount: number) => void;
-  onJoinChallenge: (id: string) => void;
+  onJoinChallenge: (id: string,title:string) => void;
 }
 
 export const ChallengeCard = ({
@@ -87,7 +87,7 @@ export const ChallengeCard = ({
 
         {challenge.status === "upcoming" && (
           <Button
-            onClick={() => onJoinChallenge(challenge.id)}
+            onClick={() => onJoinChallenge(challenge.id,challenge.title)}
             className="w-full mt-4"
           >
             <Trophy className="w-4 h-4 mr-2" />

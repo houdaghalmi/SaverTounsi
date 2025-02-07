@@ -70,12 +70,12 @@ export default function ChallengesPage() {
     fetchData();
   }, []);
 
-  const handleJoinChallenge = async (challengeId: string) => {
+  const handleJoinChallenge = async (challengeId: string,challengeTitle:string) => {
     try {
       const response = await fetch("/api/user-challenges", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ challengeId }),
+        body: JSON.stringify({ challengeId,challengeTitle }),
       });
 
       if (!response.ok) throw new Error("Failed to join challenge");

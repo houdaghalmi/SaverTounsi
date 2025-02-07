@@ -5,39 +5,41 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token
     const path = req.nextUrl.pathname
-    console.log(path, path.startsWith('/signin'))
-    // Allow public routes
-    if (path.startsWith('/signin') || 
-        path.startsWith('/signup') || 
-        path === '/') {
+    const isAuthPage = path.startsWith('/signin') || path.startsWith('/signup')
+
+    // Prevent authenticated users from accessing auth pages
+    if (isAuthPage) {
+      if (token) {
+        // Redirect authenticated users to overview
+        return NextResponse.redirect(new URL('/overview', req.url))
+      }
+      // Allow non-authenticated users to access auth pages
       return NextResponse.next()
     }
-    // Redirect logic
-    if (path.startsWith('/categories') || 
-        path.startsWith('/budgets') || 
-        path.startsWith('/transactions') ||
-        path.startsWith('/bon-plans') ||
-        path.startsWith('/challenges')) {
-      if (!token) {
-        return NextResponse.redirect(new URL('/signin', req.url))
-      }
 
-      if (token && !token.isOnboarded) {
-        return NextResponse.redirect(new URL('/onboarding', req.url))
-      }
+    // Allow access to public routes
+    if (path === '/') {
+      return NextResponse.next()
     }
-
     
+    
+
+
+    return NextResponse.next()
   },
   {
     callbacks: {
       authorized: ({ token }) => !!token
+    },
+    pages: {
+      signIn: '/signin',
+      newUser: '/signup'      
     }
   }
 )
 
 export const config = {
   matcher: [
-    // '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|signup).*)',
   ]
 }

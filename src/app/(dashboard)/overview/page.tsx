@@ -1,18 +1,118 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-import Link from "next/link"; // Import the Link component
-import { DashboardData } from '@/types/dashboard'
+import Link from "next/link";
+import { DashboardData } from '@/types/dashboard';
+import { useCallback, useEffect, useState } from "react";
 
-export default async function OverviewPage() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard`, {
-    next: { revalidate: 60 } // Cache for 60 seconds
-  })
-  
-  const data: DashboardData = await res.json()
+interface FinancialCardProps {
+  title: string;
+  amount: number;
+  description: string;
+}
+
+interface ProgressCardProps {
+  title: string;
+  imagePath: string;
+  description: string;
+}
+
+const FinancialCard = ({ title, amount, description }: FinancialCardProps) => (
+  <Card className="bg-[#fdbb2d]">
+    <CardHeader>
+      <CardTitle className="text-[#1a2a6c]">{title}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <p className="text-2xl font-bold text-[#1a2a6c]">{amount} DT</p>
+      <CardDescription className="text-[#1a2a6c]">{description}</CardDescription>
+    </CardContent>
+  </Card>
+);
+
+const ProgressCard = ({ title, imagePath, description }: ProgressCardProps) => (
+  <Card className="bg-[#ffffff]">
+    <CardHeader>
+      <CardTitle className="text-[#1a2a6c]">{title}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="relative h-40 mb-4">
+        <Image
+          src={imagePath}
+          alt={title}
+          fill
+          className="object-cover rounded-lg"
+        />
+      </div>
+      <CardDescription className="text-[#1a2a6c]">{description}</CardDescription>
+    </CardContent>
+  </Card>
+);
+
+export default function OverviewPage() {
+  const [data, setData] = useState<DashboardData>({
+    totalBudget: 0,
+    totalExpenses: 0,
+    remainingBudget: 0,
+    totalIncome: 0,
+    categoryBreakdown: [],
+    recentTransactions: []
+  } as any);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await fetch('/api/dashboard');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch dashboard data');
+      }
+
+      const data = await response.json();
+      setData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
+
+  const financialCards = [
+    {
+      title: "Total Budget",
+      amount: data.totalBudget,
+      description: "Your total monthly budget across all categories."
+    },
+    {
+      title: "Total Expenses",
+      amount: data.totalExpenses,
+      description: "Your total expenses for the current month."
+    },
+    {
+      title: "Remaining Budget",
+      amount: data.remainingBudget,
+      description: "The amount left in your budget for the month."
+    }
+  ];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff] container mx-auto 0 pb-8">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff] container mx-auto pb-8">
       {/* Hero Section */}
       <section className="w-full py-20 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white text-center">
         <h1 className="text-5xl font-bold mb-4">Overview</h1>
@@ -20,7 +120,7 @@ export default async function OverviewPage() {
         <div className="space-x-4">
           <Link href="/logout">
             <Button variant="secondary" className="bg-[#fdbb2d] text-[#1a2a6c] hover:bg-[#b21f1f] hover:text-white">
-              log out
+              Log out
             </Button>
           </Link>
           <Link href="/about">
@@ -36,46 +136,13 @@ export default async function OverviewPage() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12 text-[#1a2a6c]">Financial Summary</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Total Budget */}
-            <Card className="bg-[#fdbb2d]">
-              <CardHeader>
-                <CardTitle className="text-[#1a2a6c]">Total Budget</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-[#1a2a6c]">
-                  {data.totalBudget} DT
-                </p>
-                <CardDescription className="text-[#1a2a6c]">
-                  Your total monthly budget across all categories.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            {/* Total Expenses */}
-            <Card className="bg-[#fdbb2d]">
-              <CardHeader>
-                <CardTitle className="text-[#1a2a6c]">Total Expenses</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-[#1a2a6c]">{data.totalExpenses} DT</p>
-                <CardDescription className="text-[#1a2a6c]">
-                  Your total expenses for the current month.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            {/* Remaining Budget */}
-            <Card className="bg-[#fdbb2d]">
-              <CardHeader>
-                <CardTitle className="text-[#1a2a6c]">Remaining Budget</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-[#1a2a6c]">{data.remainingBudget} DT</p>
-                <CardDescription className="text-[#1a2a6c]">
-                  The amount left in your budget for the month.
-                </CardDescription>
-              </CardContent>
-            </Card>
+            {isLoading ? (
+              <div className="col-span-3 text-center">Loading...</div>
+            ) : (
+              financialCards.map((card, index) => (
+                <FinancialCard key={index} {...card} />
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -85,49 +152,19 @@ export default async function OverviewPage() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12 text-[#1a2a6c]">Progress Tracking</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Budget Progress */}
-            <Card className="bg-[#ffffff]">
-              <CardHeader>
-                <CardTitle className="text-[#1a2a6c]">Budget Progress</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="relative h-40 mb-4">
-                  <Image
-                    src="/images/features/progress.png"
-                    alt="Budget Progress"
-                    fill
-                    className="object-cover rounded-lg"
-                  />
-                </div>
-                <CardDescription className="text-[#1a2a6c]">
-                  Track your budget usage and stay on target.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            {/* Savings Progress */}
-            <Card className="bg-[#ffffff]">
-              <CardHeader>
-                <CardTitle className="text-[#1a2a6c]">Savings Progress</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="relative h-40 mb-4">
-                  <Image
-                    src="/images/features/monthsavingreport.png"
-                    alt="Savings Progress"
-                    fill
-                    className="object-cover rounded-lg"
-                  />
-                </div>
-                <CardDescription className="text-[#1a2a6c]">
-                  Monitor your savings goals and achievements.
-                </CardDescription>
-              </CardContent>
-            </Card>
+            <ProgressCard
+              title="Budget Progress"
+              imagePath="/images/features/progress.png"
+              description="Track your budget usage and stay on target."
+            />
+            <ProgressCard
+              title="Savings Progress"
+              imagePath="/images/features/monthsavingreport.png"
+              description="Monitor your savings goals and achievements."
+            />
           </div>
         </div>
       </section>
-
     </div>
   );
 }
