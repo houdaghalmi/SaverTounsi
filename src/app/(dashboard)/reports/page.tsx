@@ -15,6 +15,7 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
+  LabelList,
 } from "recharts";
 import { useState, useEffect } from "react";
 
@@ -365,9 +366,13 @@ export default function ReportsPage() {
               <div className="w-full max-w-3xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Monthly Spending Card */}
-                  <Card>
+                  <Card >
                     <CardHeader>
-                      <CardTitle>Monthly Spending</CardTitle>
+                      <CardTitle className="text-[#1a2a6c]">
+                        {spendingViewMode === "detailed" 
+                          ? "Monthly Spending by Category"
+                          : "Monthly Spending by Group"}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-lg font-semibold">
@@ -377,20 +382,20 @@ export default function ReportsPage() {
                         <div className="flex gap-4">
                           <button
                             onClick={() => setSpendingViewMode("detailed")}
-                            className={`px-4 py-2 rounded-md ${
+                            className={`px-4 py-2 rounded-md transition-colors ${
                               spendingViewMode === "detailed"
-                                ? "bg-primary text-white"
-                                : "bg-gray-100"
+                                ? "bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white"
+                                : "bg-[#1a2a6c]/10 text-[#1a2a6c] hover:bg-[#1a2a6c]/20"
                             }`}
                           >
                             Detailed
                           </button>
                           <button
                             onClick={() => setSpendingViewMode("grouped")}
-                            className={`px-4 py-2 rounded-md ${
+                            className={`px-4 py-2 rounded-md transition-colors ${
                               spendingViewMode === "grouped"
-                                ? "bg-primary text-white"
-                                : "bg-gray-100"
+                                ? "bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white"
+                                : "bg-[#1a2a6c]/10 text-[#1a2a6c] hover:bg-[#1a2a6c]/20"
                             }`}
                           >
                             Grouped
@@ -402,15 +407,15 @@ export default function ReportsPage() {
                         <ul className="space-y-1">
                           {spendingViewMode === "detailed"
                             ? monthlyData.categories.map((category) => (
-                                <li key={category.id} className="flex justify-between">
+                                <li key={category.id} className="flex justify-between text-[#1a2a6c]">
                                   <span>{category.name}</span>
-                                  <span>{category.spent} DT</span>
+                                  <span className="font-medium text-[#b21f1f]">{category.spent} DT</span>
                                 </li>
                               ))
                             : monthlyGroupedCategories.map((group) => (
-                                <li key={group.groupName} className="flex justify-between">
+                                <li key={group.groupName} className="flex justify-between text-[#1a2a6c]">
                                   <span>{group.groupName}</span>
-                                  <span>{group.amount} DT</span>
+                                  <span className="font-medium text-[#b21f1f]">{group.amount} DT</span>
                                 </li>
                               ))}
                         </ul>
@@ -421,7 +426,11 @@ export default function ReportsPage() {
                   {/* Monthly Savings Card */}
                   <Card>
                     <CardHeader>
-                      <CardTitle>Monthly Savings</CardTitle>
+                      <CardTitle className="text-[#1a2a6c]">
+                        {savingViewMode === "detailed" 
+                          ? "Monthly Savings by Category"
+                          : "Monthly Savings by Group"}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-lg font-semibold">
@@ -431,20 +440,20 @@ export default function ReportsPage() {
                         <div className="flex gap-4">
                           <button
                             onClick={() => setSavingViewMode("detailed")}
-                            className={`px-4 py-2 rounded-md ${
+                            className={`px-4 py-2 rounded-md transition-colors ${
                               savingViewMode === "detailed"
-                                ? "bg-primary text-white"
-                                : "bg-gray-100"
+                                ? "bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white"
+                                : "bg-[#1a2a6c]/10 text-[#1a2a6c] hover:bg-[#1a2a6c]/20"
                             }`}
                           >
                             Detailed
                           </button>
                           <button
                             onClick={() => setSavingViewMode("grouped")}
-                            className={`px-4 py-2 rounded-md ${
+                            className={`px-4 py-2 rounded-md transition-colors ${
                               savingViewMode === "grouped"
-                                ? "bg-primary text-white"
-                                : "bg-gray-100"
+                                ? "bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white"
+                                : "bg-[#1a2a6c]/10 text-[#1a2a6c] hover:bg-[#1a2a6c]/20"
                             }`}
                           >
                             Grouped
@@ -456,15 +465,15 @@ export default function ReportsPage() {
                         <ul className="space-y-1">
                           {savingViewMode === "detailed"
                             ? monthlyData.savingsData.map((savings) => (
-                                <li key={savings.categoryName} className="flex justify-between">
+                                <li key={savings.categoryName} className="flex justify-between text-[#1a2a6c]">
                                   <span>{savings.categoryName}</span>
-                                  <span>{savings.saved} DT</span>
+                                  <span className="font-medium text-[#b21f1f]">{savings.saved} DT</span>
                                 </li>
                               ))
                             : monthlyGroupedSavings.map((group) => (
-                                <li key={group.groupName} className="flex justify-between">
+                                <li key={group.groupName} className="flex justify-between text-[#1a2a6c]">
                                   <span>{group.groupName}</span>
-                                  <span>{group.amount} DT</span>
+                                  <span className="font-medium text-[#b21f1f]">{group.amount} DT</span>
                                 </li>
                               ))}
                         </ul>
