@@ -9,14 +9,22 @@ export async function GET(req: Request) {
   }
 
   try {
+    const { searchParams } = new URL(req.url);
+    const categoryId = searchParams.get('categoryId');
+
     const transactions = await prisma.transaction.findMany({
-      include: {
-        category: true
-      },
       where: {
-        userId: session.user?.id
-      }
+        userId: session.user?.id,
+        ...(categoryId && { categoryId }),
+      },
+      include: {
+        category: true,
+      },
+      orderBy: {
+        date: 'desc',
+      },
     });
+
     return NextResponse.json(transactions);
   } catch (err) {
     console.error("Error fetching transactions:", (err as Error).stack);
@@ -25,16 +33,27 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
   try {
+    const session = await getSession();
+    if (!session) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const { amount, date, categoryId, description, type } = await req.json();
 
-    if (!amount || !date || !type) {
+    if (!amount || !date || !type || !categoryId) {
       return new NextResponse("Missing required fields", { status: 400 });
+    }
+
+    // First check if the category exists
+    const category = await prisma.category.findUnique({
+      where: {
+        id: categoryId,
+      },
+    });
+
+    if (!category) {
+      return new NextResponse("Category not found", { status: 404 });
     }
 
     const result = await prisma.$transaction(async (tx) => {

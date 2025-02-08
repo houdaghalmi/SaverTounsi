@@ -2,63 +2,105 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 import Image from "next/image";
 import Link from "next/link";
-import { DashboardData } from '@/types/dashboard';
 import { useCallback, useEffect, useState } from "react";
+import { Transaction } from "@prisma/client";
 
-interface FinancialCardProps {
-  title: string;
-  amount: number;
-  description: string;
+
+interface CategoryData {
+  id: string;
+  name: string;
+  budget: number;
+  spent: number;
+  groupId: string;
+  group: {
+    id: string;
+    name: string;
+  };
 }
 
-interface ProgressCardProps {
-  title: string;
-  imagePath: string;
-  description: string;
+interface DashboardData {
+  categories: CategoryData[];
+  transactions: Transaction[];
+  totalBudget: number;
+  totalExpenses: number;
+  monthlySummary: {
+    month: string;
+    spending: number;
+    saving: number;
+  }[];
 }
 
-const FinancialCard = ({ title, amount, description }: FinancialCardProps) => (
-  <Card className="bg-[#fdbb2d]">
+// Loading Card Component
+const LoadingCard = () => (
+  <Card className="bg-[#fdbb2d]/50">
     <CardHeader>
-      <CardTitle className="text-[#1a2a6c]">{title}</CardTitle>
+      <Skeleton className="h-4 w-[150px]" />
     </CardHeader>
     <CardContent>
-      <p className="text-2xl font-bold text-[#1a2a6c]">{amount} DT</p>
-      <CardDescription className="text-[#1a2a6c]">{description}</CardDescription>
+      <Skeleton className="h-8 w-[100px] mb-2" />
+      <Skeleton className="h-4 w-[200px]" />
     </CardContent>
   </Card>
 );
 
-const ProgressCard = ({ title, imagePath, description }: ProgressCardProps) => (
-  <Card className="bg-[#ffffff]">
+// Financial Card with Progress
+const FinancialCard = ({ title, current, total, description }: {
+  title: string;
+  current: number;
+  total: number;
+  description: string;
+}) => (
+  <Card className="bg-[#fdbb2d]/50 hover:bg-[#fdbb2d]/60 transition-all">
     <CardHeader>
       <CardTitle className="text-[#1a2a6c]">{title}</CardTitle>
     </CardHeader>
     <CardContent>
-      <div className="relative h-40 mb-4">
-        <Image
-          src={imagePath}
-          alt={title}
-          fill
-          className="object-cover rounded-lg"
-        />
-      </div>
-      <CardDescription className="text-[#1a2a6c]">{description}</CardDescription>
+      <p className="text-2xl font-bold text-[#1a2a6c]">{current.toFixed(2)} DT</p>
+      <Progress value={(current / total) * 100} className="my-2" />
+      <CardDescription className="text-[#1a2a6c]">
+        {description} ({((current / total) * 100).toFixed(1)}%)
+      </CardDescription>
     </CardContent>
   </Card>
+);
+
+// Transaction List Component
+const TransactionList = ({ transactions }: { transactions: Transaction[] }) => (
+  <div className="space-y-4">
+    {transactions.map((transaction) => (
+      <Card key={transaction.id} className="bg-white hover:shadow-md transition-all">
+        <CardContent className="flex justify-between items-center p-4">
+          <div>
+            <p className="font-semibold">{transaction.description}</p>
+            <p className="text-sm text-muted-foreground">{transaction.categoryId}</p>
+            <p className="text-xs text-muted-foreground">{new Date(transaction.date).toLocaleDateString()}</p>
+          </div>
+          <p className={`font-bold ${
+            transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
+          }`}>
+            {transaction.type === 'INCOME' ? '+' : '-'}{transaction.amount.toFixed(2)} DT
+          </p>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
 );
 
 export default function OverviewPage() {
-  const [data, setData] = useState<DashboardData>({
-    totalBudget: 0,
-    totalExpenses: 0,
-    remainingBudget: 0,
-    totalIncome: 0,
-    categoryBreakdown: [],
-    recentTransactions: []
-  } as any);
+  const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,14 +108,57 @@ export default function OverviewPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch('/api/dashboard');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch dashboard data');
+
+      // Fetch categories and transactions in parallel
+      const [categoriesResponse, transactionsResponse] = await Promise.all([
+        fetch('/api/categories'),
+        fetch('/api/transactions')
+      ]);
+
+      if (!categoriesResponse.ok || !transactionsResponse.ok) {
+        throw new Error('Failed to fetch data');
       }
 
-      const data = await response.json();
-      setData(data);
+      const categories: CategoryData[] = await categoriesResponse.json();
+      const transactions: Transaction[] = await transactionsResponse.json();
+
+      // Calculate totals
+      const totalBudget = categories.reduce((acc, cat) => acc + cat.budget, 0);
+      const totalExpenses = categories.reduce((acc, cat) => acc + cat.spent, 0);
+
+      // Calculate monthly summary for the last 6 months
+      const monthlySummary = Array.from({ length: 6 }, (_, i) => {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const month = date.toLocaleString('default', { month: 'short' });
+        
+        const monthTransactions = transactions.filter(t => {
+          const tDate = new Date(t.date);
+          return tDate.getMonth() === date.getMonth() && 
+                 tDate.getFullYear() === date.getFullYear();
+        });
+
+        return {
+          month,
+          spending: monthTransactions
+            .filter(t => t.type === 'EXPENSE')
+            .reduce((acc, t) => acc + t.amount, 0),
+          saving: monthTransactions
+            .filter(t => t.type === 'INCOME')
+            .reduce((acc, t) => acc + t.amount, 0) -
+            monthTransactions
+            .filter(t => t.type === 'EXPENSE')
+            .reduce((acc, t) => acc + t.amount, 0)
+        };
+      }).reverse();
+
+      setData({
+        categories,
+        transactions,
+        totalBudget,
+        totalExpenses,
+        monthlySummary
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -88,83 +173,104 @@ export default function OverviewPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-500">Error: {error}</p>
+        <Card className="p-6 bg-red-50">
+          <CardTitle className="text-red-600 mb-2">Error</CardTitle>
+          <CardDescription>{error}</CardDescription>
+          <Button onClick={fetchDashboardData} className="mt-4">
+            Retry
+          </Button>
+        </Card>
       </div>
     );
   }
 
-  const financialCards = [
-    {
-      title: "Total Budget",
-      amount: data.totalBudget,
-      description: "Your total monthly budget across all categories."
-    },
-    {
-      title: "Total Expenses",
-      amount: data.totalExpenses,
-      description: "Your total expenses for the current month."
-    },
-    {
-      title: "Remaining Budget",
-      amount: data.remainingBudget,
-      description: "The amount left in your budget for the month."
-    }
-  ];
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff] container mx-auto pb-8">
+    <div className="flex flex-col min-h-screen w-full bg-background">
       {/* Hero Section */}
-      <section className="w-full py-20 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white text-center">
-        <h1 className="text-5xl font-bold mb-4">Overview</h1>
-        <p className="text-xl mb-8">Get a snapshot of your financial health.</p>
-        <div className="space-x-4">
-          <Link href="/logout">
-            <Button variant="secondary" className="bg-[#fdbb2d] text-[#1a2a6c] hover:bg-[#b21f1f] hover:text-white">
-              Log out
-            </Button>
-          </Link>
-          <Link href="/about">
-            <Button variant="outline" className="text-black border-white hover:bg-[#fdbb2d] hover:text-[#1a2a6c]">
-              Learn More
-            </Button>
-          </Link>
+      <section className="w-full py-12 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white">
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl font-bold mb-4">Financial Overview</h1>
+          <p className="text-xl opacity-90">
+            {new Date().toLocaleDateString('en-US', { 
+              month: 'long',
+              year: 'numeric'
+            })}
+          </p>
         </div>
       </section>
 
-      {/* Financial Summary Section */}
-      <section className="w-full py-20 bg-[#ffffff]">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 text-[#1a2a6c]">Financial Summary</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {isLoading ? (
-              <div className="col-span-3 text-center">Loading...</div>
-            ) : (
-              financialCards.map((card, index) => (
-                <FinancialCard key={index} {...card} />
-              ))
-            )}
-          </div>
+      {/* Dashboard Content */}
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        {/* Financial Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {isLoading ? (
+            <>
+              <LoadingCard />
+              <LoadingCard />
+              <LoadingCard />
+            </>
+          ) : data && (
+            <>
+              <FinancialCard
+                title="Budget Usage"
+                current={data.totalExpenses}
+                total={data.totalBudget}
+                description={`${(data.totalBudget - data.totalExpenses).toFixed(2)} DT remaining`}
+              />
+              <FinancialCard
+                title="Monthly Savings"
+                current={data.monthlySummary[data.monthlySummary.length - 1].saving}
+                total={data.totalBudget * 0.2} // Assuming 20% savings goal
+                description="Of monthly savings goal"
+              />
+              <FinancialCard
+                title="Monthly Spending"
+                current={data.totalExpenses}
+                total={data.totalBudget}
+                description="Current month expenses"
+              />
+            </>
+          )}
         </div>
-      </section>
 
-      {/* Progress Tracking Section */}
-      <section className="w-full py-20 bg-[#fdbb2d]">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 text-[#1a2a6c]">Progress Tracking</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <ProgressCard
-              title="Budget Progress"
-              imagePath="/images/features/progress.png"
-              description="Track your budget usage and stay on target."
-            />
-            <ProgressCard
-              title="Savings Progress"
-              imagePath="/images/features/monthsavingreport.png"
-              description="Monitor your savings goals and achievements."
-            />
+        {/* Charts Section */}
+        {!isLoading && data && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Spending Trend */}
+            <Card className="p-6">
+              <CardHeader>
+                <CardTitle>Spending Trend</CardTitle>
+              </CardHeader>
+              <CardContent className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data.monthlySummary}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="spending"
+                      stroke="#1a2a6c"
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Recent Transactions */}
+            <Card className="p-6">
+              <CardHeader>
+                <CardTitle>Recent Transactions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TransactionList transactions={data.transactions.slice(0, 5)} />
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </section>
+        )}
+      </div>
     </div>
   );
 }

@@ -346,8 +346,8 @@ export default function ReportsPage() {
 
   // Previous JSX remains the same until the challenges tab
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 w-full">
+      <div className="flex justify-between items-center w-full">
         <h1 className="text-2xl font-bold">Reports</h1>
       </div>
 
@@ -360,10 +360,10 @@ export default function ReportsPage() {
 
         <div className="mt-4">
           {/* Monthly Report */}
-          <TabsContent value="monthly">
+          <TabsContent value="monthly" className='flex flex-col w-full'>
             <h2 className="text-xl font-semibold mb-4">Monthly Report</h2>
-            <div className="flex justify-end">
-              <div className="w-full max-w-3xl">
+            <div className="flex w-full justify-start">
+              <div className="w-full ">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Monthly Spending Card */}
                   <Card >
@@ -570,7 +570,7 @@ export default function ReportsPage() {
 <TabsContent value="yearly">
             <h2 className="text-xl font-semibold mb-4">Yearly Report</h2>
             <div className="flex justify-end">
-              <div className="w-full max-w-3xl">
+              <div className="w-full ">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Yearly Spending Card */}
                   <Card>
@@ -772,7 +772,7 @@ export default function ReportsPage() {
           <TabsContent value="challenges">
             <h2 className="text-xl font-semibold mb-4">Challenge Progress</h2>
             <div className="flex justify-end">
-              <div className="w-full max-w-3xl space-y-6">
+              <div className="w-full  space-y-6">
                 {userChallenges.map((userChallenge) => (
                   <Card key={userChallenge.id}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

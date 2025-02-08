@@ -71,3 +71,14 @@ export const bonPlanSchema = z.object({
   startDate: z.date(),
   endDate: z.date(),
 })
+
+
+export const transactionValidation = z.object({
+  type: z.enum(["INCOME", "EXPENSE"]),
+  amount: z.number().positive(),
+  categoryId: z.string().min(1),
+  date: z.date(),
+  description: z.string().optional(),
+});
+
+export type TransactionInput = z.infer<typeof transactionValidation>;

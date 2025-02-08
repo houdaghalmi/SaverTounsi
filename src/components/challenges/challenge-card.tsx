@@ -1,36 +1,35 @@
 "use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { formatCurrency } from "@/lib/utils";
+import { Challenge } from "@prisma/client";
 
-interface ChallengeCardProps {
-  challenge: {
-    id: string;
-    title: string;
-    description: string;
-    goal: number;
-    current: number;
-    progress: number;
-    participants: number;
-    duration: number;
-    reward?: string;
-    status: string;
-  };
-  onUpdateProgress: (id: string, newAmount: number) => void;
-  onJoinChallenge: (id: string,title:string) => void;
+interface ExtendedChallenge extends Challenge {
+  progress: number;
+  current: number;
+  participants: number;
+  status: 'active' | 'completed' | 'available';
 }
 
-export const ChallengeCard = ({
+interface ChallengeCardProps {
+  challenge: ExtendedChallenge;
+  onUpdateProgress: (id: string, newAmount: number) => void;
+  onJoinChallenge: (id: string, title: string) => void;
+}
+
+export function ChallengeCard({
   challenge,
   onUpdateProgress,
   onJoinChallenge,
-}: ChallengeCardProps) => {
+}: ChallengeCardProps) {
   const [amount, setAmount] = useState("");
 
-  const handleUpgradeProgress = () => {
+  const handleUpdateProgress = () => {
     const amountValue = parseFloat(amount);
     if (isNaN(amountValue) || amountValue <= 0) {
       alert("Please enter a valid amount.");
@@ -42,7 +41,7 @@ export const ChallengeCard = ({
   };
 
   return (
-    <Card className="w-full max-w-sm hover:shadow-lg transition-shadow">
+    <Card className="w-full hover:shadow-lg transition-shadow">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Trophy className="w-5 h-5 text-primary" />
@@ -56,10 +55,10 @@ export const ChallengeCard = ({
           <div className="flex justify-between text-sm">
             <span>Progress</span>
             <span>
-              {Math.min(Math.round(challenge.progress), 100)}/100%
+              {formatCurrency(challenge.current)} / {formatCurrency(challenge.goal)}
             </span>
           </div>
-          <Progress value={Math.min(Math.round(challenge.progress), 100)} />
+          <Progress value={Math.min(challenge.progress, 100)} />
         </div>
 
         <div className="flex items-center justify-between text-sm text-gray-600">
@@ -70,7 +69,7 @@ export const ChallengeCard = ({
           <span>{challenge.duration} days</span>
         </div>
 
-        <div className="text-sm text-gray-600">
+        <div className="text-sm">
           Status:{" "}
           <span
             className={`font-medium ${
@@ -85,10 +84,10 @@ export const ChallengeCard = ({
           </span>
         </div>
 
-        {challenge.status === "upcoming" && (
+        {challenge.status === "available" && (
           <Button
-            onClick={() => onJoinChallenge(challenge.id,challenge.title)}
-            className="w-full mt-4"
+            onClick={() => onJoinChallenge(challenge.id, challenge.title)}
+            className="w-full"
           >
             <Trophy className="w-4 h-4 mr-2" />
             Join Challenge
@@ -96,7 +95,7 @@ export const ChallengeCard = ({
         )}
 
         {challenge.status === "active" && (
-          <div className="mt-4 space-y-2">
+          <div className="space-y-2">
             <Input
               type="number"
               step="0.01"
@@ -106,11 +105,11 @@ export const ChallengeCard = ({
               onChange={(e) => setAmount(e.target.value)}
             />
             <Button
-              onClick={handleUpgradeProgress}
+              onClick={handleUpdateProgress}
               disabled={challenge.progress >= 100}
               className="w-full"
             >
-              Add Amount
+              Add Progress
             </Button>
           </div>
         )}
@@ -123,4 +122,4 @@ export const ChallengeCard = ({
       </CardContent>
     </Card>
   );
-};
+}
