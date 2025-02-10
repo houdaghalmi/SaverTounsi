@@ -168,7 +168,7 @@ export default function Home() {
                   <div className="space-y-4">
                     <div className="text-center">
                       <p className="text-4xl font-bold">40dt<span className="text-xl">/month</span></p>
-                      <p className="text-sm text-gray-300">or 10dt/day</p>
+                      <p className="text-sm text-gray-300">or 10dt/week</p>
                     </div>
                     <Button size="lg" className="w-full bg-[#fdbb2d] text-[#1a2a6c] hover:bg-[#fdbb2d]/90">
                       Upgrade Now
