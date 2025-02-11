@@ -6,6 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Challenge, UserChallenge } from "@prisma/client";
 import { useState, useEffect } from "react";
 
+// Add this interface near the top of the file
+interface ChallengeWithDetails extends Challenge {
+  current: number;
+  progress: number;
+  participants: number;
+  status: 'active' | 'completed' | 'available';
+}
 
 export default function ChallengesPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -30,8 +37,19 @@ export default function ChallengesPage() {
           userChallengesRes.json(),
         ]);
 
-        setChallenges(challengesData);
-        setUserChallenges(userChallengesData);
+        // Validate the data
+        if (!Array.isArray(challengesData) || !Array.isArray(userChallengesData)) {
+          throw new Error("Invalid data format received");
+        }
+
+        // Ensure all required fields are present
+        const validChallenges = challengesData.filter(c => c && c.id && c.title);
+        const validUserChallenges = userChallengesData.filter(
+          uc => uc && uc.id && uc.challengeId && uc.challenge
+        );
+
+        setChallenges(validChallenges);
+        setUserChallenges(validUserChallenges);
       } catch (error) {
         setError(error instanceof Error ? error.message : "An unknown error occurred");
       } finally {
@@ -69,12 +87,30 @@ export default function ChallengesPage() {
 
       const challenge = challenges.find(c => c.id === challengeId);
       if (!challenge) return;
-      
-      // Calculate new total progress by adding the new amount
+
+      // Calculate new total progress
       const newProgress = userChallenge.progress + newAmount;
       const isCompleted = newProgress >= userChallenge.challenge.goal;
 
-      // First save the progress point
+      // Save the transaction first
+      const transactionResponse = await fetch('/api/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: newAmount,
+          type: 'EXPENSE',
+          description: `Challenge: ${challenge.title}`,
+          date: new Date().toISOString(),
+          categoryId: userChallenge.categoryId, // Add categoryId from userChallenge
+        }),
+      });
+
+      if (!transactionResponse.ok) {
+        const errorData = await transactionResponse.json();
+        throw new Error(`Failed to save transaction: ${errorData.error || 'Unknown error'}`);
+      }
+
+      // Then save the progress point
       const progressResponse = await fetch('/api/user-progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -88,31 +124,14 @@ export default function ChallengesPage() {
         throw new Error('Failed to save progress point');
       }
 
-      // Save the transaction
-      const transactionResponse = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: newAmount,
-          type: 'EXPENSE',
-          challengeId: challengeId,
-          description: challenge.description,
-          date: new Date(),
-        }),
-      });
-
-      if (!transactionResponse.ok) {
-        throw new Error('Failed to save transaction');
-      }
-
-      // Then update the challenge progress
+      // Finally update the challenge progress
       const response = await fetch(`/api/user-challenges/${userChallenge.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           progress: newProgress,
           completed: isCompleted,
-          completedAt: isCompleted ? new Date() : null,
+          completedAt: isCompleted ? new Date().toISOString() : null,
         }),
       });
 
@@ -126,6 +145,8 @@ export default function ChallengesPage() {
       );
     } catch (error) {
       console.error("Error updating progress:", error);
+      // Add user feedback here
+      alert(error instanceof Error ? error.message : "Failed to update progress");
     }
   };
 
@@ -178,11 +199,11 @@ export default function ChallengesPage() {
 
       <ProgressTracker
         milestones={userChallenges
-          .filter(uc => !uc.completedAt) // Only show active challenges in tracker
+          .filter(uc => !uc.completedAt && uc.challenge) // Add check for challenge existence
           .map((uc) => ({
-            title: uc.challenge.title,
-            target: uc.challenge.goal,
-            current: uc.progress,
+            title: uc.challenge?.title || 'Unnamed Challenge', // Add fallback
+            target: uc.challenge?.goal || 0,
+            current: uc.progress || 0,
             unit: "DT",
             isCompleted: !!uc.completedAt,
           }))}
