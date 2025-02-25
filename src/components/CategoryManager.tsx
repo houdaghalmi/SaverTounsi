@@ -244,20 +244,24 @@ export default function CategoryManager() {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold text-[#1a2a6c]">{group.name}</h2>
                   <div className="flex items-center space-x-2">
-                    <button
-                      className="flex items-center text-[#1a2a6c] hover:text-[#fdbb2d] transition-colors"
-                      onClick={() => handleAddCategoryClick(group.id)}
-                    >
-                      <PlusCircle className="w-4 h-4 mr-1" />
-                      Add Category
-                    </button>
-                    <button
-                      className="flex items-center text-[#b21f1f] hover:text-[#b21f1f]/70 transition-colors"
-                      onClick={() => removeCategoryGroup(group.id)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Remove Group
-                    </button>
+                    {group.name.toLowerCase() !== "challenges" && (
+                      <>
+                        <button
+                          className="flex items-center text-[#1a2a6c] hover:text-[#fdbb2d] transition-colors"
+                          onClick={() => handleAddCategoryClick(group.id)}
+                        >
+                          <PlusCircle className="w-4 h-4 mr-1" />
+                          Add Category
+                        </button>
+                        <button
+                          className="flex items-center text-[#b21f1f] hover:text-[#b21f1f]/70 transition-colors"
+                          onClick={() => removeCategoryGroup(group.id)}
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Remove Group
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -272,15 +276,17 @@ export default function CategoryManager() {
                           <div className="font-medium">{category.name}</div>
                           <div className="flex items-center space-x-2">
                             <div className={`h-2 w-24 rounded ${getProgressColor(category)}`} />
-                            <button
-                              className="p-1 hover:bg-gray-100 rounded"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                removeCategory(category.id);
-                              }}
-                            >
-                              <Trash2 className="w-4 h-4 text-red-500" />
-                            </button>
+                            {group.name.toLowerCase() !== "challenges" && (
+                              <button
+                                className="p-1 hover:bg-gray-100 rounded"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeCategory(category.id);
+                                }}
+                              >
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                              </button>
+                            )}
                           </div>
                         </div>
                         <div className="text-sm text-gray-600">
