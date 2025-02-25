@@ -25,13 +25,10 @@ export default function CategoryManager() {
   const [showNewGroupModal, setShowNewGroupModal] = useState(false);
   const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
   const [showEditBudgetModal, setShowEditBudgetModal] = useState(false);
-  const [showEditCategoryBudgetModal, setShowEditCategoryBudgetModal] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newBudgetAmount, setNewBudgetAmount] = useState("");
-  const [categoryBudgetAmount, setCategoryBudgetAmount] = useState("");
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -133,49 +130,6 @@ export default function CategoryManager() {
     }
   };
 
-  // Update the budget for a specific category
-  const updateCategoryBudget = async () => {
-    if (!editingCategory) return;
-
-    const amount = parseFloat(categoryBudgetAmount);
-    if (!isNaN(amount) && amount >= 0) {
-      try {
-        const response = await fetch("/api/categories", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: editingCategory.id,
-            budget: amount,
-          }),
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to update category budget: ${response.statusText}`);
-        }
-        const updatedCategory = await response.json();
-        console.log("Updated category:", updatedCategory); // Log the updated category
-        setCategoryGroups(
-          categoryGroups.map((group) => ({
-            ...group,
-            categories: group.categories.map((cat) => {
-              if (cat.id === updatedCategory.id) {
-                return updatedCategory;
-              }
-              return cat;
-            }),
-          }))
-        );
-        setShowEditCategoryBudgetModal(false);
-        setEditingCategory(null);
-        setCategoryBudgetAmount("");
-      } catch (error) {
-        console.error("Error updating category budget:", error);
-        setError(error instanceof Error ? error.message : "An unknown error occurred");
-      }
-    }
-  };
-
   // Update the total budget
   const updateBudget = () => {
     const amount = parseFloat(newBudgetAmount);
@@ -190,14 +144,6 @@ export default function CategoryManager() {
   const handleAddCategoryClick = (groupId: string) => {
     setSelectedGroupId(groupId);
     setShowNewCategoryModal(true);
-  };
-
-  // Handle editing a category's budget
-  const handleEditCategoryBudget = (category: Category, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingCategory(category);
-    setCategoryBudgetAmount(category.budget.toString());
-    setShowEditCategoryBudgetModal(true);
   };
 
   // Remove a category group
@@ -328,12 +274,6 @@ export default function CategoryManager() {
                             <div className={`h-2 w-24 rounded ${getProgressColor(category)}`} />
                             <button
                               className="p-1 hover:bg-gray-100 rounded"
-                              onClick={(e) => handleEditCategoryBudget(category, e)}
-                            >
-                              <Edit2 className="w-4 h-4 text-gray-500" />
-                            </button>
-                            <button
-                              className="p-1 hover:bg-gray-100 rounded"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 removeCategory(category.id);
@@ -448,41 +388,6 @@ export default function CategoryManager() {
               <button
                 className="px-4 py-2 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white rounded hover:opacity-90 transition-opacity"
                 onClick={updateBudget}
-              >
-                Update
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Category Budget Modal */}
-      {showEditCategoryBudgetModal && (
-        <div className="fixed inset-0 bg-[#1a2a6c]/50 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white/95 rounded-lg p-6 w-96 shadow-xl border border-[#1a2a6c]/20">
-            <h3 className="text-lg font-semibold mb-4 text-[#1a2a6c]">
-              Edit Budget for {editingCategory?.name}
-            </h3>
-            <input
-              type="number"
-              className="w-full border border-[#1a2a6c]/20 rounded p-2 mb-4 focus:border-[#fdbb2d] focus:ring-1 focus:ring-[#fdbb2d] outline-none"
-              placeholder="New budget amount"
-              value={categoryBudgetAmount}
-              onChange={(e) => setCategoryBudgetAmount(e.target.value)}
-            />
-            <div className="flex justify-end space-x-2">
-              <button
-                className="px-4 py-2 text-[#1a2a6c] hover:bg-[#1a2a6c]/5 rounded transition-colors"
-                onClick={() => {
-                  setShowEditCategoryBudgetModal(false);
-                  setEditingCategory(null);
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white rounded hover:opacity-90 transition-opacity"
-                onClick={updateCategoryBudget}
               >
                 Update
               </button>
