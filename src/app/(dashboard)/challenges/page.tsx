@@ -77,6 +77,7 @@ export default function ChallengesPage() {
     }
   };
 
+  // Update the handleUpdateProgress function to manage both card and tracker progress
   const handleUpdateProgress = async (challengeId: string, newAmount: number) => {
     try {
       const userChallenge = userChallenges.find(
@@ -90,7 +91,16 @@ export default function ChallengesPage() {
 
       // Calculate new total progress
       const newProgress = userChallenge.progress + newAmount;
-      const isCompleted = newProgress >= challenge.goal; // Use challenge.goal instead of userChallenge.challenge.goal
+      const isCompleted = newProgress >= challenge.goal;
+
+      // Optimistically update the UI
+      setUserChallenges((prev) =>
+        prev.map((uc) =>
+          uc.id === userChallenge.id
+            ? { ...uc, progress: newProgress, completedAt: isCompleted ? new Date() : null }
+            : uc
+        )
+      );
 
       // Save the transaction first
       const transactionResponse = await fetch('/api/transactions', {
@@ -110,7 +120,7 @@ export default function ChallengesPage() {
         throw new Error(`Failed to save transaction: ${errorData.error || 'Unknown error'}`);
       }
 
-      // Then save the progress point
+      // Save progress point
       const progressResponse = await fetch('/api/user-progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -124,7 +134,7 @@ export default function ChallengesPage() {
         throw new Error('Failed to save progress point');
       }
 
-      // Finally update the challenge progress
+      // Update challenge progress
       const response = await fetch(`/api/user-challenges/${userChallenge.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -135,17 +145,24 @@ export default function ChallengesPage() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to update progress");
+      if (!response.ok) {
+        throw new Error("Failed to update challenge progress");
+      }
 
-      const updatedUserChallenge = await response.json();
-      setUserChallenges((prev) =>
-        prev.map((uc) =>
-          uc.id === updatedUserChallenge.id ? updatedUserChallenge : uc
-        )
-      );
+      // Only revert if any API call fails
+      if (!transactionResponse.ok || !progressResponse.ok || !response.ok) {
+        setUserChallenges((prev) =>
+          prev.map((uc) =>
+            uc.id === userChallenge.id
+              ? { ...uc, progress: userChallenge.progress, completedAt: userChallenge.completedAt }
+              : uc
+          )
+        );
+        throw new Error("Failed to update progress");
+      }
+
     } catch (error) {
       console.error("Error updating progress:", error);
-      // Add user feedback here
       alert(error instanceof Error ? error.message : "Failed to update progress");
     }
   };
