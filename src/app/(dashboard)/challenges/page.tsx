@@ -90,7 +90,7 @@ export default function ChallengesPage() {
 
       // Calculate new total progress
       const newProgress = userChallenge.progress + newAmount;
-      const isCompleted = newProgress >= userChallenge.challenge.goal;
+      const isCompleted = newProgress >= challenge.goal; // Use challenge.goal instead of userChallenge.challenge.goal
 
       // Save the transaction first
       const transactionResponse = await fetch('/api/transactions', {
@@ -101,7 +101,7 @@ export default function ChallengesPage() {
           type: 'EXPENSE',
           description: `Challenge: ${challenge.title}`,
           date: new Date().toISOString(),
-          categoryId: userChallenge.categoryId, // Add categoryId from userChallenge
+          categoryId: userChallenge.categoryId,
         }),
       });
 
@@ -188,7 +188,8 @@ export default function ChallengesPage() {
   };
 
   const calculateProgressPercentage = (current: number, goal: number) => {
-    return (current / goal) * 100;
+    if (!goal || goal === 0) return 0;
+    return Math.round((current / goal) * 100); // This will round to nearest whole number
   };
 
   return (
@@ -237,7 +238,7 @@ export default function ChallengesPage() {
                     progress: calculateProgressPercentage(
                       userChallenge?.progress || 0,
                       challenge.goal
-                    ),
+                    ), // This will now return whole numbers
                     participants: userChallenges.filter(
                       (uc) => uc.challengeId === challenge.id
                     ).length,

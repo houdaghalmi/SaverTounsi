@@ -55,10 +55,16 @@ export function ChallengeCard({
           <div className="flex justify-between text-sm">
             <span>Progress</span>
             <span>
-              {formatCurrency(challenge.current)} / {formatCurrency(challenge.goal)}
+              {Math.round(challenge.progress)}% {/* This will show whole numbers only */}
             </span>
           </div>
-          <Progress value={Math.min(challenge.progress, 100)} />
+          <Progress 
+            value={challenge.progress} 
+            className="h-2"
+          />
+          <div className="text-sm text-gray-600">
+            {challenge.current.toLocaleString()} / {challenge.goal.toLocaleString()} DT
+          </div>
         </div>
 
         <div className="flex items-center justify-between text-sm text-gray-600">
