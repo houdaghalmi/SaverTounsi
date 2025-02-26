@@ -32,11 +32,16 @@ export default function TransactionsPage() {
         throw new Error("Failed to fetch categories");
       }
       const data = await response.json();
-      setCategories(data);
+      // Filter out categories with group name "Challenges"
+      const filteredCategories = data.filter(
+        (category: Category) => category.group?.name !== "Challenges"
+      );
+      setCategories(filteredCategories);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
+
   // Fetch categories from the API
   const fetchTransactions = async () => {
     try {
