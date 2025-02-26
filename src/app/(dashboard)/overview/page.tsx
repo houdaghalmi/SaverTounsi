@@ -76,9 +76,8 @@ const FinancialCard = ({ title, current, total, description }: {
     </CardHeader>
     <CardContent>
       <p className="text-2xl font-bold text-[#1a2a6c]">{current.toFixed(2)} DT</p>
-      <Progress value={(current / total) * 100} className="my-2" />
-      <CardDescription className="text-[#1a2a6c]">
-        {description} ({((current / total) * 100).toFixed(1)}%)
+      <CardDescription className="text-[#1a2a6c] mt-2">
+        {description}
       </CardDescription>
     </CardContent>
   </Card>
@@ -215,32 +214,25 @@ export default function OverviewPage() {
       {/* Dashboard Content */}
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Financial Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {isLoading ? (
             <>
-              <LoadingCard />
               <LoadingCard />
               <LoadingCard />
             </>
           ) : data && (
             <>
               <FinancialCard
-                title="Budget Usage"
-                current={data.totalExpenses}
-                total={data.totalBudget}
-                description={`${(data.totalBudget - data.totalExpenses).toFixed(2)} DT remaining`}
-              />
-              <FinancialCard
                 title="Monthly Savings"
                 current={data.monthlySummary[data.monthlySummary.length - 1].saving}
-                total={data.totalBudget * 0.2} // Assuming 20% savings goal
-                description="Of monthly savings goal"
+                total={data.totalBudget * 0.2}
+                description=""
               />
               <FinancialCard
                 title="Monthly Spending"
                 current={data.totalExpenses}
                 total={data.totalBudget}
-                description="Current month expenses"
+                description=""
               />
             </>
           )}
