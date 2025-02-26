@@ -43,6 +43,13 @@ interface DashboardData {
   }[];
 }
 
+interface TransactionWithCategory extends Transaction {
+  category?: {
+    id: string;
+    name: string;
+  } | null;
+}
+
 // Loading Card Component
 const LoadingCard = () => (
   <Card className="bg-[#fdbb2d]/50">
@@ -78,15 +85,21 @@ const FinancialCard = ({ title, current, total, description }: {
 );
 
 // Transaction List Component
-const TransactionList = ({ transactions }: { transactions: Transaction[] }) => (
+const TransactionList = ({ transactions }: { transactions: TransactionWithCategory[] }) => (
   <div className="space-y-4">
     {transactions.map((transaction) => (
       <Card key={transaction.id} className="bg-white hover:shadow-md transition-all">
         <CardContent className="flex justify-between items-center p-4">
           <div>
-            <p className="font-semibold">{transaction.description}</p>
-            <p className="text-sm text-muted-foreground">{transaction.categoryId}</p>
-            <p className="text-xs text-muted-foreground">{new Date(transaction.date).toLocaleDateString()}</p>
+            <p className="font-semibold">
+            {transaction.category?.name || 'Uncategorized'}
+            </p>
+            <p className="text-sm text-muted-foreground">
+            {transaction.description || 'No Description'}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {new Date(transaction.date).toLocaleDateString()}
+            </p>
           </div>
           <p className={`font-bold ${
             transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
