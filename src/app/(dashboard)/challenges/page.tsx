@@ -109,7 +109,7 @@ export default function ChallengesPage() {
         body: JSON.stringify({
           amount: newAmount,
           type: 'EXPENSE',
-          description: `Challenge: ${challenge.title}`,
+          description: `Challenge`,
           date: new Date().toISOString(),
           categoryId: userChallenge.categoryId,
         }),
