@@ -21,7 +21,7 @@ interface UserChallenge {
   categoryId: string;
 }
 
-export default function ChallengePage({ params }: { params: { id: string } }) {
+export default function ChallengePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [userChallenge, setUserChallenge] = useState<UserChallenge | null>(null);
   const [transactions, setTransactions] = useState([]);
@@ -35,7 +35,7 @@ export default function ChallengePage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchChallengeData = async () => {
       try {
-        const response = await fetch(`/api/user-challenges/${params.id}`);
+        const response = await fetch(`/api/user-challenges/${(await params).id}`);
         if (response.ok) {
           const data = await response.json();
           setUserChallenge(data);
@@ -57,7 +57,7 @@ export default function ChallengePage({ params }: { params: { id: string } }) {
     };
 
     fetchChallengeData();
-  }, [params.id]);
+  }, [params]);
 
   const handleChallengeComplete = async () => {
     try {

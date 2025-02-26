@@ -2,6 +2,43 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth-utils";
 
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getSession();
+    const id = (await params).id;
+    if (!session) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const userChallenge = await prisma.userChallenge.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        challenge: true,
+      },
+    });
+
+    if (!userChallenge) {
+      return NextResponse.json({ error: "Challenge not found" }, { status: 404 });
+    }
+
+    if (userChallenge.userId !== session.user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    return NextResponse.json(userChallenge);
+  } catch (error) {
+    console.error("Error fetching challenge:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch challenge" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function PATCH(
   request: NextRequest,
@@ -45,39 +82,3 @@ export async function PATCH(
   }
 }
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    const userChallenge = await prisma.userChallenge.findUnique({
-      where: {
-        id: params.id,
-      },
-      include: {
-        challenge: true,
-      },
-    });
-
-    if (!userChallenge) {
-      return NextResponse.json({ error: "Challenge not found" }, { status: 404 });
-    }
-
-    if (userChallenge.userId !== session.user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    }
-
-    return NextResponse.json(userChallenge);
-  } catch (error) {
-    console.error("Error fetching challenge:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch challenge" },
-      { status: 500 }
-    );
-  }
-}

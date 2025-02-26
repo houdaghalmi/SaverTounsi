@@ -15,7 +15,10 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const handleStart = () => console.log("handleStart") && setIsNavigating(true);
+    const handleStart = () => {
+      console.log("handleStart");
+      setIsNavigating(true);
+    };
     const handleStop = () => setIsNavigating(false);
 
     window.addEventListener("navigationstart", handleStart);

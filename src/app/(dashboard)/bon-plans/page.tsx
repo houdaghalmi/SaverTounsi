@@ -120,7 +120,7 @@ export default function BonPlansPage() {
         {/* Filters */}
         <div className="lg:col-span-1">
           <DealFilters
-            onFilterChange={handleFilterChange}
+            onFilterChangeAction={handleFilterChange}
             categories={["Food & Dining", "Shopping", "Entertainment"]}
           />
         </div>

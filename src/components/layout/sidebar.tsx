@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Home, Wallet, Tag, Trophy, Settings, LogOut, PieChart, Bell, Star, HelpCircle } from "lucide-react"; // Updated icons
+import { Wallet, Trophy, Settings, LogOut, PieChart, Star } from "lucide-react"; // Updated icons
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 

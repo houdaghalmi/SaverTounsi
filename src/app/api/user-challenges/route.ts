@@ -56,9 +56,8 @@ export async function POST(request: Request) {
       );
     }
     
-    //check if already have challenges system group category
-    
-      let g = await prisma.categoryGroup.findFirst({
+    // check if already have challenges system group category
+      const g = await prisma.categoryGroup.findFirst({
         select: {
           id: true,
         },

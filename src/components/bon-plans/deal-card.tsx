@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BonPlan } from "@/types/bon-plan";
 import { MapPin, Tag } from "lucide-react";
+import Image from "next/image";
 
 interface DealCardProps {
   deal: BonPlan;
@@ -15,7 +16,7 @@ export const DealCard = ({ deal }: DealCardProps) => {
     <Card className="w-full max-w-sm hover:shadow-lg transition-shadow">
       {/* En-tête de la carte avec l'image du deal */}
       <CardHeader className="relative">
-        <img
+        <Image
           src={deal.image || "/api/placeholder/400/200"}
           alt={deal.title}
           className="rounded-t-lg h-48 w-full object-cover"

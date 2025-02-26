@@ -12,6 +12,12 @@ declare module "next-auth" {
       isOnboarded: boolean;
     }
   }
+  interface JWT {
+    id: string;
+    name: string;
+    email: string;
+    isOnboarded: boolean;
+  }
 }
 
 

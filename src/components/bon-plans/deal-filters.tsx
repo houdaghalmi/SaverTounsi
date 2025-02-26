@@ -5,17 +5,17 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 
 interface DealFiltersProps {
-  onFilterChange: (filters: any) => void;
+  onFilterChangeAction: (filters: {categories: string[]}) => void;
   categories: string[];
 }
 
-export const DealFilters = ({ onFilterChange, categories }: DealFiltersProps) => {
+export const DealFilters = ({ onFilterChangeAction, categories }: DealFiltersProps) => {
   const [filters, setFilters] = useState({categories, })
 
-  const handleFilterChange = (newFilters: any) => {
+  const handleFilterChange = (newFilters: {categories?: string[], search?: any  }) => {
     const updated = { ...filters, ...newFilters };
     setFilters(updated);
-    onFilterChange(updated);
+    onFilterChangeAction(updated);
   };
 
   return (
