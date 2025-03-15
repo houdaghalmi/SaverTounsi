@@ -121,24 +121,26 @@ export default function OverviewPage() {
       setIsLoading(true);
       setError(null);
 
-      // Fetch categories and transactions in parallel
-      const [categoriesResponse, transactionsResponse] = await Promise.all([
-        fetch('/api/categories'),
-        fetch('/api/transactions')
-      ]);
-
-      if (!categoriesResponse.ok || !transactionsResponse.ok) {
+      const transactionsResponse = await fetch('/api/transactions');
+      if (!transactionsResponse.ok) {
         throw new Error('Failed to fetch data');
       }
 
-      const categories: CategoryData[] = await categoriesResponse.json();
       const transactions: Transaction[] = await transactionsResponse.json();
 
-      // Calculate totals
-      const totalBudget = categories.reduce((acc, cat) => acc + cat.budget, 0);
-      const totalExpenses = categories.reduce((acc, cat) => acc + cat.spent, 0);
+      // Calculate total income and expenses
+      const totalIncome = transactions
+        .filter(t => t.type === 'INCOME')
+        .reduce((acc, t) => acc + t.amount, 0);
 
-      // Calculate monthly summary for the last 6 months
+      const totalExpenses = transactions
+        .filter(t => t.type === 'EXPENSE')
+        .reduce((acc, t) => acc + t.amount, 0);
+
+      // Calculate actual savings (income - expenses)
+      const totalSavings = totalIncome - totalExpenses;
+
+      // Calculate monthly summary
       const monthlySummary = Array.from({ length: 6 }, (_, i) => {
         const date = new Date();
         date.setMonth(date.getMonth() - i);
@@ -150,26 +152,27 @@ export default function OverviewPage() {
                  tDate.getFullYear() === date.getFullYear();
         });
 
+        const monthlyIncome = monthTransactions
+          .filter(t => t.type === 'INCOME')
+          .reduce((acc, t) => acc + t.amount, 0);
+
+        const monthlyExpenses = monthTransactions
+          .filter(t => t.type === 'EXPENSE')
+          .reduce((acc, t) => acc + t.amount, 0);
+
         return {
           month,
-          spending: monthTransactions
-            .filter(t => t.type === 'EXPENSE')
-            .reduce((acc, t) => acc + t.amount, 0),
-          saving: monthTransactions
-            .filter(t => t.type === 'INCOME')
-            .reduce((acc, t) => acc + t.amount, 0) -
-            monthTransactions
-            .filter(t => t.type === 'EXPENSE')
-            .reduce((acc, t) => acc + t.amount, 0)
+          spending: monthlyExpenses,
+          saving: monthlyIncome - monthlyExpenses // Calculate monthly savings
         };
       }).reverse();
 
       setData({
-        categories,
         transactions,
-        totalBudget,
+        totalBudget: totalSavings, // Update this to use actual savings
         totalExpenses,
-        monthlySummary
+        monthlySummary,
+        categories: []
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -223,13 +226,13 @@ export default function OverviewPage() {
           ) : data && (
             <>
               <FinancialCard
-                title="Monthly Savings"
-                current={data.monthlySummary[data.monthlySummary.length - 1].saving}
-                total={data.totalBudget * 0.2}
+                title="Total Savings"
+                current={data.totalBudget}
+                total={data.totalBudget}
                 description=""
               />
               <FinancialCard
-                title="Monthly Spending"
+                title="Total Spending"
                 current={data.totalExpenses}
                 total={data.totalBudget}
                 description=""
