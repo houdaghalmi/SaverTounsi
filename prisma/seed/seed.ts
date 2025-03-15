@@ -28,7 +28,7 @@ async function seedBonPlans() {
             location: "Av. de L'independance, Menzel Bourguiba 7050",
             city: "bizerte menzel bourguiba",
             image: "/images/deals/tacos.jpg",
-            categories: ["Food & Dining"],
+            categories: ["Food & Drinking"],
         },
         {
             id: "4",
@@ -38,7 +38,7 @@ async function seedBonPlans() {
             city: "bizerte menzel bourguiba",
     
             image: "/images/deals/lotus.jpeg",
-            categories: ["Food & Dining"],
+            categories: ["Food & Drinking"],
         },
         {
             id: "5",
@@ -54,11 +54,66 @@ async function seedBonPlans() {
             id: "7",
             title: "Aroubi",
             description: "Un restaurant proposant des pizzas et d'autres plats délicieux.",
-            location: "4QXR+H39, Menzel Bourguiba", 
+            location: "Aroubi 4QXR+H39, Menzel Bourguiba", 
             city: "bizerte menzel bourguiba",
             image: "/images/deals/aroubi.png", 
-            categories: ["Food & Dining"],
+            categories: ["Food & Drinking"],
         },
+        {
+            id: "8",
+            title: "Fastry",
+            description: "Un café offrant une variété de pâtisseries et de boissons.",
+            location: "FASTRY shop M4G5+57V, Kairouan", 
+            city: "Kairouan",
+            image: "/images/deals/fastry.jpg", 
+            categories: ["Food & Drinking"],
+        },
+        {
+            id: "9",
+            title: "Vintage",
+            description: "Un espace vintage avec une ambiance rétro et des spécialités locales.",
+            location: "Vintage bistro Kairouan 3100",
+            city: "Kairouan",
+            image: "/images/deals/vintage.jpg", 
+            categories: ["Food & Drinking"],
+        },
+        {
+            id: "10",
+            title: "Brother's Food",
+            description: "Un restaurant offrant une variété de plats savoureux et conviviaux.",
+            location: "Brothers' Food 8 Rue 13 Aout 1956, Kairouan",
+            city: "Kairouan",
+            image: "/images/deals/brotherfood.jpg", 
+            categories: ["Food & Drinking"],
+        },
+        {
+            id: "11",
+            title: "Nes Cute",
+            description: "Un restaurant offrant des plats délicieux et une ambiance conviviale.",
+            location:"Ness cute nabeul FP2J+GRM, Rue de Sousse, Nabeul 8000",
+            city: "Nabeul",
+            image: "/images/deals/nescute.jpg", 
+            categories: ["Food & Drinking"],
+        },
+        {
+            id: "13",
+            title: "Sidi Bouhdid",
+            description: "Un café authentique avec une vue magnifique et une ambiance traditionnelle.",
+            location: "Sidi Bouhdid 9JV6+RPH، Rue Sidi Abdel Kader, Hammamet 8050",
+            city: "Hammamet",
+            image: "/images/deals/sidibouhdid.jpg", 
+            categories: ["Food & Drinking"],
+        },
+        {
+            id: "14",
+            title: "Plan B",
+            description: "Un restaurant branché avec une ambiance décontractée et des plats savoureux.",
+            location: "Plan B ave Assad Ibn Fourat, Kairouan 3100",
+            city: "Kairouan",
+            image: "/images/deals/planb.jpg", 
+            categories: ["Food & Drinking"],
+        }
+        
         
     ];
 
@@ -80,7 +135,7 @@ async function seedChallenges() {
         {
             id: "2",
             title: "Save 50 DT",
-            description: "Spend less than 50 DT on dining out this month.",
+            description: "Spend less than 50 DT on Drinking out this month.",
             type: ChallengeType.SPENDING_REDUCTION,
             goal: 50,
             duration: 30,

@@ -16,11 +16,15 @@ export const DealCard = ({ deal }: DealCardProps) => {
     <Card className="w-full max-w-sm hover:shadow-lg transition-shadow">
       {/* En-tête de la carte avec l'image du deal */}
       <CardHeader className="relative">
-        <Image
-          src={deal.image || "/api/placeholder/400/200"}
-          alt={deal.title}
-          className="rounded-t-lg h-48 w-full object-cover"
-        />
+      <Image
+    src={deal.image || "/api/placeholder/400/200"}
+    alt={deal.title}
+    width={0}
+    height={0}
+    sizes="100vw"
+    className="rounded-t-lg h-48 w-full object-cover"
+  />
+   
       </CardHeader>
       {/* Contenu de la carte */}
       <CardContent className="space-y-4">

@@ -4,7 +4,6 @@ import { DealCard } from "@/components/bon-plans/deal-card";
 import { DealFilters } from "@/components/bon-plans/deal-filters";
 import ReviewForm from "@/components/bon-plans/ReviewForm";
 import ReviewList from "@/components/bon-plans/ReviewList";
-import { menzelBourguibaDeals } from "@/data/menzel-bourguiba-deals";
 import { useEffect, useState } from "react";
 import { BonPlan } from "@/types/bon-plan";
 import { Review } from "@/types/review";
@@ -32,28 +31,36 @@ export default function BonPlansPage() {
     setFilteredDeals(deals)
   }
   // Handle filter changes
-  const handleFilterChange = (filters: any) => {
+  const handleFilterChange = async (filters: any) => {
     const { search, categories } = filters;
-    let filtered = menzelBourguibaDeals;
-
-    // Filter by search
-    if (search) {
-      filtered = filtered.filter((deal) =>
-        deal.title.toLowerCase().includes(search.toLowerCase())
-      );
+    
+    try {
+      // Fetch all deals first
+      const response = await fetch("/api/deals");
+      const deals = await response.json();
+      let filtered = deals;
+  
+      // Filter by search
+      if (search) {
+        filtered = filtered.filter((deal: BonPlan) =>
+          deal.title.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+  
+      // Filter by categories
+      if (categories.length > 0) {
+        filtered = filtered.filter((deal: BonPlan) =>
+          categories.every((category: string) =>
+            deal.categories.includes(category)
+          )
+        );
+      }
+  
+      // Update filtered deals
+      setFilteredDeals(filtered);
+    } catch (error) {
+      console.error("Error filtering deals:", error);
     }
-
-    // Filter by categories
-    if (categories.length > 0) {
-      filtered = filtered.filter((deal) =>
-        categories.every((category: string) =>
-          deal.categories.includes(category)
-        )
-      );
-    }
-
-    // Update filtered deals
-    setFilteredDeals(filtered);
   };
 
   // Fetch reviews for the selected deal
@@ -121,7 +128,7 @@ export default function BonPlansPage() {
         <div className="lg:col-span-1">
           <DealFilters
             onFilterChangeAction={handleFilterChange}
-            categories={["Food & Dining", "Shopping", "Entertainment"]}
+            categories={["Food & Drinking", "Shopping", "Entertainment"]}
           />
         </div>
         {/* Main Content (Deal List) */}
