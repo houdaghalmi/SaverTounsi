@@ -123,7 +123,7 @@ export default function BonPlansPage() {
         <h1 className="text-2xl font-bold">Bon Plans</h1>
       </div>
       {/* Filters and Deal List */}
-      <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-1">
         {/* Filters */}
         <div className="lg:col-span-1">
           <DealFilters
@@ -133,7 +133,7 @@ export default function BonPlansPage() {
         </div>
         {/* Main Content (Deal List) */}
         <div className="lg:col-span-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {filteredDeals.map((deal) => (
               <DealCard key={deal.id} deal={deal} />
             ))}
