@@ -145,7 +145,12 @@ export default function BonPlansPage() {
         <h2 className="text-xl font-semibold mb-4">Submit a Review</h2>
         {/* Deal Selection Dropdown */}
         <div className="mb-6">
-          <Select onValueChange={(value) => setSelectedDealId(value)}>
+          <Select onValueChange={(value) => {
+            setSelectedDealId(value);
+            // Update selectedDeal when a deal is chosen
+            const deal = filteredDeals.find(d => d.id === value);
+            setSelectedDeal(deal || null);
+          }}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a deal to review" />
             </SelectTrigger>

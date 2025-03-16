@@ -28,7 +28,7 @@ import {
 
 // Main menu items.
 const items = [
-  { title: "Home", url: "/overview", icon: Home },
+  { title: "Overview", url: "/overview", icon: Home },
   { title: "Categorie manager", url: "/categories", icon: Folder },
   { title: "Reports", url: "/reports", icon: BarChart },
   { title: "Bon-plans", url: "/bon-plans", icon: Star },

@@ -566,16 +566,20 @@ export default function ReportsPage() {
             </div>
           </TabsContent>
 
-{/* Yearly Report */}
-<TabsContent value="yearly">
+          {/* Yearly Report */}
+          <TabsContent value="yearly">
             <h2 className="text-xl font-semibold mb-4">Yearly Report</h2>
             <div className="flex justify-end">
-              <div className="w-full ">
+              <div className="w-full">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Yearly Spending Card */}
                   <Card>
                     <CardHeader>
-                      <CardTitle>Yearly Spending</CardTitle>
+                      <CardTitle className="text-[#1a2a6c]">
+                        {spendingViewMode === "detailed" 
+                          ? "Yearly Spending by Category"
+                          : "Yearly Spending by Group"}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-lg font-semibold">
@@ -585,20 +589,20 @@ export default function ReportsPage() {
                         <div className="flex gap-4">
                           <button
                             onClick={() => setSpendingViewMode("detailed")}
-                            className={`px-4 py-2 rounded-md ${
+                            className={`px-4 py-2 rounded-md transition-colors ${
                               spendingViewMode === "detailed"
-                                ? "bg-primary text-white"
-                                : "bg-gray-100"
+                                ? "bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white"
+                                : "bg-[#1a2a6c]/10 text-[#1a2a6c] hover:bg-[#1a2a6c]/20"
                             }`}
                           >
                             Detailed
                           </button>
                           <button
                             onClick={() => setSpendingViewMode("grouped")}
-                            className={`px-4 py-2 rounded-md ${
+                            className={`px-4 py-2 rounded-md transition-colors ${
                               spendingViewMode === "grouped"
-                                ? "bg-primary text-white"
-                                : "bg-gray-100"
+                                ? "bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white"
+                                : "bg-[#1a2a6c]/10 text-[#1a2a6c] hover:bg-[#1a2a6c]/20"
                             }`}
                           >
                             Grouped
@@ -610,15 +614,15 @@ export default function ReportsPage() {
                         <ul className="space-y-1">
                           {spendingViewMode === "detailed"
                             ? yearlyData.categories.map((category) => (
-                                <li key={category.id} className="flex justify-between">
+                                <li key={category.id} className="flex justify-between text-[#1a2a6c]">
                                   <span>{category.name}</span>
-                                  <span>{category.spent} DT</span>
+                                  <span className="font-medium text-[#b21f1f]">{category.spent * 12} DT</span>
                                 </li>
                               ))
                             : yearlyGroupedCategories.map((group) => (
-                                <li key={group.groupName} className="flex justify-between">
+                                <li key={group.groupName} className="flex justify-between text-[#1a2a6c]">
                                   <span>{group.groupName}</span>
-                                  <span>{group.amount} DT</span>
+                                  <span className="font-medium text-[#b21f1f]">{group.amount * 12} DT</span>
                                 </li>
                               ))}
                         </ul>
@@ -629,7 +633,11 @@ export default function ReportsPage() {
                   {/* Yearly Savings Card */}
                   <Card>
                     <CardHeader>
-                      <CardTitle>Yearly Savings</CardTitle>
+                      <CardTitle className="text-[#1a2a6c]">
+                        {savingViewMode === "detailed" 
+                          ? "Yearly Savings by Category"
+                          : "Yearly Savings by Group"}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-lg font-semibold">
@@ -639,20 +647,20 @@ export default function ReportsPage() {
                         <div className="flex gap-4">
                           <button
                             onClick={() => setSavingViewMode("detailed")}
-                            className={`px-4 py-2 rounded-md ${
+                            className={`px-4 py-2 rounded-md transition-colors ${
                               savingViewMode === "detailed"
-                                ? "bg-primary text-white"
-                                : "bg-gray-100"
+                                ? "bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white"
+                                : "bg-[#1a2a6c]/10 text-[#1a2a6c] hover:bg-[#1a2a6c]/20"
                             }`}
                           >
                             Detailed
                           </button>
                           <button
                             onClick={() => setSavingViewMode("grouped")}
-                            className={`px-4 py-2 rounded-md ${
+                            className={`px-4 py-2 rounded-md transition-colors ${
                               savingViewMode === "grouped"
-                                ? "bg-primary text-white"
-                                : "bg-gray-100"
+                                ? "bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white"
+                                : "bg-[#1a2a6c]/10 text-[#1a2a6c] hover:bg-[#1a2a6c]/20"
                             }`}
                           >
                             Grouped
@@ -664,15 +672,15 @@ export default function ReportsPage() {
                         <ul className="space-y-1">
                           {savingViewMode === "detailed"
                             ? yearlyData.savingsData.map((savings) => (
-                                <li key={savings.categoryName} className="flex justify-between">
+                                <li key={savings.categoryName} className="flex justify-between text-[#1a2a6c]">
                                   <span>{savings.categoryName}</span>
-                                  <span>{savings.saved} DT</span>
+                                  <span className="font-medium text-[#b21f1f]">{savings.saved * 12} DT</span>
                                 </li>
                               ))
                             : yearlyGroupedSavings.map((group) => (
-                                <li key={group.groupName} className="flex justify-between">
+                                <li key={group.groupName} className="flex justify-between text-[#1a2a6c]">
                                   <span>{group.groupName}</span>
-                                  <span>{group.amount} DT</span>
+                                  <span className="font-medium text-[#b21f1f]">{group.amount * 12} DT</span>
                                 </li>
                               ))}
                         </ul>
@@ -680,7 +688,6 @@ export default function ReportsPage() {
                     </CardContent>
                   </Card>
                 </div>
-
                 {/* Yearly Charts */}
                 <div className="mt-6">
                   {/* Yearly Category/Group Chart */}

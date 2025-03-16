@@ -273,7 +273,7 @@ export default function OverviewPage() {
                 <CardTitle>Recent Transactions</CardTitle>
               </CardHeader>
               <CardContent>
-                <TransactionList transactions={data.transactions.slice(0, 5)} />
+                <TransactionList transactions={data.transactions.slice(0, 3)} />
               </CardContent>
             </Card>
           </div>

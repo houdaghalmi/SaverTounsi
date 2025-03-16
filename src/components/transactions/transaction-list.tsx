@@ -18,7 +18,7 @@ interface TransactionListProps {
 
 export default function TransactionList({ transactions }: TransactionListProps) {
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-6">
       {transactions.map((transaction) => {
         // Validate the date before formatting
         const transactionDate = new Date(transaction.date);
@@ -27,7 +27,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
         return (
           <div
             key={transaction.id}
-            className="p-4 bg-white rounded-lg shadow-md flex justify-between items-center"
+            className="p-5 bg-white rounded-lg shadow-md flex justify-between items-center"
           >
             <div>
               <p className="font-semibold">

@@ -3,41 +3,51 @@ import { ChallengeType } from "@prisma/client";
 
 async function seedBonPlans() {
     const data = [
+        
+            {
+                id: "2",
+                title: "Sidi Bouhdid",
+                description: "Un café authentique avec une vue magnifique et une ambiance traditionnelle.",
+                location: "Sidi Bouhdid 9JV6+RPH، Rue Sidi Abdel Kader, Hammamet 8050",
+                city: "Hammamet",
+                image: "/images/deals/sidibouhdid.jpg", 
+                categories: ["Food & Drinking"],
+            },
+            {
+                id: "1",
+                title: "Plan B",
+                description: "Un restaurant branché avec une ambiance décontractée et des plats savoureux.",
+                location: "Plan B ave Assad Ibn Fourat, Kairouan 3100",
+                city: "Kairouan",
+                image: "/images/deals/planb.jpg", 
+                categories: ["Food & Drinking"],
+            },
+            {
+                id: "3",
+                title: "Brother's Food",
+                description: "Un restaurant offrant une variété de plats savoureux et conviviaux.",
+                location: "Brothers' Food 8 Rue 13 Aout 1956, Kairouan",
+                city: "Kairouan",
+                image: "/images/deals/brotherfood.jpg", 
+                categories: ["Food & Drinking"],
+            },
+            {
+                id: "4",
+                title: "Fastry",
+                description: "Un café offrant une variété de pâtisseries et de boissons.",
+                location: "FASTRY shop M4G5+57V, Kairouan", 
+                city: "Kairouan",
+                image: "/images/deals/fastry.jpg", 
+                categories: ["Food & Drinking"],
+            },
+            
         {
-            id: "1",
-            title: "Tech Jungle",
-            description: "Un magasin spécialisé dans les produits technologiques et électroniques.",
-            location: "1 Avenue Monji Slim, Menzel Bourguiba 7050",
-            city: "bizerte menzel bourguiba",
-            image: "/images/deals/tech-jungle.png",
-            categories: ["Shopping", "Electronics"],
-        },
-        {
-            id: "2",
-            title: "Tutti Verdi",
-            description: "Un supermarché moderne offrant une large gamme de produits frais et bio.",
-            location: "Avenue Habib Bourguiba, Menzel Bourguiba, Tunisie",
-            city: "bizerte menzel bourguiba",
-            image: "/images/deals/tutti-verdi.jpg",
-            categories: ["Shopping"],
-        },
-        {
-            id: "3",
+            id: "10",
             title: "Tacos",
             description: "Dégustez des tacos savoureux dans un cadre convivial.",
             location: "Av. de L'independance, Menzel Bourguiba 7050",
             city: "bizerte menzel bourguiba",
             image: "/images/deals/tacos.jpg",
-            categories: ["Food & Drinking"],
-        },
-        {
-            id: "4",
-            title: "Lotus",
-            description: "Un lieu idéal pour les amateurs de pâtisseries et de café.",
-            location: "5Q4V+6J8, rue de la république, Menzel Bourguiba", 
-            city: "bizerte menzel bourguiba",
-    
-            image: "/images/deals/lotus.jpeg",
             categories: ["Food & Drinking"],
         },
         {
@@ -51,6 +61,16 @@ async function seedBonPlans() {
             categories: ["Entertainment"],
         },
         {
+            id: "8",
+            title: "Lotus",
+            description: "Un lieu idéal pour les amateurs de pâtisseries et de café.",
+            location: "5Q4V+6J8, rue de la république, Menzel Bourguiba", 
+            city: "bizerte menzel bourguiba",
+            image: "/images/deals/lotus.jpeg",
+            categories: ["Food & Drinking"],
+        },
+       
+        {
             id: "7",
             title: "Aroubi",
             description: "Un restaurant proposant des pizzas et d'autres plats délicieux.",
@@ -59,15 +79,7 @@ async function seedBonPlans() {
             image: "/images/deals/aroubi.png", 
             categories: ["Food & Drinking"],
         },
-        {
-            id: "8",
-            title: "Fastry",
-            description: "Un café offrant une variété de pâtisseries et de boissons.",
-            location: "FASTRY shop M4G5+57V, Kairouan", 
-            city: "Kairouan",
-            image: "/images/deals/fastry.jpg", 
-            categories: ["Food & Drinking"],
-        },
+       
         {
             id: "9",
             title: "Vintage",
@@ -77,15 +89,7 @@ async function seedBonPlans() {
             image: "/images/deals/vintage.jpg", 
             categories: ["Food & Drinking"],
         },
-        {
-            id: "10",
-            title: "Brother's Food",
-            description: "Un restaurant offrant une variété de plats savoureux et conviviaux.",
-            location: "Brothers' Food 8 Rue 13 Aout 1956, Kairouan",
-            city: "Kairouan",
-            image: "/images/deals/brotherfood.jpg", 
-            categories: ["Food & Drinking"],
-        },
+     
         {
             id: "11",
             title: "Nes Cute",
@@ -96,23 +100,23 @@ async function seedBonPlans() {
             categories: ["Food & Drinking"],
         },
         {
-            id: "13",
-            title: "Sidi Bouhdid",
-            description: "Un café authentique avec une vue magnifique et une ambiance traditionnelle.",
-            location: "Sidi Bouhdid 9JV6+RPH، Rue Sidi Abdel Kader, Hammamet 8050",
-            city: "Hammamet",
-            image: "/images/deals/sidibouhdid.jpg", 
-            categories: ["Food & Drinking"],
+            id: "12",
+            title: "Tech Jungle",
+            description: "Un magasin spécialisé dans les produits technologiques et électroniques.",
+            location: "1 Avenue Monji Slim, Menzel Bourguiba 7050",
+            city: "bizerte menzel bourguiba",
+            image: "/images/deals/tech-jungle.png",
+            categories: ["Shopping", "Electronics"],
         },
         {
-            id: "14",
-            title: "Plan B",
-            description: "Un restaurant branché avec une ambiance décontractée et des plats savoureux.",
-            location: "Plan B ave Assad Ibn Fourat, Kairouan 3100",
-            city: "Kairouan",
-            image: "/images/deals/planb.jpg", 
-            categories: ["Food & Drinking"],
-        }
+            id: "13",
+            title: "Tutti Verdi",
+            description: "Un supermarché moderne offrant une large gamme de produits frais et bio.",
+            location: "Avenue Habib Bourguiba, Menzel Bourguiba, Tunisie",
+            city: "bizerte menzel bourguiba",
+            image: "/images/deals/tutti-verdi.jpg",
+            categories: ["Shopping"],
+        },
         
         
     ];
