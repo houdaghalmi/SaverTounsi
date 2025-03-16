@@ -18,7 +18,7 @@ export default function SignInPage() {
               Welcome Back
             </h1>
             <p className="text-base text-gray-600">
-              Enter your email to sign in to your account
+              Enter your credentials to sign in to your account
             </p>
           </div>
 

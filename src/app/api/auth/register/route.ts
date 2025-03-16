@@ -4,8 +4,9 @@ import prisma from "@/lib/prisma"
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json()
-    console.log(email,password)
+    const { email, password, name } = await req.json()
+    console.log(email, password, name)
+    
     // Check if email exists
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -22,14 +23,16 @@ export async function POST(req: Request) {
     const user = await prisma.user.create({
       data: {
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        name
       }
     })
 
     return NextResponse.json({
       user: {
         id: user.id,
-        email: user.email
+        email: user.email,
+        name: user.name
       }
     })
   } catch (error) {

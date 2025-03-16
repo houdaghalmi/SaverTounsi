@@ -6,17 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { signIn } from "next-auth/react"
-
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
+import { useState } from "react"
+import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 
 import { Icons } from "../ui/icons"
@@ -38,7 +31,12 @@ export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const { toast } = useToast();
-  
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: ""
+  })
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,12 +45,13 @@ export function AuthForm({ mode }: AuthFormProps) {
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     setIsLoading(true)
     if (mode === "signin") {
       const result = await signIn("credentials", {
-        email: values.email,
-        password: values.password,
+        email: formData.email,
+        password: formData.password,
         redirect: false,
       })
 
@@ -69,7 +68,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       try {
         const res = await fetch("/api/auth/register", {
           method: "POST",
-          body: JSON.stringify(values),
+          body: JSON.stringify(formData),
           headers: {
             "Content-Type": "application/json",
           },
@@ -93,42 +92,49 @@ export function AuthForm({ mode }: AuthFormProps) {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="email@example.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {mode === "signup" && (
+        <div className="space-y-2">
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            type="text"
+            placeholder="Enter your name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required={mode === "signup"}
+          />
+        </div>
+      )}
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="Enter your email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
         />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          placeholder="Enter your password"
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          required
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading && (
-            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-          )}
-          {mode === "signin" ? "Sign In" : "Sign Up"}
-        </Button>
-      </form>
-    </Form>
+      </div>
+      <Button type="submit" className="w-full bg-[#1a2a6c] hover:bg-[#b21f1f]">
+        {isLoading && (
+          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+        )}
+        {mode === "signin" ? "Sign In" : "Sign Up"}
+      </Button>
+    </form>
   )
 }
 
