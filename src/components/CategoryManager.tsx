@@ -235,8 +235,8 @@ export default function CategoryManager() {
 
   // Render the component
   return (
-    <div className="min-h-screen bg-white p-6">
-      <div className="max-w-4xl mx-auto bg-gradient-to-br from-[#1a2a6c]/5 via-[#b21f1f]/5 to-[#fdbb2d]/5 rounded-lg shadow-xl p-6">
+    <div className="w-full bg-white p-6">
+      <div className="w-full mx-auto bg-gradient-to-br from-[#1a2a6c]/5 via-[#b21f1f]/5 to-[#1a2a6c]/5 rounded-lg shadow-xl p-6">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-[#1a2a6c]">Budget Manager</h1>
           <button
@@ -250,7 +250,7 @@ export default function CategoryManager() {
         <div className="mb-8">
           <div className="text-xl text-[#1a2a6c]">Total Budget: {totalBudget} DT</div>
           <button
-            className="mt-4 flex items-center text-[#1a2a6c] hover:text-[#fdbb2d] transition-colors"
+            className="mt-4 flex items-center text-[#1a2a6c] hover:text-[#b21f1f] transition-colors"
             onClick={() => setShowNewGroupModal(true)}
           >
             <PlusCircle className="w-5 h-5 mr-2" />
@@ -262,14 +262,14 @@ export default function CategoryManager() {
         <div className="space-y-6">
           {categoryGroups && categoryGroups.length > 0 ? (
             categoryGroups.map((group) => (
-              <div key={group.id} className="border border-[#1a2a6c]/20 rounded-lg p-4 hover:border-[#fdbb2d] transition-colors">
+              <div key={group.id} className="border border-[#1a2a6c]/20 rounded-lg p-4 hover:border-[#b21f1f] transition-colors">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold text-[#1a2a6c]">{group.name}</h2>
                   <div className="flex items-center space-x-2">
                     {group.name.toLowerCase() !== "challenges" && (
                       <>
                         <button
-                          className="flex items-center text-[#1a2a6c] hover:text-[#fdbb2d] transition-colors"
+                          className="flex items-center text-[#1a2a6c] hover:text-[#b21f1f] transition-colors"
                           onClick={() => handleAddCategoryClick(group.id)}
                         >
                           <PlusCircle className="w-4 h-4 mr-1" />
@@ -336,7 +336,7 @@ export default function CategoryManager() {
               type="text"
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-[#1a2a6c]/20 focus:border-[#fdbb2d] focus:ring-1 focus:ring-[#fdbb2d] outline-none mb-4"
+              className="w-full px-4 py-2 rounded-lg border border-[#1a2a6c]/20 focus:border-[#b21f1f] focus:ring-1 focus:ring-[#b21f1f] outline-none mb-4"
               placeholder="Enter group name"
             />
             <div className="flex justify-end space-x-2">
@@ -366,7 +366,7 @@ export default function CategoryManager() {
               type="text"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-[#1a2a6c]/20 focus:border-[#fdbb2d] focus:ring-1 focus:ring-[#fdbb2d] outline-none mb-4"
+              className="w-full px-4 py-2 rounded-lg border border-[#1a2a6c]/20 focus:border-[#b21f1f] focus:ring-1 focus:ring-[#b21f1f] outline-none mb-4"
               placeholder="Category name"
             />
             
@@ -398,7 +398,7 @@ export default function CategoryManager() {
             <h3 className="text-lg font-semibold mb-4 text-[#1a2a6c]">Edit Total Budget</h3>
             <input
               type="number"
-              className="w-full border border-[#1a2a6c]/20 rounded p-2 mb-4 focus:border-[#fdbb2d] focus:ring-1 focus:ring-[#fdbb2d] outline-none"
+              className="w-full border border-[#1a2a6c]/20 rounded p-2 mb-4 focus:border-[#b21f1f] focus:ring-1 focus:ring-[#b21f1f] outline-none"
               placeholder="New budget amount"
               value={newBudgetAmount}
               onChange={(e) => setNewBudgetAmount(e.target.value)}
@@ -455,7 +455,7 @@ export default function CategoryManager() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-[#fdbb2d] font-bold text-xl">
+                  <span className="text-[#1a2a6c] font-bold text-xl">
                     {Math.round((selectedCategory.spent / selectedCategory.budget) * 100)}%
                   </span>
                 </div>
@@ -516,7 +516,7 @@ export default function CategoryManager() {
                   🌟 Great job! You're keeping your budget under control.
                 </span>
               ) : ((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100 <= 30 ? (
-                <span className="block text-center text-yellow-500 mt-2">
+                <span className="block text-center text-[#b21f1f] mt-2">
                   ⚠️ Take care! Your available budget is almost finished.
                 </span>
               ) : null}
@@ -555,11 +555,7 @@ export default function CategoryManager() {
               <p className="font-medium text-[#1a2a6c]">
                 {deleteConfirmation.name}
               </p>
-              {deleteConfirmation.type === 'group' && (
-                <p className="text-[#b21f1f] text-sm mt-2">
-                  ⚠️ This will also delete all categories in this group!
-                </p>
-              )}
+           
             </div>
             <div className="flex justify-center space-x-3">
               <button

@@ -4,6 +4,18 @@
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -100,6 +112,32 @@ export default function FeedbackPage() {
     }
   };
 
+  const handleDelete = async (feedbackId: string) => {
+    try {
+      const response = await fetch(`/api/feedback/${feedbackId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete feedback');
+      }
+
+      setFeedbacks(feedbacks.filter(feedback => feedback.id !== feedbackId));
+      
+      toast({
+        title: 'Success',
+        description: 'Feedback deleted successfully',
+      });
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete feedback',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">User Feedback</h1>
@@ -140,15 +178,45 @@ export default function FeedbackPage() {
                   <p className="font-semibold text-[#1a2a6c]">
                     {feedback.userName}
                   </p>
-                  <time className="text-sm text-gray-500">
-                    {new Date(feedback.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </time>
+                  <div className="flex items-center gap-4">
+                    <time className="text-sm text-gray-500">
+                      {new Date(feedback.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </time>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-gray-500 hover:text-red-500"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Feedback</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete this feedback? 
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(feedback.id)}
+                            className="bg-red-500 hover:bg-red-600"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
                 <p className="text-gray-700">{feedback.message}</p>
               </div>
