@@ -31,6 +31,11 @@ export default function CategoryManager() {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    type: 'category' | 'group';
+    id: string;
+    name: string;
+  } | null>(null);
 
   // Fetch category groups on component mount
   useEffect(() => {
@@ -189,6 +194,23 @@ export default function CategoryManager() {
     return percentage <= 40 ? "bg-red-500" : "bg-green-500";
   };
 
+  const handleRemoveCategoryGroup = (group: CategoryGroup) => {
+    setDeleteConfirmation({
+      type: 'group',
+      id: group.id,
+      name: group.name
+    });
+  };
+
+  const handleRemoveCategory = (e: React.MouseEvent, category: Category) => {
+    e.stopPropagation();
+    setDeleteConfirmation({
+      type: 'category',
+      id: category.id,
+      name: category.name
+    });
+  };
+
   // Render loading state
   if (loading) {
     return (
@@ -255,7 +277,7 @@ export default function CategoryManager() {
                         </button>
                         <button
                           className="flex items-center text-[#b21f1f] hover:text-[#b21f1f]/70 transition-colors"
-                          onClick={() => removeCategoryGroup(group.id)}
+                          onClick={() => handleRemoveCategoryGroup(group)}
                         >
                           <Trash2 className="w-4 h-4 mr-1" />
                           Remove Group
@@ -279,10 +301,7 @@ export default function CategoryManager() {
                             {group.name.toLowerCase() !== "challenges" && (
                               <button
                                 className="p-1 hover:bg-gray-100 rounded"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeCategory(category.id);
-                                }}
+                                onClick={(e) => handleRemoveCategory(e, category)}
                               >
                                 <Trash2 className="w-4 h-4 text-red-500" />
                               </button>
@@ -514,6 +533,53 @@ export default function CategoryManager() {
                 onClick={() => router.push("/transactions")} // Redirect to Transactions Page
               >
                 Go to Transactions
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmation && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 shadow-xl border border-[#1a2a6c]/20">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="w-8 h-8 text-[#b21f1f]" />
+              </div>
+              <h3 className="text-lg font-semibold text-[#1a2a6c] mb-2">
+                Confirm Deletion
+              </h3>
+              <p className="text-gray-600 mb-2">
+                Are you sure you want to delete this {deleteConfirmation.type}:
+              </p>
+              <p className="font-medium text-[#1a2a6c]">
+                {deleteConfirmation.name}
+              </p>
+              {deleteConfirmation.type === 'group' && (
+                <p className="text-[#b21f1f] text-sm mt-2">
+                  ⚠️ This will also delete all categories in this group!
+                </p>
+              )}
+            </div>
+            <div className="flex justify-center space-x-3">
+              <button
+                className="px-5 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                onClick={() => setDeleteConfirmation(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-5 py-2 bg-gradient-to-r from-[#b21f1f] to-[#1a2a6c] text-white rounded-lg hover:opacity-90 transition-opacity"
+                onClick={() => {
+                  if (deleteConfirmation.type === 'group') {
+                    removeCategoryGroup(deleteConfirmation.id);
+                  } else {
+                    removeCategory(deleteConfirmation.id);
+                  }
+                  setDeleteConfirmation(null);
+                }}
+              >
+                Delete
               </button>
             </div>
           </div>
