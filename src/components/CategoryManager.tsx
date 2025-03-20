@@ -100,7 +100,7 @@ export default function CategoryManager() {
           },
           body: JSON.stringify({
             name: newCategoryName,
-            budget: totalBudget * 0.2, // Default to 20% of total budget
+            budget: 0,
             groupId: selectedGroupId,
           }),
         });
