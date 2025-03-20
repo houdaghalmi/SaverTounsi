@@ -11,9 +11,8 @@ interface Feedback {
   id: string;
   message: string;
   createdAt: string;
-  user: {
-    email: string;
-  };
+  userId: string;
+  userName: string;
 }
 
 export default function FeedbackPage() {
@@ -105,10 +104,8 @@ export default function FeedbackPage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">User Feedback</h1>
 
-
-
       {/* Feedback form */}
-      <Card className="p-6">
+      <Card className="p-6 mb-8">
         <h2 className="text-xl font-bold mb-4">Share Your Feedback</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
@@ -122,6 +119,47 @@ export default function FeedbackPage() {
           </Button>
         </form>
       </Card>
+
+      {/* Feedback List */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold mb-4">Recent Feedback</h2>
+        
+        {error && (
+          <div className="text-red-500 mb-4">
+            {error}
+          </div>
+        )}
+
+        {loading && <div>Loading...</div>}
+
+        {feedbacks.map((feedback) => (
+          <Card key={feedback.id} className="p-4">
+            <div className="flex items-start space-x-4">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-semibold text-[#1a2a6c]">
+                    {feedback.userName}
+                  </p>
+                  <time className="text-sm text-gray-500">
+                    {new Date(feedback.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </time>
+                </div>
+                <p className="text-gray-700">{feedback.message}</p>
+              </div>
+            </div>
+          </Card>
+        ))}
+
+        {!loading && feedbacks.length === 0 && (
+          <p className="text-gray-500 text-center">No feedback yet</p>
+        )}
+      </div>
     </div>
   );
 }
