@@ -2,9 +2,13 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth-utils";
 
+interface RouteParams {
+  id: string;
+}
+
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSession();
   if (!session) {
@@ -12,10 +16,12 @@ export async function DELETE(
   }
 
   try {
+    const feedbackId = (await params).id;
+    
     // First check if the feedback belongs to the user
     const feedback = await prisma.feedback.findUnique({
       where: {
-        id: params.id,
+        id: feedbackId,
       },
     });
 
@@ -26,16 +32,13 @@ export async function DELETE(
     // Delete the feedback
     await prisma.feedback.delete({
       where: {
-        id: params.id,
+        id: feedbackId,
       },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ message: "Feedback deleted" });
   } catch (error) {
     console.error("Error deleting feedback:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
