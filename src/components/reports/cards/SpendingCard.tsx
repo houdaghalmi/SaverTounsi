@@ -19,6 +19,7 @@ export function SpendingCard({ data, viewMode, setViewMode, groupedData }: Spend
             variant={viewMode === "detailed" ? "default" : "outline"}
             size="sm"
             onClick={() => setViewMode("detailed")}
+            className={viewMode === "detailed" ? "bg-[#1a2a6c] hover:bg-[#1a2a6c]/90" : "text-[#1a2a6c] border-[#1a2a6c] hover:bg-[#1a2a6c]/10"}
           >
             Detailed
           </Button>
@@ -26,6 +27,7 @@ export function SpendingCard({ data, viewMode, setViewMode, groupedData }: Spend
             variant={viewMode === "grouped" ? "default" : "outline"}
             size="sm"
             onClick={() => setViewMode("grouped")}
+            className={viewMode === "grouped" ? "bg-[#1a2a6c] hover:bg-[#1a2a6c]/90" : "text-[#1a2a6c] border-[#1a2a6c] hover:bg-[#1a2a6c]/10"}
           >
             Grouped
           </Button>

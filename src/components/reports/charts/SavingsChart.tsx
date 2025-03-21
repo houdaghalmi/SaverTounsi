@@ -39,16 +39,19 @@ export function SavingsChart({ data, viewMode, groupedData }: SavingsChartProps)
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="name"
-                angle={-45}
                 textAnchor="end"
+                tick={{ fill: '#1a2a6c' }}
                 height={70}
               />
-              <YAxis />
+              <YAxis 
+                tick={{ fill: '#1a2a6c' }}
+
+               />
               <Tooltip />
               <Legend />
               <Bar
                 dataKey="saved"
-                fill="#82ca9d"
+                fill="#99d98c"
                 name="Saved Amount"
               />
             </BarChart>

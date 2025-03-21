@@ -15,6 +15,7 @@ export function ChallengeCard({
     <Card>
       <CardHeader>
         <CardTitle className="text-[#1a2a6c] text-xl font-bold">
+          
            {userChallenge.challenge.title}
         </CardTitle>
       </CardHeader>
@@ -39,14 +40,14 @@ export function ChallengeCard({
                   }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis />
+                  <XAxis dataKey="day"   tick={{ fill: '#1a2a6c' }}/>
+                  <YAxis tick={{ fill: '#1a2a6c' }}/>
                   <Tooltip />
                   <Legend />
                   <Line
                     type="monotone"
                     dataKey="amount"
-                    stroke="#1a2a6c"
+                    stroke="#99d98c"
                     name="Progress"
                   />
                 </LineChart>

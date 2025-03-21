@@ -43,6 +43,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
                 variant={spendingViewMode === "detailed" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSpendingViewMode("detailed")}
+                className={spendingViewMode === "detailed" ? "bg-[#1a2a6c] hover:bg-[#1a2a6c]/90" : "text-[#1a2a6c] border-[#1a2a6c] hover:bg-[#1a2a6c]/10"}
               >
                 Detailed
               </Button>
@@ -50,6 +51,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
                 variant={spendingViewMode === "grouped" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSpendingViewMode("grouped")}
+                className={spendingViewMode === "grouped" ? "bg-[#1a2a6c] hover:bg-[#1a2a6c]/90" : "text-[#1a2a6c] border-[#1a2a6c] hover:bg-[#1a2a6c]/10"}
               >
                 Grouped
               </Button>
@@ -96,6 +98,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
                 variant={savingViewMode === "detailed" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSavingViewMode("detailed")}
+                className={savingViewMode === "detailed" ? "bg-[#1a2a6c] hover:bg-[#1a2a6c]/90" : "text-[#1a2a6c] border-[#1a2a6c] hover:bg-[#1a2a6c]/10"}
               >
                 Detailed
               </Button>
@@ -103,6 +106,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
                 variant={savingViewMode === "grouped" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSavingViewMode("grouped")}
+                className={savingViewMode === "grouped" ? "bg-[#1a2a6c] hover:bg-[#1a2a6c]/90" : "text-[#1a2a6c] border-[#1a2a6c] hover:bg-[#1a2a6c]/10"}
               >
                 Grouped
               </Button>
@@ -158,16 +162,18 @@ export const YearlyReport: FC<YearlyReportProps> = ({
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey={spendingViewMode === "grouped" ? "groupName" : "name"}
-                    angle={-45}
                     textAnchor="end"
+                    tick={{ fill: '#1a2a6c' }}
                     height={70}
                   />
-                  <YAxis />
+                  <YAxis
+                  tick={{ fill: '#1a2a6c' }}
+                  />
                   <Tooltip />
                   <Legend />
                   <Bar
                     dataKey={spendingViewMode === "grouped" ? "amount" : "spent"}
-                    fill="#1a2a6c"
+                    fill="#f17300"
                     name="Amount Spent"
                   />
                 </BarChart>
@@ -191,16 +197,18 @@ export const YearlyReport: FC<YearlyReportProps> = ({
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey={savingViewMode === "grouped" ? "groupName" : "categoryName"}
-                    angle={-45}
+                    tick={{ fill: '#1a2a6c' }}
                     textAnchor="end"
                     height={70}
                   />
-                  <YAxis />
+                  <YAxis                 
+                  tick={{ fill: '#1a2a6c' }}
+                  />
                   <Tooltip />
                   <Legend />
                   <Bar
                     dataKey={savingViewMode === "grouped" ? "amount" : "saved"}
-                    fill="#82ca9d"
+                    fill="#99d98c"
                     name="Amount Saved"
                   />
                 </BarChart>
