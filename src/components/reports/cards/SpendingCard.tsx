@@ -10,6 +10,17 @@ interface SpendingCardProps {
 }
 
 export function SpendingCard({ data, viewMode, setViewMode, groupedData }: SpendingCardProps) {
+  // Filter out the Challenges category from groupedData
+  const filteredGroupedData = groupedData.filter(group => group.groupName !== "Challenges");
+  
+  // Filter out categories that belong to the Challenges group
+  const filteredCategories = data.categories.filter(category => 
+    category.group.name !== "Challenges"
+  );
+
+  // Calculate total spent excluding Challenges
+  const totalSpent = filteredCategories.reduce((sum, category) => sum + category.spent, 0);
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -34,13 +45,13 @@ export function SpendingCard({ data, viewMode, setViewMode, groupedData }: Spend
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-lg font-semibold">Total Spent: {data.spent} DT</p>
+        <p className="text-lg font-semibold">Total Spent: {totalSpent} DT</p>
         <div className="space-y-2 mt-4">
           {viewMode === "detailed" ? (
             <>
               <h3 className="text-md font-medium">Spending by Category</h3>
               <ul className="space-y-1">
-                {data.categories.map((category) => (
+                {filteredCategories.map((category) => (
                   <li key={category.id} className="flex justify-between text-[#1a2a6c]">
                     <span>{category.name}</span>
                     <span className="font-medium">{category.spent} DT</span>
@@ -52,7 +63,7 @@ export function SpendingCard({ data, viewMode, setViewMode, groupedData }: Spend
             <>
               <h3 className="text-md font-medium">Spending by Group</h3>
               <ul className="space-y-1">
-                {groupedData.map((group) => (
+                {filteredGroupedData.map((group) => (
                   <li key={group.groupName} className="flex justify-between text-[#1a2a6c]">
                     <span>{group.groupName}</span>
                     <span className="font-medium">{group.amount} DT</span>

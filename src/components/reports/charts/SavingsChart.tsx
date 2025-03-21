@@ -2,22 +2,48 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { MonthlyReport } from "@/types/reports";
 
+interface Category {
+  name: string;
+  id: string;
+  saved?: number;
+  spent?: number;
+}
+
+interface GroupData {
+  groupName: string;
+  amount: number;
+  categories?: Category[];
+}
+
 interface SavingsChartProps {
   data: MonthlyReport;
   viewMode: "detailed" | "grouped";
-  groupedData: any[];
+  groupedData: GroupData[];
 }
 
 export function SavingsChart({ data, viewMode, groupedData }: SavingsChartProps) {
-  const chartData = viewMode === "grouped"
-    ? groupedData.map(group => ({
-        name: group.groupName,
-        saved: group.amount
-      }))
-    : data.savingsData.map(saving => ({
-        name: saving.categoryName,
-        saved: saving.saved
-      }));
+  // Get all categories from Challenges group
+  const challengesGroup = groupedData.find(group => group.groupName === "Challenges");
+  const challengeCategoryNames = challengesGroup?.categories?.map((cat: Category) => cat.name) || [];
+
+  // Transform savings data to make challenge categories positive
+  const transformedSavingsData = data.savingsData.map(saving => ({
+    name: saving.categoryName,
+    saved: challengeCategoryNames? Math.abs(saving.saved) : saving.saved
+  }));
+
+  // Transform grouped data to make Challenges group positive
+  const transformedGroupedData = groupedData.map(group => ({
+    name: group.groupName,
+    saved: group.groupName === "Challenges" 
+      ? Math.abs(group.amount) 
+      : group.amount
+  }));
+
+  // Use transformed data for chart
+  const chartData = viewMode === "grouped" 
+    ? transformedGroupedData 
+    : transformedSavingsData;
 
   return (
     <Card className="mt-6">
@@ -45,7 +71,6 @@ export function SavingsChart({ data, viewMode, groupedData }: SavingsChartProps)
               />
               <YAxis 
                 tick={{ fill: '#1a2a6c' }}
-
                />
               <Tooltip />
               <Legend />

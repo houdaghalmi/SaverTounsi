@@ -9,12 +9,18 @@ interface SpendingChartProps {
 }
 
 export function SpendingChart({ data, viewMode, groupedData }: SpendingChartProps) {
+  // Filter out Challenges group and its categories
+  const filteredGroupedData = groupedData.filter(group => group.groupName !== "Challenges");
+  const filteredCategories = data.categories.filter(category => 
+    category.group.name !== "Challenges"
+  );
+
   const chartData = viewMode === "grouped"
-    ? groupedData.map(group => ({
+    ? filteredGroupedData.map(group => ({
         name: group.groupName,
         spent: group.amount
       }))
-    : data.categories.map(category => ({
+    : filteredCategories.map(category => ({
         name: category.name,
         spent: category.spent
       }));

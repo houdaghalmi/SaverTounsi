@@ -30,6 +30,31 @@ export const YearlyReport: FC<YearlyReportProps> = ({
   groupedCategories,
   groupedSavings,
 }) => {
+  // Filter out Challenges from spending data
+  const filteredCategories = data.categories.filter(
+    category => !category.group?.name?.includes("Challenges")
+  );
+  
+  const filteredGroupedCategories = groupedCategories.filter(
+    group => group.groupName !== "Challenges"
+  );
+
+  // Transform savings data to make challenges positive
+  const transformedSavingsData = data.savingsData.map(saving => ({
+    ...saving,
+    saved: saving.categoryName ? Math.abs(saving.saved) : saving.saved
+  }));
+
+  // Transform grouped savings to make challenges positive
+  const transformedGroupedSavings = groupedSavings.map(group => ({
+    ...group,
+    amount: group.groupName === "Challenges" ? Math.abs(group.amount) : group.amount
+  }));
+
+  // Calculate totals
+  const totalSpent = filteredCategories.reduce((sum, cat) => sum + cat.spent, 0);
+  const totalSaved = transformedSavingsData.reduce((sum, saving) => sum + saving.saved, 0);
+
   return (
     <div className="flex flex-col w-full">
       <h2 className="text-xl font-semibold mb-4">Yearly Report</h2>
@@ -58,13 +83,13 @@ export const YearlyReport: FC<YearlyReportProps> = ({
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">Total Spent: {data.spent} DT</p>
+            <p className="text-lg font-semibold">Total Spent: {totalSpent} DT</p>
             <div className="space-y-2 mt-4">
               {spendingViewMode === "detailed" ? (
                 <>
                   <h3 className="text-md font-medium">Spending by Category</h3>
                   <ul className="space-y-1">
-                    {data.categories.map((category) => (
+                    {filteredCategories.map((category) => (
                       <li key={category.id} className="flex justify-between text-[#1a2a6c]">
                         <span>{category.name}</span>
                         <span className="font-medium">{category.spent} DT</span>
@@ -76,7 +101,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
                 <>
                   <h3 className="text-md font-medium">Spending by Group</h3>
                   <ul className="space-y-1">
-                    {groupedCategories.map((group) => (
+                    {filteredGroupedCategories.map((group) => (
                       <li key={group.groupName} className="flex justify-between text-[#1a2a6c]">
                         <span>{group.groupName}</span>
                         <span className="font-medium">{group.amount} DT</span>
@@ -89,7 +114,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
           </CardContent>
         </Card>
 
-        {/* Savings Card */}
+        {/* Savings Card - Update the data sources */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-[#1a2a6c]">Yearly Savings</CardTitle>
@@ -113,13 +138,13 @@ export const YearlyReport: FC<YearlyReportProps> = ({
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">Total Saved: {data.saved} DT</p>
+            <p className="text-lg font-semibold">Total Saved: {totalSaved} DT</p>
             <div className="space-y-2 mt-4">
               {savingViewMode === "detailed" ? (
                 <>
                   <h3 className="text-md font-medium">Savings by Category</h3>
                   <ul className="space-y-1">
-                    {data.savingsData.map((saving) => (
+                    {transformedSavingsData.map((saving) => (
                       <li key={saving.categoryName} className="flex justify-between text-[#1a2a6c]">
                         <span>{saving.categoryName}</span>
                         <span className="font-medium">{saving.saved} DT</span>
@@ -131,7 +156,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
                 <>
                   <h3 className="text-md font-medium">Savings by Group</h3>
                   <ul className="space-y-1">
-                    {groupedSavings.map((group) => (
+                    {transformedGroupedSavings.map((group) => (
                       <li key={group.groupName} className="flex justify-between text-[#1a2a6c]">
                         <span>{group.groupName}</span>
                         <span className="font-medium">{group.amount} DT</span>
@@ -145,7 +170,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
         </Card>
       </div>
 
-      {/* Charts Section */}
+      {/* Charts Section - Update data sources */}
       <div className="grid grid-cols-1 gap-6 mt-6">
         {/* Spending Chart */}
         <Card>
@@ -156,7 +181,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
             <div className="h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={spendingViewMode === "grouped" ? groupedCategories : data.categories}
+                  data={spendingViewMode === "grouped" ? filteredGroupedCategories : filteredCategories}
                   margin={{ top: 20, right: 30, left: 20, bottom: 70 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
@@ -191,7 +216,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
             <div className="h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={savingViewMode === "grouped" ? groupedSavings : data.savingsData}
+                  data={savingViewMode === "grouped" ? transformedGroupedSavings : transformedSavingsData}
                   margin={{ top: 20, right: 30, left: 20, bottom: 70 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
