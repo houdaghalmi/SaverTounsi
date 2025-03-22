@@ -13,6 +13,7 @@ import {
   HelpCircle,
   ChevronDown,
   ChevronUp,
+  Settings,
 } from "lucide-react";
 
 import {
@@ -40,6 +41,8 @@ const items = [
 const helpSubmenuItems = [
   { title: "Feedback", url: "/feedback", icon: MessageCircle },
   { title: "Tutorial", url: "/tutorial", icon: HelpCircle },
+  { title: "Settings", url: "/settings", icon: Settings },
+
 ];
 
 // Logout item.
