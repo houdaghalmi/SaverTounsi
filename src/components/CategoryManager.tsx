@@ -235,72 +235,84 @@ export default function CategoryManager() {
 
   // Render the component
   return (
-    <div className="w-full bg-white p-6">
-      <div className="w-full mx-auto bg-gradient-to-br from-[#1a2a6c]/5 via-[#b21f1f]/5 to-[#1a2a6c]/5 rounded-lg shadow-xl p-6">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-[#1a2a6c]">Budget Manager</h1>
+    <div className="w-full min-h-screen bg-gray-50 p-8">
+      <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-8">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-10">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
+            Category Manager
+          </h1>
           <button
-            className="bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white px-4 py-2 rounded-lg flex items-center hover:opacity-90 transition-opacity"
+            className="bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-md hover:shadow-xl"
             onClick={() => setShowEditBudgetModal(true)}
           >
-            <Edit2 className="w-4 h-4 mr-2" />
+            <Edit2 className="w-5 h-5" />
             Edit Budget
           </button>
         </div>
-        <div className="mb-8">
-          <div className="text-xl text-[#1a2a6c]">Total Budget: {totalBudget} DT</div>
+
+        {/* Budget Info Section */}
+        <div className="mb-10 bg-gradient-to-r from-[#1a2a6c]/5 to-[#b21f1f]/5 p-6 rounded-xl">
+          <div className="text-2xl font-semibold text-[#1a2a6c]">
+            Total Budget: <span className="text-[#b21f1f]">{totalBudget} DT</span>
+          </div>
           <button
-            className="mt-4 flex items-center text-[#1a2a6c] hover:text-[#b21f1f] transition-colors"
+            className="mt-4 flex items-center text-[#1a2a6c] hover:text-[#b21f1f] transition-all gap-2 group"
             onClick={() => setShowNewGroupModal(true)}
           >
-            <PlusCircle className="w-5 h-5 mr-2" />
-            Add Category Group
+            <PlusCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Add Category Group</span>
           </button>
         </div>
 
-        {/* Category Groups */}
-        <div className="space-y-6">
+        {/* Category Groups Grid */}
+        <div className="grid gap-8">
           {categoryGroups && categoryGroups.length > 0 ? (
             categoryGroups.map((group) => (
-              <div key={group.id} className="border border-[#1a2a6c]/20 rounded-lg p-4 hover:border-[#b21f1f] transition-colors">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold text-[#1a2a6c]">{group.name}</h2>
-                  <div className="flex items-center space-x-2">
+              <div 
+                key={group.id} 
+                className="border border-gray-200 rounded-xl p-6 hover:border-[#b21f1f] transition-all hover:shadow-md"
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-[#1a2a6c]">{group.name}</h2>
+                  <div className="flex items-center gap-4">
                     {group.name.toLowerCase() !== "challenges" && (
                       <>
                         <button
-                          className="flex items-center text-[#1a2a6c] hover:text-[#b21f1f] transition-colors"
+                          className="flex items-center gap-2 text-[#1a2a6c] hover:text-[#b21f1f] transition-all group"
                           onClick={() => handleAddCategoryClick(group.id)}
                         >
-                          <PlusCircle className="w-4 h-4 mr-1" />
-                          Add Category
+                          <PlusCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                          <span>Add Category</span>
                         </button>
                         <button
-                          className="flex items-center text-[#b21f1f] hover:text-[#b21f1f]/70 transition-colors"
+                          className="flex items-center gap-2 text-[#b21f1f] hover:text-[#b21f1f]/70 transition-all group"
                           onClick={() => handleRemoveCategoryGroup(group)}
                         >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Remove Group
+                          <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                          <span>Remove Group</span>
                         </button>
                       </>
                     )}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                {/* Categories Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {group.categories && group.categories.length > 0 ? (
                     group.categories.map((category) => (
                       <div
                         key={category.id}
-                        className="border rounded-lg p-4 cursor-pointer"
+                        className="bg-white border border-gray-100 rounded-xl p-5 hover:shadow-lg transition-all cursor-pointer group"
                         onClick={() => setSelectedCategory(category)}
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="font-medium">{category.name}</div>
-                          <div className="flex items-center space-x-2">
-                            <div className={`h-2 w-24 rounded ${getProgressColor(category)}`} />
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="font-semibold text-[#1a2a6c]">{category.name}</div>
+                          <div className="flex items-center gap-3">
+                            <div className={`h-2.5 w-28 rounded-full ${getProgressColor(category)}`} />
                             {group.name.toLowerCase() !== "challenges" && (
                               <button
-                                className="p-1 hover:bg-gray-100 rounded"
+                                className="p-2 hover:bg-red-50 rounded-full group-hover:opacity-100 opacity-0 transition-all"
                                 onClick={(e) => handleRemoveCategory(e, category)}
                               >
                                 <Trash2 className="w-4 h-4 text-red-500" />
@@ -314,13 +326,15 @@ export default function CategoryManager() {
                       </div>
                     ))
                   ) : (
-                    <div>No categories found.</div>
+                    <div className="col-span-full text-center text-gray-500 py-8">
+                      No categories found in this group.
+                    </div>
                   )}
                 </div>
               </div>
             ))
           ) : (
-            <div className="text-[#1a2a6c]/70 text-center py-8">
+            <div className="text-center py-12 text-gray-500">
               No category groups found. Create one to get started.
             </div>
           )}

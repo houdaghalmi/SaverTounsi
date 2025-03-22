@@ -32,17 +32,18 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-// Main menu items.
+// Main menu items (remove Settings from here)
 const items = [
   { title: "Overview", url: "/overview", icon: PieChart },
-  { title: "Categorie manager", url: "/categories", icon: Wallet },
+  { title: "Category manager", url: "/categories", icon: Wallet },
   { title: "Reports", url: "/reports", icon: BarChart },
   { title: "Bon-plans", url: "/bon-plans", icon: Star },
   { title: "Transaction", url: "/transactions", icon: CreditCard },
   { title: "Challenge", url: "/challenges", icon: Trophy },
-  { title: "Settings", url: "/settings", icon: Settings },
-
 ];
+
+// Settings item definition
+const settingsItem = { title: "Settings", url: "/settings", icon: Settings };
 
 // Submenu items for Help
 const helpSubmenuItems = [
@@ -142,6 +143,21 @@ export function AppSidebar() {
                 </>
               )}
 
+              {/* Add Settings Item */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link 
+                    href={settingsItem.url} 
+                    className="flex items-center p-2 hover:bg-gray-100 rounded"
+                    title={isCollapsed ? "Settings" : ""}
+                  >
+                    <settingsItem.icon className={`w-5 h-5 ${isCollapsed ? '' : 'mr-2'}`} />
+                    {!isCollapsed && <span>{settingsItem.title}</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Existing Logout Item */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link 
