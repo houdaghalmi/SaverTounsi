@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import TransactionList from "@/components/transactions/transaction-list";
 import TransactionFilters from "@/components/transactions/transaction-filters";
 import { Transaction } from "@prisma/client";
+import { motion } from "framer-motion";
 
 interface Category {
   id: string;
@@ -92,32 +93,61 @@ export default function TransactionsPage() {
   });
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Transactions</h1>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-screen-2xl mx-auto p-6">
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
+              Transactions
+            </h1>
+            <p className="text-gray-500 mt-1">
+              Manage your income and expenses
+            </p>
+          </div>
 
-      {/* Filters */}
-      <TransactionFilters filter={filter} setFilter={setFilter} />
+          <Button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white hover:opacity-90 transition-opacity"
+          >
+            <PlusIcon className="h-5 w-5 mr-2" />
+            Add Transaction
+          </Button>
+        </div>
 
-      {/* Transaction List */}
-      <TransactionList transactions={filteredTransactions as any} />
+        {/* Main Content */}
+        <div className="space-y-6">
+          {/* Filters Section */}
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <TransactionFilters filter={filter} setFilter={setFilter} />
+          </div>
 
-      {/* Add Transaction Button */}
-      <div className="fixed bottom-6 right-6">
-        <Button onClick={() => setIsModalOpen(true)}>
-          <PlusIcon className="h-5 w-5 mr-2" />
-          Add Transaction
-        </Button>
+          {/* Transaction List */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-transparent"
+          >
+            <TransactionList transactions={filteredTransactions as any} />
+          </motion.div>
+        </div>
+
+        {/* Modal remains unchanged */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
+                Add Transaction
+              </DialogTitle>
+            </DialogHeader>
+            <TransactionForm 
+              onSubmit={handleAddTransaction} 
+              categories={categories} 
+            />
+          </DialogContent>
+        </Dialog>
       </div>
-
-      {/* Add Transaction Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Transaction</DialogTitle>
-          </DialogHeader>
-          <TransactionForm onSubmit={handleAddTransaction} categories={categories} />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

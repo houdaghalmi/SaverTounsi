@@ -53,7 +53,8 @@ export async function GET(req: Request) {
         userId: true,
         user: {
           select: {
-            name: true
+            name: true,
+            image:true
           }
         }
       },

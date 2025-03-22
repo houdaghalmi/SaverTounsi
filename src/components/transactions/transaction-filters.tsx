@@ -1,5 +1,7 @@
 // src/components/transactions/TransactionFilters.tsx
 import { Dispatch, SetStateAction } from "react";
+import { Wallet, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TransactionFiltersProps {
   filter: "all" | "INCOME" | "EXPENSE";
@@ -11,36 +13,53 @@ export default function TransactionFilters({
   setFilter,
 }: TransactionFiltersProps) {
   return (
-    <div className="flex space-x-4 mb-6">
+    <div className="flex flex-wrap gap-2 p-1">
       <button
         onClick={() => setFilter("all")}
-        className={`px-4 py-2 rounded-lg ${
+        className={cn(
+          "inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200",
+          "border hover:bg-gray-50",
           filter === "all"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }`}
+            ? "border-gray-900/10 bg-gray-900/5 text-gray-900"
+            : "border-gray-200 text-gray-600 hover:border-gray-300"
+        )}
       >
-        All
+        <Wallet className="w-4 h-4" />
+        <span>All</span>
       </button>
+      
       <button
         onClick={() => setFilter("INCOME")}
-        className={`px-4 py-2 rounded-lg ${
+        className={cn(
+          "inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200",
+          "border hover:bg-gray-50",
           filter === "INCOME"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }`}
+            ? "border-gray-900/10 bg-gray-900/5 text-gray-900"
+            : "border-gray-200 text-gray-600 hover:border-gray-300"
+        )}
       >
-        Income
+        <ArrowUpCircle className={cn(
+          "w-4 h-4",
+          filter === "INCOME" ? "text-emerald-500" : "text-gray-400"
+        )} />
+        <span>Income</span>
       </button>
+      
       <button
         onClick={() => setFilter("EXPENSE")}
-        className={`px-4 py-2 rounded-lg ${
+        className={cn(
+          "inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200",
+          "border hover:bg-gray-50",
           filter === "EXPENSE"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }`}
+            ? "border-gray-900/10 bg-gray-900/5 text-gray-900"
+            : "border-gray-200 text-gray-600 hover:border-gray-300"
+        )}
       >
-        Expenses
+        <ArrowDownCircle className={cn(
+          "w-4 h-4",
+          filter === "EXPENSE" ? "text-red-500" : "text-gray-400"
+        )} />
+        <span>Expenses</span>
       </button>
     </div>
   );

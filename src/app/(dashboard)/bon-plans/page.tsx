@@ -118,40 +118,48 @@ export default function BonPlansPage() {
   // const selectedDeal = filteredDeals.find((deal) => deal.id === selectedDealId);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Bon Plans</h1>
+    <div className="space-y-6 p-6">
+      {/* Enhanced Header Section */}
+      <div className="relative mb-12">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
+          Bon Plans
+        </h1>
       </div>
-      {/* Filters and Deal List */}
-      <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-1">
-        {/* Filters */}
+
+      {/* Filters and Deal List with improved layout */}
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Filters Card */}
         <div className="lg:col-span-1">
-          <DealFilters
-            onFilterChangeAction={handleFilterChange}
-            categories={["Food & Drinking", "Shopping", "Entertainment"]}
-          />
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <DealFilters
+              onFilterChangeAction={handleFilterChange}
+              categories={["Food & Drinking", "Shopping", "Entertainment"]}
+            />
+          </div>
         </div>
-        {/* Main Content (Deal List) */}
+
+        {/* Main Content with Grid Layout */}
         <div className="lg:col-span-3">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDeals.map((deal) => (
               <DealCard key={deal.id} deal={deal} />
             ))}
           </div>
         </div>
       </div>
-      {/* Reviews Section */}
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Submit a Review</h2>
-        {/* Deal Selection Dropdown */}
-        <div className="mb-6">
+
+      {/* Reviews Section with Enhanced Design */}
+      <div className="mt-12 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h2 className="text-2xl font-semibold mb-6 text-[#1a2a6c]">Submit a Review</h2>
+        
+        {/* Deal Selection with Improved Styling */}
+        <div className="mb-8">
           <Select onValueChange={(value) => {
             setSelectedDealId(value);
-            // Update selectedDeal when a deal is chosen
             const deal = filteredDeals.find(d => d.id === value);
             setSelectedDeal(deal || null);
           }}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full border-gray-200 rounded-lg">
               <SelectValue placeholder="Select a deal to review" />
             </SelectTrigger>
             <SelectContent>
@@ -163,14 +171,22 @@ export default function BonPlansPage() {
             </SelectContent>
           </Select>
         </div>
-        {/* Review Form */}
+
+        {/* Review Form and List */}
         {selectedDealId && (
           <>
-            <ReviewForm onSubmit={handleSubmitReview} />
-            <h3 className="text-lg font-semibold mt-6 mb-4">
-              Reviews for {selectedDeal?.title}
-            </h3>
-            <ReviewList reviews={reviews as any} />
+            <div className="bg-gray-50 rounded-lg p-6 mb-8">
+              <ReviewForm onSubmit={handleSubmitReview} />
+            </div>
+            
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold mb-6 text-[#1a2a6c]">
+                Reviews for {selectedDeal?.title}
+              </h3>
+              <div className="bg-white rounded-lg">
+                <ReviewList reviews={reviews as any} />
+              </div>
+            </div>
           </>
         )}
       </div>

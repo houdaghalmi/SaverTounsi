@@ -13,50 +13,64 @@ interface DealCardProps {
 
 export const DealCard = ({ deal }: DealCardProps) => {
   return (
-    <Card className="w-full max-w-sm hover:shadow-lg transition-shadow">
-      {/* En-tête de la carte avec l'image du deal */}
-      <CardHeader className="relative">
-      <Image
-    src={deal.image || "/api/placeholder/400/200"}
-    alt={deal.title}
-    width={0}
-    height={0}
-    sizes="100vw"
-    className="rounded-t-lg h-48 w-full object-cover"
-  />
-   
-      </CardHeader>
-      {/* Contenu de la carte */}
-      <CardContent className="space-y-4">
-        {/* Titre du deal */}
-        <h3 className="text-xl font-semibold">{deal.title}</h3>
-        {/* Localisation du deal */}
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <MapPin className="w-4 h-4" />
-          <span>{deal.location}</span> {/* Affiche l'adresse physique */}
+    <Card className="w-full max-w-sm group hover:shadow-xl transition-all duration-300 border-gray-100">
+      {/* Enhanced Header with overlay and hover effect */}
+      <CardHeader className="relative p-0">
+        <div className="relative h-48 overflow-hidden rounded-t-lg">
+          <Image
+            src={deal.image || "/api/placeholder/400/200"}
+            alt={deal.title}
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
-        {/* Catégories du deal */}
+      </CardHeader>
+
+      {/* Enhanced Content with better spacing and typography */}
+      <CardContent className="space-y-4 p-5">
+        <h3 className="text-xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
+          {deal.title}
+        </h3>
+
+        <div className="flex items-center gap-2 text-sm">
+          <div className="p-1.5 rounded-full bg-[#1a2a6c]/5">
+            <MapPin className="w-4 h-4 text-[#1a2a6c]" />
+          </div>
+          <span className="text-gray-600 font-medium">{deal.location}</span>
+        </div>
+
         <div className="flex items-center gap-2">
-          <Tag className="w-4 h-4" />
-          <div className="flex gap-2">
+          <div className="p-1.5 rounded-full bg-[#b21f1f]/5">
+            <Tag className="w-4 h-4 text-[#b21f1f]" />
+          </div>
+          <div className="flex flex-wrap gap-2">
             {deal.categories.map((category) => (
-              <Badge key={category} variant="secondary">
+              <Badge 
+                key={category} 
+                variant="secondary"
+                className="bg-gray-100 hover:bg-gray-200 text-[#1a2a6c] font-medium transition-colors"
+              >
                 {category}
               </Badge>
             ))}
           </div>
         </div>
       </CardContent>
-      {/* Pied de la carte avec le bouton "Open in Google Maps" */}
-      <CardFooter className="flex justify-between">
+
+      {/* Enhanced Footer with gradient button */}
+      <CardFooter className="p-5 pt-0">
         <Button
           onClick={() => {
             const query = encodeURIComponent(deal.location);
             window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
           }}
-          variant="outline"
+          className="w-full bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white hover:opacity-90 transition-opacity"
         >
-          Open in Google Maps
+          <MapPin className="w-4 h-4 mr-2" />
+          View Location
         </Button>
       </CardFooter>
     </Card>

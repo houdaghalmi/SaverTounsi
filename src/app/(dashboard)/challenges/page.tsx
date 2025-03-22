@@ -5,6 +5,7 @@ import { ProgressTracker } from "@/components/challenges/progress-tracker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Challenge, UserChallenge } from "@prisma/client";
 import { useState, useEffect } from "react";
+import { Trophy, Activity, Sparkles } from "lucide-react";
 
 // Add this interface near the top of the file
 interface ChallengeWithDetails extends Challenge {
@@ -186,8 +187,16 @@ export default function ChallengesPage() {
     });
   };
 
-  if (loading) return <div>Loading challenges...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center py-12">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a2a6c]"></div>
+    </div>
+  );
+  if (error) return (
+    <div className="text-center py-12 text-red-600">
+      <p className="font-medium">Error: {error}</p>
+    </div>
+  );
 
   const getChallengeStatus = (challenge: Challenge) => {
     const userChallenge = userChallenges.find(
@@ -210,126 +219,102 @@ export default function ChallengesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
+      {/* Header Section */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Challenges</h1>
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
+            Challenges
+          </h1>
+          <p className="text-gray-500 mt-1">Track your financial goals and achievements</p>
+        </div>
       </div>
 
-      <ProgressTracker
-        milestones={userChallenges
-          .filter(uc => !uc.completedAt && uc.challenge) // Add check for challenge existence
-          .map((uc) => ({
-            title: uc.challenge?.title || 'Unnamed Challenge', // Add fallback
-            target: uc.challenge?.goal || 0,
-            current: uc.progress || 0,
-            unit: "DT",
-            isCompleted: !!uc.completedAt,
-          }))}
-      />
+      {/* Progress Tracker with improved styling */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <ProgressTracker
+          milestones={userChallenges
+            .filter(uc => !uc.completedAt && uc.challenge) // Add check for challenge existence
+            .map((uc) => ({
+              title: uc.challenge?.title || 'Unnamed Challenge', // Add fallback
+              target: uc.challenge?.goal || 0,
+              current: uc.progress || 0,
+              unit: "DT",
+              isCompleted: !!uc.completedAt,
+            }))}
+        />
+      </div>
 
+      {/* Enhanced Tabs */}
       <Tabs defaultValue="active">
-        <TabsList>
-          <TabsTrigger value="active">
+        <TabsList className="bg-white p-1 rounded-lg border border-gray-200">
+          <TabsTrigger 
+            value="active"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#1a2a6c] data-[state=active]:to-[#b21f1f] data-[state=active]:text-white"
+          >
+            <Activity className="w-4 h-4 mr-2" />
             Active ({filterChallenges('active').length})
           </TabsTrigger>
-          <TabsTrigger value="completed">
+          <TabsTrigger 
+            value="completed"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#1a2a6c] data-[state=active]:to-[#b21f1f] data-[state=active]:text-white"
+          >
+            <Trophy className="w-4 h-4 mr-2" />
             Completed ({filterChallenges('completed').length})
           </TabsTrigger>
-          <TabsTrigger value="available">
+          <TabsTrigger 
+            value="available"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#1a2a6c] data-[state=active]:to-[#b21f1f] data-[state=active]:text-white"
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
             Available ({filterChallenges('available').length})
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="active" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filterChallenges('active').map((challenge) => {
-              const userChallenge = userChallenges.find(
-                (uc) => uc.challengeId === challenge.id
-              );
-              return (
-                <ChallengeCard
-                  key={challenge.id}
-                  challenge={{
-                    ...challenge,
-                    current: userChallenge?.progress || 0,
-                    progress: calculateProgressPercentage(
-                      userChallenge?.progress || 0,
-                      challenge.goal
-                    ), // This will now return whole numbers
-                    participants: userChallenges.filter(
-                      (uc) => uc.challengeId === challenge.id
-                    ).length,
-                    status: 'active',
-                  }}
-                  onUpdateProgress={handleUpdateProgress}
-                  onJoinChallenge={handleJoinChallenge}
-                />
-              );
-            })}
-            {filterChallenges('active').length === 0 && (
-              <p className="col-span-full text-center text-gray-500 py-8">
-                No active challenges. Join a challenge to get started!
-              </p>
-            )}
-          </div>
-        </TabsContent>
+        {/* Improved Tab Content */}
+        {['active', 'completed', 'available'].map((status) => (
+          <TabsContent key={status} value={status} className="mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filterChallenges(status as 'active' | 'completed' | 'available').map((challenge) => {
+                const userChallenge = userChallenges.find(
+                  (uc) => uc.challengeId === challenge.id
+                );
+                return (
+                  <ChallengeCard
+                    key={challenge.id}
+                    challenge={{
+                      ...challenge,
+                      current: userChallenge?.progress || 0,
+                      progress: calculateProgressPercentage(
+                        userChallenge?.progress || 0,
+                        challenge.goal
+                      ), // This will now return whole numbers
+                      participants: userChallenges.filter(
+                        (uc) => uc.challengeId === challenge.id
+                      ).length,
+                      status: status as 'active' | 'completed' | 'available',
+                    }}
+                    onUpdateProgress={handleUpdateProgress}
+                    onJoinChallenge={handleJoinChallenge}
+                  />
+                );
+              })}
 
-        <TabsContent value="completed" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filterChallenges('completed').map((challenge) => {
-              const userChallenge = userChallenges.find(
-                (uc) => uc.challengeId === challenge.id
-              );
-              return (
-                <ChallengeCard
-                  key={challenge.id}
-                  challenge={{
-                    ...challenge,
-                    current: userChallenge?.progress || 0,
-                    progress: 100,
-                    participants: userChallenges.filter(
-                      (uc) => uc.challengeId === challenge.id
-                    ).length,
-                    status: 'completed',
-                  }}
-                  onUpdateProgress={handleUpdateProgress}
-                  onJoinChallenge={handleJoinChallenge}
-                />
-              );
-            })}
-            {filterChallenges('completed').length === 0 && (
-              <p className="col-span-full text-center text-gray-500 py-8">
-                No completed challenges yet. Keep going!
-              </p>
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="available" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filterChallenges('available').map((challenge) => (
-              <ChallengeCard
-                key={challenge.id}
-                challenge={{
-                  ...challenge,
-                  current: 0,
-                  progress: 0,
-                  participants: userChallenges.filter(
-                    (uc) => uc.challengeId === challenge.id
-                  ).length,
-                  status: 'available',
-                }}
-                onUpdateProgress={handleUpdateProgress}
-                onJoinChallenge={handleJoinChallenge}
-              />
-            ))}
-            {filterChallenges('available').length === 0 && (
-              <p className="col-span-full text-center text-gray-500 py-8">
-                No available challenges at the moment. Check back later!
-              </p>
-            )}
-          </div>
-        </TabsContent>
+              {/* Enhanced Empty State */}
+              {filterChallenges(status as 'active' | 'completed' | 'available').length === 0 && (
+                <div className="col-span-full">
+                  <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                    <p className="text-gray-600 font-medium">
+                      {status === 'active' && "No active challenges. Join a challenge to get started!"}
+                      {status === 'completed' && "No completed challenges yet. Keep going!"}
+                      {status === 'available' && "No available challenges at the moment. Check back later!"}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        ))}
       </Tabs>
     </div>
   );

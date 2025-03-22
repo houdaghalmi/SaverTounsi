@@ -1,13 +1,13 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Trophy, Users } from "lucide-react";
+import { Trophy, Users, Star, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { Challenge } from "@prisma/client";
+import { motion } from "framer-motion";
 
 interface ExtendedChallenge extends Challenge {
   progress: number;
@@ -41,59 +41,64 @@ export function ChallengeCard({
   };
 
   return (
-    <Card className="w-full hover:shadow-lg transition-shadow">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-primary" />
-          {challenge.title}
+    <Card className="group w-full hover:shadow-md transition-all duration-200 border-gray-100">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-[#1a2a6c]/10">
+              <Trophy className="w-5 h-5 text-[#1a2a6c]" />
+            </div>
+            <span className="text-lg font-semibold text-[#1a2a6c]">{challenge.title}</span>
+          </div>
+          <div className={cn(
+            "px-2 py-1 text-xs font-medium rounded-full",
+            challenge.status === "active" && "bg-green-100 text-green-700",
+            challenge.status === "completed" && "bg-blue-100 text-blue-700",
+            challenge.status === "available" && "bg-orange-100 text-orange-700"
+          )}>
+            {challenge.status}
+          </div>
         </CardTitle>
       </CardHeader>
+
       <CardContent className="space-y-4">
-        <p className="text-sm text-gray-600">{challenge.description}</p>
+        <p className="text-sm text-gray-600 line-clamp-2">{challenge.description}</p>
 
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>Progress</span>
-            <span>
-              {Math.round(challenge.progress)}% {/* This will show whole numbers only */}
-            </span>
+        {/* Progress Section - Only show for active and completed challenges */}
+        {challenge.status !== "available" && (
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600 font-medium">Progress</span>
+              <span className="font-semibold px-2 py-0.5 rounded-full bg-[#1a2a6c]/10 text-[#1a2a6c]">
+                {Math.round(challenge.progress)}%
+              </span>
+            </div>
+            <div className="relative h-2.5 rounded-full bg-[#1a2a6c]/10 overflow-hidden">
+              <div 
+                className="absolute top-0 left-0 h-full bg-[#1a2a6c] transition-all duration-300"
+                style={{ width: `${Math.min(challenge.progress, 100)}%` }}
+              />
+            </div>
           </div>
-          <Progress 
-            value={challenge.progress} 
-            className="h-2"
-          />
-          <div className="text-sm text-gray-600">
-            {challenge.current.toLocaleString()} / {challenge.goal.toLocaleString()} DT
-          </div>
-        </div>
+        )}
 
-        <div className="flex items-center justify-between text-sm text-gray-600">
-          <div className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
+        {/* Stats Row */}
+        <div className="flex items-center justify-between py-2 border-t border-gray-100">
+          <div className="flex items-center gap-1.5 text-sm text-gray-600">
+            <Users className="w-4 h-4 text-[#1a2a6c]" />
             <span>{challenge.participants} participants</span>
           </div>
-          <span>{challenge.duration} days</span>
+          <div className="flex items-center gap-1.5 text-sm text-gray-600">
+            <Target className="w-4 h-4 text-[#1a2a6c]" />
+            <span>{challenge.duration} days</span>
+          </div>
         </div>
 
-        <div className="text-sm">
-          Status:{" "}
-          <span
-            className={`font-medium ${
-              challenge.status === "active"
-                ? "text-green-600"
-                : challenge.status === "completed"
-                ? "text-blue-600"
-                : "text-gray-600"
-            }`}
-          >
-            {challenge.status}
-          </span>
-        </div>
-
+        {/* Action Buttons */}
         {challenge.status === "available" && (
           <Button
             onClick={() => onJoinChallenge(challenge.id, challenge.title)}
-            className="w-full"
+            className="w-full bg-[#1a2a6c] text-white hover:bg-[#1a2a6c]/90 transition-opacity"
           >
             <Trophy className="w-4 h-4 mr-2" />
             Join Challenge
@@ -109,20 +114,23 @@ export function ChallengeCard({
               placeholder="Enter amount in DT"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
+              className="border-gray-200 focus:border-[#1a2a6c] focus:ring-2 focus:ring-[#1a2a6c]/20"
             />
             <Button
               onClick={handleUpdateProgress}
               disabled={challenge.progress >= 100}
-              className="w-full"
+              className="w-full bg-[#1a2a6c] text-white hover:bg-[#1a2a6c]/90 transition-opacity disabled:opacity-50"
             >
               Add Progress
             </Button>
           </div>
         )}
 
+        {/* Reward Badge */}
         {challenge.reward && (
-          <div className="text-sm text-gray-600">
-            Reward: <span className="font-medium">{challenge.reward}</span>
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1a2a6c]/10 text-[#1a2a6c]">
+            <Star className="w-4 h-4" />
+            <span className="text-sm font-medium">{challenge.reward}</span>
           </div>
         )}
       </CardContent>

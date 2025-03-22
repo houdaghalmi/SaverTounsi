@@ -78,31 +78,47 @@ export function TransactionForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Transaction Type Field */}
+        {/* Transaction Type Toggle */}
         <FormField
           control={form.control}
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Transaction Type</FormLabel>
-              <Select
-                onValueChange={(value: "INCOME" | "EXPENSE") => {
-                  field.onChange(value);
-                  setTransactionType(value);
-                  form.setValue("categoryId", ""); // Reset category when type changes
-                }}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="EXPENSE">Expense</SelectItem>
-                  <SelectItem value="INCOME">Income</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormLabel className="text-sm font-semibold text-[#1a2a6c]">Transaction Type</FormLabel>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    field.onChange("EXPENSE");
+                    setTransactionType("EXPENSE");
+                    form.setValue("categoryId", "");
+                  }}
+                  className={cn(
+                    "w-full transition-all",
+                    field.value === "EXPENSE"
+                      ? "bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white"
+                      : "bg-transparent border border-gray-200 text-gray-700 hover:bg-gray-50"
+                  )}
+                >
+                  Expense
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    field.onChange("INCOME");
+                    setTransactionType("INCOME");
+                    form.setValue("categoryId", "");
+                  }}
+                  className={cn(
+                    "w-full transition-all",
+                    field.value === "INCOME"
+                      ? "bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white"
+                      : "bg-transparent border border-gray-200 text-gray-700 hover:bg-gray-50"
+                  )}
+                >
+                  Income
+                </Button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -114,11 +130,16 @@ export function TransactionForm({
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount (TND)</FormLabel>
+              <FormLabel className="text-sm font-semibold text-[#1a2a6c]">Amount (TND)</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="0.00" {...field} />
+                <Input 
+                  type="number" 
+                  placeholder="0.00" 
+                  {...field}
+                  className="text-lg font-medium border-gray-200 focus:border-[#1a2a6c] focus:ring-2 focus:ring-[#1a2a6c]/20" 
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
@@ -129,22 +150,29 @@ export function TransactionForm({
           name="categoryId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel className="text-sm font-semibold text-[#1a2a6c]">Category</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="border-gray-200 focus:border-[#1a2a6c] focus:ring-2 focus:ring-[#1a2a6c]/20">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name} ({category.group.name})
+                    <SelectItem 
+                      key={category.id} 
+                      value={category.id}
+                      className="focus:bg-[#1a2a6c]/5"
+                    >
+                      {category.name} 
+                      <span className="text-sm text-gray-500 ml-1">
+                        ({category.group.name})
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <FormMessage />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
@@ -155,15 +183,15 @@ export function TransactionForm({
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Date</FormLabel>
+              <FormLabel className="text-sm font-semibold text-[#1a2a6c]">Date</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
+                        "w-full pl-3 text-left font-normal border-gray-200 hover:bg-gray-50",
+                        !field.value && "text-gray-500"
                       )}
                     >
                       {field.value ? (
@@ -171,7 +199,7 @@ export function TransactionForm({
                       ) : (
                         <span>Pick a date</span>
                       )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      <CalendarIcon className="ml-auto h-4 w-4 text-[#1a2a6c]" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
@@ -180,36 +208,48 @@ export function TransactionForm({
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
+                    className="rounded-md border"
                   />
                 </PopoverContent>
               </Popover>
-              <FormMessage />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
 
-        {/* Description Field (Optional) */}
+        {/* Description Field */}
         <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description (Optional)</FormLabel>
+              <FormLabel className="text-sm font-semibold text-[#1a2a6c]">Description (Optional)</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Add notes about this transaction"
-                  className="resize-none"
+                  className="resize-none border-gray-200 focus:border-[#1a2a6c] focus:ring-2 focus:ring-[#1a2a6c]/20"
                   {...field}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
 
         {/* Submit Button */}
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Transaction"}
+        <Button 
+          type="submit" 
+          className="w-full bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white hover:opacity-90 transition-opacity py-6 text-lg font-medium"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <span>Saving...</span>
+            </div>
+          ) : (
+            "Save Transaction"
+          )}
         </Button>
       </form>
     </Form>

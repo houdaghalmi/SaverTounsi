@@ -334,8 +334,12 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6 w-full">
-      <div className="flex justify-between items-center w-full">
-        <h1 className="text-2xl font-bold">Reports</h1>
+      <div className="flex justify-between items-center w-full mb-8">
+        <div className="relative">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
+            Reports
+          </h1>
+        </div>
       </div>
 
       <Tabs defaultValue="monthly">

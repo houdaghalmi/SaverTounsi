@@ -16,6 +16,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,6 +29,17 @@ interface Feedback {
   userName: string;
 }
 
+// Helper function to get initials
+const getInitials = (name: string) => {
+  if (!name) return '?';
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+};
+
 export default function FeedbackPage() {
   const [message, setMessage] = useState('');
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -34,28 +47,29 @@ export default function FeedbackPage() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Fetch feedback from the backend
-  useEffect(() => {
-    const fetchFeedbacks = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch('/api/feedback');
-        if (!response.ok) {
-          throw new Error('Failed to fetch feedback');
-        }
-        const data = await response.json();
-        setFeedbacks(data);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'An unknown error occurred');
-      } finally {
-        setLoading(false);
+  // Add this function to fetch feedbacks
+  const fetchFeedbacks = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/feedback');
+      if (!response.ok) {
+        throw new Error('Failed to fetch feedback');
       }
-    };
+      const data = await response.json();
+      setFeedbacks(data);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An unknown error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Update useEffect to use the new function
+  useEffect(() => {
     fetchFeedbacks();
   }, []);
 
-  // Handle form submission
+  // Update handleSubmit to refresh data after submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -79,9 +93,7 @@ export default function FeedbackPage() {
         body: JSON.stringify({ message }),
       });
 
-      // Check if the response is OK
       if (!response.ok) {
-        // Try to parse the error response as JSON
         let errorData;
         try {
           errorData = await response.json();
@@ -91,10 +103,9 @@ export default function FeedbackPage() {
         throw new Error(errorData.error || 'Failed to submit feedback');
       }
 
-      // Parse the successful response as JSON
-      const newFeedback = await response.json();
-      setFeedbacks([newFeedback, ...feedbacks]);
+      // Clear the input and fetch fresh data
       setMessage('');
+      await fetchFeedbacks(); // Refresh the feedback list
 
       toast({
         title: 'Success',
@@ -112,6 +123,7 @@ export default function FeedbackPage() {
     }
   };
 
+  // Update handleDelete to refresh data after deletion
   const handleDelete = async (feedbackId: string) => {
     try {
       const response = await fetch(`/api/feedback/${feedbackId}`, {
@@ -122,7 +134,7 @@ export default function FeedbackPage() {
         throw new Error('Failed to delete feedback');
       }
 
-      setFeedbacks(feedbacks.filter(feedback => feedback.id !== feedbackId));
+      await fetchFeedbacks(); // Refresh the feedback list
       
       toast({
         title: 'Success',
@@ -140,93 +152,126 @@ export default function FeedbackPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">User Feedback</h1>
+      {/* Header */}
+      <h1 className="text-2xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent mb-2">
+        User Feedback
+      </h1>
+      <p className="text-gray-600 mb-6">Share your thoughts and help us improve</p>
 
       {/* Feedback form */}
-      <Card className="p-6 mb-8">
-        <h2 className="text-xl font-bold mb-4">Share Your Feedback</h2>
+      <Card className="p-6 mb-8 border-none shadow-sm hover:shadow-md transition-all duration-200">
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            placeholder="Type your message here"
-            className="w-full"
+            placeholder="What's on your mind?"
+            className="w-full border-gray-200 focus:border-[#1a2a6c] focus:ring-2 focus:ring-[#1a2a6c]/20"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Submitting...' : 'Send Message'}
+          <Button 
+            type="submit" 
+            className="w-full bg-[#1a2a6c] hover:bg-[#1a2a6c]/90 transition-colors"
+            disabled={loading}
+          >
+            {loading ? 
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Submitting...</span>
+              </div>
+              : 'Share Feedback'
+            }
           </Button>
         </form>
       </Card>
 
       {/* Feedback List */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold mb-4">Recent Feedback</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Feedback</h2>
         
         {error && (
-          <div className="text-red-500 mb-4">
+          <div className="p-4 bg-red-50 text-red-600 rounded-lg border border-red-100">
             {error}
           </div>
         )}
 
-        {loading && <div>Loading...</div>}
-
-        {feedbacks.map((feedback) => (
-          <Card key={feedback.id} className="p-4">
-            <div className="flex items-start space-x-4">
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="font-semibold text-[#1a2a6c]">
-                    {feedback.userName}
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <time className="text-sm text-gray-500">
-                      {new Date(feedback.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </time>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-gray-500 hover:text-red-500"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Feedback</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete this feedback? 
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(feedback.id)}
-                            className="bg-red-500 hover:bg-red-600"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-                <p className="text-gray-700">{feedback.message}</p>
-              </div>
-            </div>
-          </Card>
-        ))}
-
-        {!loading && feedbacks.length === 0 && (
-          <p className="text-gray-500 text-center">No feedback yet</p>
+        {loading && (
+          <div className="flex justify-center py-8">
+            <div className="w-8 h-8 border-2 border-[#1a2a6c] border-t-transparent rounded-full animate-spin" />
+          </div>
         )}
+
+        <div className="space-y-4">
+          {feedbacks.map((feedback) => (
+            <Card key={feedback.id} className="p-5 hover:shadow-md transition-all duration-200">
+              <div className="flex items-start justify-between">
+                <div className="space-y-2 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8 border border-[#1a2a6c]/10">
+                        <AvatarImage
+                          src="./images/icons/avatar.jpg"
+                          alt={feedback.userName || 'Anonymous User'}
+                        />
+                        <AvatarFallback className="bg-[#1a2a6c]/10 text-[#1a2a6c] text-sm">
+                          {getInitials(feedback.userName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <p className="font-medium text-[#1a2a6c]">
+                        {feedback.userName || 'User'}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-gray-700">{feedback.message}</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <time className="text-xs text-gray-500 whitespace-nowrap">
+                    {new Date(feedback.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </time>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Feedback</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. Are you sure?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="border-gray-200">Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(feedback.id)}
+                          className="bg-red-500 hover:bg-red-600"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </Card>
+          ))}
+
+          {!loading && feedbacks.length === 0 && (
+            <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+              <p className="text-gray-600 font-medium">No feedback yet</p>
+              <p className="text-sm text-gray-500 mt-1">Be the first to share your thoughts</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
