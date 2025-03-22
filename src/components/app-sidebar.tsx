@@ -1,9 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import  Link  from "next/link";
+import Link from "next/link";
+import Image from "next/image"; // Add this import
 import {
   PieChart,
-  Wallet ,
+  Wallet,
   Home,
   Folder,
   BarChart,
@@ -25,6 +26,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -54,15 +56,30 @@ const logoutItem = { title: "Log Out", url: "/logout", icon: LogOut };
 
 export function AppSidebar() {
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <Sidebar>
+    <Sidebar 
+      className={`transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}
+      collapsible="icon"
+    >
       <SidebarContent>
-        {/* Main menu group */}
+        
+        <SidebarHeader>
+          <div className={` py-2 flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'}`}>
+            <Image 
+              src="/images/logo/logo2.png" 
+              alt="SaverTounsi Logo"
+              width={60}
+              height={60}
+            />
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                SaverTounsi
+              </span>
+           
+          </div> 
+        </SidebarHeader>
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            saverTounsi
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {items.map((item) => (
@@ -70,10 +87,11 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <Link 
                       href={item.url} 
-                      className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 transition-colors duration-200 rounded-lg hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200"
+                      className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 transition-colors   rounded-lg hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200"
+                      title={item.title} // Always show tooltip regardless of collapsed state
                     >
-                      <item.icon className="w-5 h-5 mr-3 text-gray-500" />
-                      <span className="font-medium">{item.title}</span>
+                      <item.icon className={`w-5 h-5 ${isCollapsed ? '' : 'mr-3'} text-gray-500`} />
+                      {!isCollapsed && <span className="font-medium">{item.title}</span>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -82,49 +100,57 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Logout group at the bottom */}
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* Help section at the very bottom */}
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)}
-                  className="flex items-center justify-between p-2 hover:bg-gray-100 rounded cursor-pointer"
-                >
-                  <div>
-                    <div className="flex items-center">
-                      <HelpCircle className="w-5 h-5 mr-2" />
-                      <span>Support</span>
-                    </div>
-                    {isHelpMenuOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {!isCollapsed && (
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)}
+                      className="flex items-center justify-between p-2 hover:bg-gray-100 rounded cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center">
+                          <HelpCircle className="w-5 h-5 mr-2" />
+                          <span>Support</span>
+                        </div>
+                        {isHelpMenuOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
-              {/* Submenu for Help */}
-              {isHelpMenuOpen && (
-                <ul className="pl-6 mt-1">
-                  {helpSubmenuItems.map((subItem) => (
-                    <li key={subItem.title}>
-                      <SidebarMenuButton asChild>
-                        <Link href={subItem.url} className="flex items-center p-2 hover:bg-gray-100 rounded">
-                          <subItem.icon className="w-5 h-5 mr-2" />
-                          <span>{subItem.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </li>
-                  ))}
-                </ul>
+                  {/* Help submenu items */}
+                  {isHelpMenuOpen && (
+                    <div className="pl-6 mt-1">
+                      {helpSubmenuItems.map((subItem) => (
+                        <SidebarMenuItem key={subItem.title}>
+                          <SidebarMenuButton asChild>
+                            <Link 
+                              href={subItem.url} 
+                              className="flex items-center p-2 hover:bg-gray-100 rounded"
+                            >
+                              <subItem.icon className="w-5 h-5 mr-2" />
+                              <span>{subItem.title}</span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
 
-              {/* Log out button below Help */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href={logoutItem.url} className="flex items-center p-2 hover:bg-gray-100 rounded">
-                    <logoutItem.icon className="w-5 h-5 mr-2" />
-                    <span>{logoutItem.title}</span>
+                  <Link 
+                    href={logoutItem.url} 
+                    className="flex items-center p-2 hover:bg-gray-100 rounded"
+                    title={isCollapsed ? "Log Out" : ""}
+                  >
+                    <logoutItem.icon className={`w-5 h-5 ${isCollapsed ? '' : 'mr-2'}`} />
+                    {!isCollapsed && <span>{logoutItem.title}</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
