@@ -1,12 +1,14 @@
 import { cn } from "@/lib/utils";
-import { Wallet, Trophy, Settings, LogOut, PieChart, Star } from "lucide-react"; // Updated icons
+import { Wallet, Trophy, Settings, LogOut, PieChart, Star,BarChart,CreditCard } from "lucide-react"; // Updated icons
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: PieChart }, // Changed to PieChart
-  { name: "Budgets", href: "/dashboard/budgets", icon: Wallet }, // Kept Wallet
+  { name: "Budgets", href: "/dashboard/categories", icon: Wallet }, // Kept Wallet
   { name: "Bon Plans", href: "/dashboard/bon-plans", icon: Star }, // Changed to Star
+  { name: "Reports", href: "/dashboard/reports", icon: BarChart }, // Kept BarChart
+  { name: "Transation", href: "/dashboard/transaction", icon: CreditCard }, // Kept CreditCard
   { name: "Challenges", href: "/dashboard/challenges", icon: Trophy }, // Kept Trophy
   { name: "Settings", href: "/dashboard/settings", icon: Settings }, // Kept Settings
 ];

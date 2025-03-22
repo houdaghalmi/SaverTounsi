@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import  Link  from "next/link";
 import {
+  PieChart,
+  Wallet ,
   Home,
   Folder,
   BarChart,
@@ -14,6 +16,7 @@ import {
   ChevronDown,
   ChevronUp,
   Settings,
+  PlayCircle
 } from "lucide-react";
 
 import {
@@ -29,19 +32,20 @@ import {
 
 // Main menu items.
 const items = [
-  { title: "Overview", url: "/overview", icon: Home },
-  { title: "Categorie manager", url: "/categories", icon: Folder },
+  { title: "Overview", url: "/overview", icon: PieChart },
+  { title: "Categorie manager", url: "/categories", icon: Wallet },
   { title: "Reports", url: "/reports", icon: BarChart },
   { title: "Bon-plans", url: "/bon-plans", icon: Star },
   { title: "Transaction", url: "/transactions", icon: CreditCard },
   { title: "Challenge", url: "/challenges", icon: Trophy },
+  { title: "Settings", url: "/settings", icon: Settings },
+
 ];
 
 // Submenu items for Help
 const helpSubmenuItems = [
   { title: "Feedback", url: "/feedback", icon: MessageCircle },
-  { title: "Tutorial", url: "/tutorial", icon: HelpCircle },
-  { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Tutorial", url: "/tutorial", icon: PlayCircle },
 
 ];
 
