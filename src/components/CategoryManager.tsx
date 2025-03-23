@@ -235,10 +235,10 @@ export default function CategoryManager() {
 
   // Render the component
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-8">
+    <div className="w-full min-h-screen bg-gray-50">
+      <div className="w-full bg-white shadow-lg p-6 md:p-8">
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-10">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-10">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
             Category Manager
           </h1>
@@ -271,7 +271,7 @@ export default function CategoryManager() {
             categoryGroups.map((group) => (
               <div 
                 key={group.id} 
-                className="border border-gray-200 rounded-xl p-6 hover:border-[#b21f1f] transition-all hover:shadow-md"
+                className="border border-gray-200 rounded-xl p-4 md:p-6 hover:border-[#b21f1f] transition-all hover:shadow-md"
               >
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold text-[#1a2a6c]">{group.name}</h2>
@@ -298,7 +298,7 @@ export default function CategoryManager() {
                 </div>
 
                 {/* Categories Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                   {group.categories && group.categories.length > 0 ? (
                     group.categories.map((category) => (
                       <div
@@ -343,7 +343,7 @@ export default function CategoryManager() {
 
       {/* New Group Modal */}
       {showNewGroupModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 w-96 shadow-xl border border-[#1a2a6c]/20">
             <h3 className="text-lg font-semibold mb-4 text-[#1a2a6c]">Add Category Group</h3>
             <input
@@ -373,7 +373,7 @@ export default function CategoryManager() {
 
       {/* New Category Modal */}
       {showNewCategoryModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/20  flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 w-96 shadow-xl border border-[#1a2a6c]/20">
             <h3 className="text-lg font-semibold mb-4 text-[#1a2a6c]">Add New Category</h3>
             <input
@@ -437,116 +437,96 @@ export default function CategoryManager() {
 
       {/* Category Detail Modal */}
       {selectedCategory && (
-        <div className="fixed inset-0 bg-[#1a2a6c]/50 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white/95 rounded-lg p-6 w-96 shadow-xl border border-[#1a2a6c]/20">
-            <h3 className="text-lg font-semibold mb-4 text-[#1a2a6c]">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 w-[380px] shadow-xl border border-gray-100">
+            <h3 className="text-2xl font-bold text-center bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent mb-6">
               {selectedCategory.name}
             </h3>
-            <div className="mb-4">
-              <div className="w-32 h-32 mx-auto relative">
-                <svg viewBox="0 0 36 36" className="w-full h-full">
-                  <path
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
+            <div className="mb-6">
+              {/* Progress Circle - Smaller Size */}
+              <div className="w-40 h-40 mx-auto relative mb-6">
+                <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
+                  {/* Keep all existing circles */}
+                  <circle cx="18" cy="18" r="16" fill="none" className="stroke-current text-gray-100" strokeWidth="0.5"/>
+                  <circle cx="18" cy="18" r="15.915" fill="none" className="stroke-current text-gray-100" strokeWidth="2"/>
+                  <circle
+                    cx="18" cy="18" r="15.915"
                     fill="none"
-                    stroke="#e2e8f0"
-                    strokeWidth="3"
+                    stroke={((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100 <= 40 
+                      ? "#b21f1f" 
+                      : "#1a2a6c"}
+                    strokeWidth="2"
+                    strokeDasharray={`${((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100}, 100`}
+                    className="transition-all duration-500"
+                    strokeLinecap="round"
                   />
-                  <path
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke={
-                      ((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100 <= 40 
-                        ? "#b21f1f" 
-                        : "#1a2a6c"
-                    }
-                    strokeWidth="3"
-                    strokeDasharray={`${((selectedCategory.spent / selectedCategory.budget) * 100)}, 100`}
-                    className="transform -rotate-90 origin-center"
-                  />
+                  {((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100 > 40 && (
+                    <circle
+                      cx="18" cy="18" r="15.915"
+                      fill="none"
+                      stroke="#28a745"
+                      strokeWidth="2"
+                      strokeDasharray={`${((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100}, 100`}
+                      className="transition-all duration-500"
+                      strokeLinecap="round"
+                    />
+                  )}
                 </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-[#1a2a6c] font-bold text-xl">
-                    {Math.round((selectedCategory.spent / selectedCategory.budget) * 100)}%
+                {/* Percentage Display */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className={`text-2xl font-bold bg-gradient-to-r ${
+                    ((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100 >= 40
+                      ? "from-[#1a2a6c] to-[#28a745]"
+                      : "from-[#1a2a6c] to-[#b21f1f]"
+                  } bg-clip-text text-transparent`}>
+                    {(((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100).toFixed(0)}%
                   </span>
+                  <span className="text-sm text-gray-500 mt-1">Remaining</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Category Detail Modal */}
-      {selectedCategory && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 w-96">
-            <h3 className="text-lg font-semibold mb-4">{selectedCategory.name}</h3>
-            <div className="mb-4">
-              <div className="w-32 h-32 mx-auto relative">
-                {/* Progress Circle */}
-                <svg viewBox="0 0 36 36" className="w-full h-full">
-                  {/* Background Circle */}
-                  <path
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#eee" // Light gray background
-                    strokeWidth="3"
-                  />
-                  {/* Progress Circle */}
-                  <path
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke={((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100 <= 40 ? "#EF4444" : "#22C55E"} // Red if <= 40%, else green
-                    strokeWidth="3"
-                    strokeDasharray={`${((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100}, 100`} // Progress calculation
-                  />
-                </svg>
-                {/* Percentage Text */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xl font-semibold">
-                    {(((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100).toFixed(1)}%
+              {/* Budget Information Cards - More Compact */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="bg-gray-50/50 rounded-xl p-4 text-center">
+                  <span className="text-sm text-gray-500 block mb-1">Available</span>
+                  <span className="text-lg font-semibold text-[#1a2a6c]">
+                    {(selectedCategory.budget - selectedCategory.spent).toFixed(2)} DT
+                  </span>
+                </div>
+                <div className="bg-gray-50/50 rounded-xl p-4 text-center">
+                  <span className="text-sm text-gray-500 block mb-1">Total Budget</span>
+                  <span className="text-lg font-semibold text-[#1a2a6c]">
+                    {selectedCategory.budget.toFixed(2)} DT
                   </span>
                 </div>
               </div>
-              {/* Solde Left and Total Budget */}
-              <div className="text-center mt-2">
-                <div className="text-sm text-gray-600">
-                  Solde Left: {(selectedCategory.budget - selectedCategory.spent).toFixed(2)} DT
-                </div>
-                <div className="text-sm text-gray-600">
-                  Total Budget: {selectedCategory.budget} DT
-                </div>
-              </div>
-              {/* Motivational/Warning Message */}
+
+              {/* Status Message - Preserved */}
               {((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100 >= 50 ? (
-                <span className="block text-center text-green-500 mt-2">
+                <div className="bg-green-50 text-green-700 rounded-xl p-4 text-center text-sm font-medium">
                   🌟 Great job! You're keeping your budget under control.
-                </span>
+                </div>
               ) : ((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100 <= 30 ? (
-                <span className="block text-center text-[#b21f1f] mt-2">
+                <div className="bg-red-50 text-[#b21f1f] rounded-xl p-4 text-center text-sm font-medium">
                   ⚠️ Take care! Your available budget is almost finished.
-                </span>
+                </div>
               ) : null}
             </div>
-            <div className="flex justify-end space-x-2">
+
+            {/* Action Buttons - More Compact */}
+            <div className="flex gap-3">
               <button
-                className="px-4 py-2 text-gray-600"
+                className="flex-1 px-4 py-3 text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-xl font-medium transition-colors"
                 onClick={() => setSelectedCategory(null)}
               >
                 Close
               </button>
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded"
-                onClick={() => router.push("/transactions")} // Redirect to Transactions Page
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white rounded-xl font-medium 
+                          hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                onClick={() => router.push("/transactions")}
               >
-                Go to Transactions
+                View Transactions
               </button>
             </div>
           </div>
