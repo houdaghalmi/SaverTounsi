@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
+import { User } from "@prisma/client"
 
 import { Icons } from "../ui/icons"
 
@@ -48,47 +49,66 @@ export function AuthForm({ mode }: AuthFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    if (mode === "signin") {
-      const result = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      })
-
-      if (result?.error) {
-        toast({
-          title: "Error",
-          description: result.error,
-          variant: "destructive",
-        })
-      } else {
-        router.push("/overview")
-      }
-    } else {
-      try {
-        const res = await fetch("/api/auth/register", {
-          method: "POST",
-          body: JSON.stringify(formData),
-          headers: {
-            "Content-Type": "application/json",
-          },
+    
+    try {
+      if (mode === "signin") {
+        const result = await signIn("credentials", {
+          email: formData.email,
+          password: formData.password,
+          redirect: false,
         })
 
-        if (!res.ok) {
-          throw new Error(await res.text())
+        if (result?.error) {
+          toast({
+            title: "Error",
+            description: result.error,
+            variant: "destructive",
+          })
+          setIsLoading(false)
+          return
         }
 
-        router.push("/signin")
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: error instanceof Error ? error.message : "Something went wrong",
-          variant: "destructive",
-        })
-      }
-    }
+        // Check if user is onboarded
+        const response = await fetch("/api/user")
+        if (!response.ok) {
+          throw new Error("Failed to fetch user data")
+        }
 
-    setIsLoading(false)
+        const userData = await response.json()
+        router.push(userData.isOnboarded ? "/overview" : "/onboarding")
+      } else {
+        try {
+          const res = await fetch("/api/auth/register", {
+            method: "POST",
+            body: JSON.stringify(formData),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+
+          if (!res.ok) {
+            throw new Error(await res.text())
+          }
+
+          router.push("/signin")
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : "Something went wrong",
+            variant: "destructive",
+          })
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      toast({
+        title: "Error",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (

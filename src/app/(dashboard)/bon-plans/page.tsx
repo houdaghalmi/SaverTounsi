@@ -121,7 +121,7 @@ export default function BonPlansPage() {
     <div className="space-y-6 p-6">
       {/* Enhanced Header Section */}
       <div className="relative mb-12">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold bg-gradient-to-t from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
           Bon Plans
         </h1>
       </div>

@@ -16,10 +16,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
-// Update types to include user ID and delete handler
 type ReviewData = Omit<Review, 'createdAt'> & {
   createdAt: string | Date;
-  userId: string; // Add this to track review owner
+  userId: string;
 };
 
 interface ReviewListProps {
@@ -35,16 +34,12 @@ export default function ReviewList({ reviews, currentUserId, onDeleteReview }: R
     try {
       const response = await fetch(`/api/reviews/${reviewId}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
 
       if (!response.ok) {
         throw new Error('Failed to delete review');
       }
 
-      // Call the parent's onDeleteReview callback to update UI
       if (onDeleteReview) {
         await onDeleteReview(reviewId);
       }

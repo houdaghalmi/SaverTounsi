@@ -1,8 +1,11 @@
-'use client';
-
+import { Metadata } from "next"
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, BookOpen, Calendar, ChartBar, Flag, Wallet2, Gift } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: "Tutorial | SaverTounsi"
+}
 
 export default function Tutorial() {
   return (

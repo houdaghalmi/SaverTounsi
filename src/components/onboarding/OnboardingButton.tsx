@@ -1,9 +1,10 @@
 // src/app/onboarding/components/OnboardingButton.tsx
 import { Button } from "@/components/ui/button";
+import { ReactNode } from "react";
 
 interface OnboardingButtonProps {
   onClick: () => void;
-  label: string;
+  label: ReactNode;  // Changed from string to ReactNode
   disabled?: boolean;
   className?: string;
 }
@@ -15,12 +16,12 @@ export default function OnboardingButton({
   className = "",
 }: OnboardingButtonProps) {
   return (
-    <Button
+    <button
       onClick={onClick}
       disabled={disabled}
-      className={`w-full bg-blue-600 text-white hover:bg-blue-700 ${className}`}
+      className={`px-6 py-3 rounded-lg text-white font-medium ${className}`}
     >
       {label}
-    </Button>
+    </button>
   );
 }
