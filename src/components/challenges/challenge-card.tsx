@@ -109,7 +109,7 @@ export function ChallengeCard({
           <div className="space-y-2">
             <Input
               type="number"
-              step="0.01"
+              step="0.5"
               min="0"
               placeholder="Enter amount in DT"
               value={amount}

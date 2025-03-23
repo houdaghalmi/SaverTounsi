@@ -24,7 +24,7 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-bold pl-8 mb-6 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
         Settings
       </h1>
-      <div className="mx-auto max-w-4xl w-full px-4 sm:px-6 lg:px-8 mt-8">
+      <div className="mx-auto max-w-4xl w-full px-4 sm:px-6 lg:px-8 mt-8 mb-20">
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-6">
             <Card className="border-none shadow-sm hover:shadow-md transition-all duration-200">

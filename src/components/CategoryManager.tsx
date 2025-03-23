@@ -138,11 +138,20 @@ export default function CategoryManager() {
   // Update the total budget
   const updateBudget = () => {
     const amount = parseFloat(newBudgetAmount);
-    if (!isNaN(amount) && amount >= 0) {
+    if (!isNaN(amount) && amount > 0) {
       setTotalBudget(amount);
       setNewBudgetAmount("");
       setShowEditBudgetModal(false);
     }
+  };
+
+  // Add a helper function for calculating percentages
+  const calculatePercentage = (current: number, total: number): string => {
+    if (!total || isNaN(total) || !current || isNaN(current)) {
+      return "0";
+    }
+    const percentage = (current / total) * 100;
+    return isFinite(percentage) ? percentage.toFixed(1) : "0";
   };
 
   // Handle clicking the "Add Category" button for a specific group
@@ -189,9 +198,10 @@ export default function CategoryManager() {
   };
 
   // Get the progress bar color based on the remaining budget
-  const getProgressColor = (category: Category) => {
+  const getProgressColor = (category: Category): string => {
+    if (!category.budget || category.budget === 0) return "bg-gray-200";
     const percentage = ((category.budget - category.spent) / category.budget) * 100;
-    return percentage <= 40 ? "bg-red-500" : "bg-green-500";
+    return isFinite(percentage) ? (percentage <= 40 ? "bg-red-500" : "bg-green-500") : "bg-gray-200";
   };
 
   const handleRemoveCategoryGroup = (group: CategoryGroup) => {
@@ -321,7 +331,11 @@ export default function CategoryManager() {
                           </div>
                         </div>
                         <div className="text-sm text-gray-600">
-                          {(((category.budget - category.spent) / category.budget) * 100).toFixed(1)}% remaining
+                          {category.budget === 0 ? (
+                            "No budget set"
+                          ) : (
+                            `${calculatePercentage(category.budget - category.spent, category.budget)}% remaining`
+                          )}
                         </div>
                       </div>
                     ))
@@ -415,18 +429,29 @@ export default function CategoryManager() {
               className="w-full border border-[#1a2a6c]/20 rounded p-2 mb-4 focus:border-[#b21f1f] focus:ring-1 focus:ring-[#b21f1f] outline-none"
               placeholder="New budget amount"
               value={newBudgetAmount}
-              onChange={(e) => setNewBudgetAmount(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (!value || parseFloat(value) >= 0) {
+                  setNewBudgetAmount(value);
+                }
+              }}
+              min="0"
+              step="0.01"
             />
             <div className="flex justify-end space-x-2">
               <button
                 className="px-4 py-2 text-[#1a2a6c] hover:bg-[#1a2a6c]/5 rounded transition-colors"
-                onClick={() => setShowEditBudgetModal(false)}
+                onClick={() => {
+                  setNewBudgetAmount("");
+                  setShowEditBudgetModal(false);
+                }}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white rounded hover:opacity-90 transition-opacity"
+                className="px-4 py-2 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white rounded hover:opacity-90 transition-opacity disabled:opacity-50"
                 onClick={updateBudget}
+                disabled={!newBudgetAmount || isNaN(parseFloat(newBudgetAmount)) || parseFloat(newBudgetAmount) <= 0}
               >
                 Update
               </button>
@@ -472,16 +497,21 @@ export default function CategoryManager() {
                     />
                   )}
                 </svg>
-                {/* Percentage Display */}
+                {/* Progress Circle Display */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className={`text-2xl font-bold bg-gradient-to-r ${
+                    !selectedCategory.budget ? "from-gray-400 to-gray-600" :
                     ((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100 >= 40
                       ? "from-[#1a2a6c] to-[#28a745]"
                       : "from-[#1a2a6c] to-[#b21f1f]"
                   } bg-clip-text text-transparent`}>
-                    {(((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100).toFixed(0)}%
+                    {selectedCategory.budget === 0 
+                      ? "0"
+                      : calculatePercentage(selectedCategory.budget - selectedCategory.spent, selectedCategory.budget)}%
                   </span>
-                  <span className="text-sm text-gray-500 mt-1">Remaining</span>
+                  <span className="text-sm text-gray-500 mt-1">
+                    {selectedCategory.budget === 0 ? "No budget" : "Remaining"}
+                  </span>
                 </div>
               </div>
 
