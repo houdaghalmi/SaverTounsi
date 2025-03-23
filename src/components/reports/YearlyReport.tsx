@@ -21,6 +21,12 @@ interface YearlyReportProps {
   groupedSavings: GroupedData[];
 }
 
+interface MonthlyData {
+  month: string;
+  spent: number;
+  saved: number;
+}
+
 export const YearlyReport: FC<YearlyReportProps> = ({
   data,
   spendingViewMode,
@@ -54,6 +60,20 @@ export const YearlyReport: FC<YearlyReportProps> = ({
   // Calculate totals
   const totalSpent = filteredCategories.reduce((sum, cat) => sum + cat.spent, 0);
   const totalSaved = transformedSavingsData.reduce((sum, saving) => sum + saving.saved, 0);
+
+  const getMonthlyChartData = (): MonthlyData[] => {
+    const months = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    // Use the actual monthly data with one decimal place
+    return months.map(month => ({
+      month,
+      spent: Number(totalSpent.toFixed(1)),
+      saved: Number(totalSaved.toFixed(1))
+    }));
+  };
 
   return (
     <div className="flex flex-col w-full">
@@ -225,6 +245,8 @@ export const YearlyReport: FC<YearlyReportProps> = ({
                     tick={{ fill: '#1a2a6c' }}
                     textAnchor="end"
                     height={70}
+                    angle={-45}
+
                   />
                   <YAxis                 
                   tick={{ fill: '#1a2a6c' }}
@@ -233,6 +255,49 @@ export const YearlyReport: FC<YearlyReportProps> = ({
                   <Legend />
                   <Bar
                     dataKey={savingViewMode === "grouped" ? "amount" : "saved"}
+                    fill="#99d98c"
+                    name="Amount Saved"
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Monthly Trends Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Monthly Trends</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={getMonthlyChartData()}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fill: '#1a2a6c' }}
+                    textAnchor="middle"
+                    height={60}
+                  />
+                  <YAxis
+                    tick={{ fill: '#1a2a6c' }}
+                    tickFormatter={(value) => value.toFixed(1)}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => value.toFixed(1)}
+                  />
+                  <Legend />
+                  <Bar
+                    dataKey="spent"
+                    fill="#f17300"
+                    name="Amount Spent"
+                  />
+                  <Bar
+                    dataKey="saved"
                     fill="#99d98c"
                     name="Amount Saved"
                   />

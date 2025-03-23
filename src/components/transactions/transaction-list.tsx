@@ -48,10 +48,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                     ? "text-emerald-600" 
                     : "text-red-600"
                 }`}>
-                  {transaction.type === "INCOME" 
-                    ? <ArrowUpCircle className="w-5 h-5" /> 
-                    : <ArrowDownCircle className="w-5 h-5" />
-                  }
+                 
                   <span className="font-medium whitespace-nowrap">
                     {transaction.type === "INCOME" ? "+" : "-"} {transaction.amount} TND
                   </span>

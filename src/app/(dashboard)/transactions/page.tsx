@@ -94,31 +94,32 @@ export default function TransactionsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-screen-2xl mx-auto p-6">
+      <div className="w-full h-full p-4 md:p-8 lg:p-12">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 md:mb-12">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
               Transactions
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-base md:text-lg text-gray-500 mt-2">
               Manage your income and expenses
             </p>
           </div>
 
           <Button 
             onClick={() => setIsModalOpen(true)}
-            className="bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white hover:opacity-90 transition-opacity"
+            className="bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white hover:opacity-90 transition-opacity 
+                      px-6 py-3 md:py-6 text-base md:text-lg w-full md:w-auto"
           >
-            <PlusIcon className="h-5 w-5 mr-2" />
+            <PlusIcon className="h-5 w-5 md:h-6 md:w-6 mr-2" />
             Add Transaction
           </Button>
         </div>
 
         {/* Main Content */}
-        <div className="space-y-6">
+        <div className="space-y-6 md:space-y-8">
           {/* Filters Section */}
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+          <div className="bg-white p-4 md:p-6 lg:p-8 rounded-xl shadow-sm border border-gray-100">
             <TransactionFilters filter={filter} setFilter={setFilter} />
           </div>
 
@@ -127,17 +128,17 @@ export default function TransactionsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="bg-transparent"
+            className="bg-transparent min-h-[60vh]"
           >
             <TransactionList transactions={filteredTransactions as any} />
           </motion.div>
         </div>
 
-        {/* Modal remains unchanged */}
+        {/* Modal */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[600px] lg:max-w-[800px]">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
+              <DialogTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
                 Add Transaction
               </DialogTitle>
             </DialogHeader>

@@ -46,12 +46,12 @@ export function SavingsChart({ data, viewMode, groupedData }: SavingsChartProps)
     : transformedSavingsData;
 
   return (
-    <Card className="mt-6">
+    <Card className="mt-8 ">
       <CardHeader>
         <CardTitle>Monthly Savings {viewMode === "grouped" ? "by Group" : "by Category"}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className="h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
@@ -59,7 +59,7 @@ export function SavingsChart({ data, viewMode, groupedData }: SavingsChartProps)
                 top: 20,
                 right: 30,
                 left: 20,
-                bottom: 5,
+                bottom: 80,
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
@@ -68,6 +68,8 @@ export function SavingsChart({ data, viewMode, groupedData }: SavingsChartProps)
                 textAnchor="end"
                 tick={{ fill: '#1a2a6c' }}
                 height={70}
+                angle={-45}
+
               />
               <YAxis 
                 tick={{ fill: '#1a2a6c' }}
@@ -78,6 +80,7 @@ export function SavingsChart({ data, viewMode, groupedData }: SavingsChartProps)
                 dataKey="saved"
                 fill="#99d98c"
                 name="Saved Amount"
+               
               />
             </BarChart>
           </ResponsiveContainer>
