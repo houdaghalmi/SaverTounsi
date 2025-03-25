@@ -74,7 +74,7 @@ export default function Home() {
                   </CardHeader>
                   <CardContent>
                     <div className="relative h-48 mb-4 overflow-hidden rounded-lg">
-                      <Image
+                      <Image 
                         src={feature.image}
                         alt={feature.title}
                         fill
