@@ -6,7 +6,7 @@ import { MonthlyReport as MonthlyReportType } from "@/types/reports";
 import { SpendingCard } from "./cards/SpendingCard";
 import { SavingsCard } from "./cards/SavingsCard";
 import { SpendingChart } from "./charts/SpendingChart";
-import { SavingsChart } from "./charts/SavingsChart"; // Adjusted the path to match the correct file location
+import { SavingsChart } from "./charts/SavingsChart"; 
 
 interface MonthlyReportProps {
   data: MonthlyReportType;

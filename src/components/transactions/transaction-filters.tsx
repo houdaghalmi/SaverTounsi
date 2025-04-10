@@ -1,4 +1,3 @@
-// src/components/transactions/TransactionFilters.tsx
 import { Dispatch, SetStateAction } from "react";
 import { Wallet, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { cn } from "@/lib/utils";

@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, Calendar, ChartBar, Flag, Wallet2, Gift } from 'lucide-react';
+import { ArrowLeft,  } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: "Tutorial | SaverTounsi"
@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 
 export default function Tutorial() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-white to-gray-50">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-white to-gray-50 ">
       <div className="container mx-auto px-8 text-center">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent mb-2">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent mb-2 mt-10">
           How to Use SaverTounsi
         </h1>
         <p className="text-gray-600 mb-8 max-w-2xl mx-auto">

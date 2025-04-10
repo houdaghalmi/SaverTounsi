@@ -1,4 +1,3 @@
-// src/components/bon-plans/ReviewList.tsx
 import { Review } from "@prisma/client";
 import { format } from "date-fns";
 import { Star, CalendarDays, MessageSquare, Trash2 } from "lucide-react";
@@ -58,7 +57,6 @@ export default function ReviewList({ reviews, currentUserId, onDeleteReview }: R
     }
   };
 
-  // Helper function to safely format dates
   const formatDate = (date: string | Date) => {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
     return format(dateObj, "MMM dd, yyyy");
@@ -86,7 +84,6 @@ export default function ReviewList({ reviews, currentUserId, onDeleteReview }: R
               ))}
             </div>
 
-            {/* Date with Calendar Icon */}
             <div className="flex items-center gap-2 text-gray-500">
               <CalendarDays className="w-4 h-4" />
               <time className="text-sm">
@@ -101,7 +98,6 @@ export default function ReviewList({ reviews, currentUserId, onDeleteReview }: R
               {review.comment}
             </p>
             
-            {/* User Info with Delete Button */}
             <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
               <p className="text-sm font-medium bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
                 {review.userName}
@@ -143,7 +139,6 @@ export default function ReviewList({ reviews, currentUserId, onDeleteReview }: R
         </div>
       ))}
 
-      {/* Empty State */}
       {reviews.length === 0 && (
         <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
           <MessageSquare className="w-12 h-12 mx-auto text-gray-400 mb-3" />

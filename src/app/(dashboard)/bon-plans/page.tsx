@@ -1,4 +1,3 @@
-// src/app/bon-plans/page.tsx
 "use client";
 import { DealCard } from "@/components/bon-plans/deal-card";
 import { DealFilters } from "@/components/bon-plans/deal-filters";
@@ -21,10 +20,9 @@ export default function BonPlansPage() {
   const [selectedDeal, setSelectedDeal] = useState<BonPlan|null>(null)
   const [reviews, setReviews] = useState<Review[]>([]);
 
-  // Load initial deals on component mount
+
   useEffect(() => {
     fetchFilteredDeals();
-    // setFilteredDeals(menzelBourguibaDeals);
   }, []);
   const fetchFilteredDeals = async () => {
     const deals = await fetch("/api/deals").then(d=> d.json());
@@ -35,7 +33,6 @@ export default function BonPlansPage() {
     const { search, categories } = filters;
     
     try {
-      // Fetch all deals first
       const response = await fetch("/api/deals");
       const deals = await response.json();
       let filtered = deals;
@@ -115,18 +112,17 @@ export default function BonPlansPage() {
   };
 
   // Get the selected deal object
-  // const selectedDeal = filteredDeals.find((deal) => deal.id === selectedDealId);
 
   return (
     <div className="space-y-6 p-6">
-      {/* Enhanced Header Section */}
+      {/* Header Section */}
       <div className="relative mb-12">
         <h1 className="text-3xl font-bold bg-gradient-to-t from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
           Bon Plans
         </h1>
       </div>
 
-      {/* Filters and Deal List with improved layout */}
+      {/* Filters and Deal List */}
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Filters Card */}
         <div className="lg:col-span-1">
@@ -138,7 +134,6 @@ export default function BonPlansPage() {
           </div>
         </div>
 
-        {/* Main Content with Grid Layout */}
         <div className="lg:col-span-3">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDeals.map((deal) => (
@@ -148,11 +143,11 @@ export default function BonPlansPage() {
         </div>
       </div>
 
-      {/* Reviews Section with Enhanced Design */}
+      {/* Reviews Section */}
       <div className="mt-12 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-2xl font-semibold mb-6 text-[#1a2a6c]">Submit a Review</h2>
         
-        {/* Deal Selection with Improved Styling */}
+        {/* Deal Selection  */}
         <div className="mb-8">
           <Select onValueChange={(value) => {
             setSelectedDealId(value);

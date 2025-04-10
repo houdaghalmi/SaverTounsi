@@ -1,4 +1,3 @@
-// src/components/bon-plans/deal-card.tsx
 "use client";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +13,6 @@ interface DealCardProps {
 export const DealCard = ({ deal }: DealCardProps) => {
   return (
     <Card className="w-full max-w-sm group hover:shadow-xl transition-all duration-300 border-gray-100">
-      {/* Enhanced Header with overlay and hover effect */}
       <CardHeader className="relative p-0">
         <div className="relative h-48 overflow-hidden rounded-t-lg">
           <Image
@@ -29,7 +27,6 @@ export const DealCard = ({ deal }: DealCardProps) => {
         </div>
       </CardHeader>
 
-      {/* Enhanced Content with better spacing and typography */}
       <CardContent className="space-y-4 p-5">
         <h3 className="text-xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
           {deal.title}
@@ -60,7 +57,6 @@ export const DealCard = ({ deal }: DealCardProps) => {
         </div>
       </CardContent>
 
-      {/* Enhanced Footer with gradient button */}
       <CardFooter className="p-5 pt-0">
         <Button
           onClick={() => {

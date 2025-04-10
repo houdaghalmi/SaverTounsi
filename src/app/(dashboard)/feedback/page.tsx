@@ -1,4 +1,3 @@
-// src/app/(dashboard)/feedback/page.tsx
 "use client";
 
 import { Card } from '@/components/ui/card';
@@ -29,7 +28,6 @@ interface Feedback {
   userName: string;
 }
 
-// Helper function to get initials
 const getInitials = (name: string) => {
   if (!name) return '?';
   return name
@@ -47,7 +45,6 @@ export default function FeedbackPage() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Add this function to fetch feedbacks
   const fetchFeedbacks = async () => {
     setLoading(true);
     try {
@@ -64,12 +61,10 @@ export default function FeedbackPage() {
     }
   };
 
-  // Update useEffect to use the new function
   useEffect(() => {
     fetchFeedbacks();
   }, []);
 
-  // Update handleSubmit to refresh data after submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -103,9 +98,8 @@ export default function FeedbackPage() {
         throw new Error(errorData.error || 'Failed to submit feedback');
       }
 
-      // Clear the input and fetch fresh data
       setMessage('');
-      await fetchFeedbacks(); // Refresh the feedback list
+      await fetchFeedbacks(); 
 
       toast({
         title: 'Success',
@@ -123,7 +117,6 @@ export default function FeedbackPage() {
     }
   };
 
-  // Update handleDelete to refresh data after deletion
   const handleDelete = async (feedbackId: string) => {
     try {
       const response = await fetch(`/api/feedback/${feedbackId}`, {

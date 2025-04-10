@@ -11,14 +11,11 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative w-full min-h-[90vh] flex items-center justify-center bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-        </div>
+      
         
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 5, y: 0 }}
           transition={{ duration: 0.5 }}
           className="container px-4 mx-auto text-center relative z-10"
         >
@@ -30,7 +27,7 @@ export default function Home() {
           </p>
           <div className="space-x-4">
             <Link href="/signup">
-              <Button size="lg" className="bg-[#fdbb2d] text-[#1a2a6c] hover:bg-[#fdbb2d]/90 hover:scale-105 transition-all">
+              <Button size="lg" className="bg-[#fdbb2d] text-[#1a2a6c] hover:bg-[#fdbb2d]/90 hover:scale-110 transition-all">
                 Get Started
               </Button>
             </Link>
@@ -48,7 +45,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 5, y: 0 }}
             transition={{ duration: 0.5 }}
             className="text-center mb-16"
           >
@@ -92,7 +89,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials Section with Improved Design */}
+      {/* Testimonials Section  */}
       <section className="w-full py-24 bg-[#fdbb2d]/10">
         <div className="container mx-auto px-4">
           <motion.div
@@ -211,7 +208,7 @@ const features = [
   },
   {
     title: "Bon Plans",
-    image: "/images/features/bon plan.png",
+    image: "/images/features/bonplan.png",
     description: "Discover exclusive deals and discounts to save money."
   },
   {

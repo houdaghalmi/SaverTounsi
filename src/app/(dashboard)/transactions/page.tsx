@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { TransactionForm } from "@/components/transactions/transaction-form";
@@ -134,7 +133,6 @@ export default function TransactionsPage() {
           </motion.div>
         </div>
   
-        {/* Modal remains unchanged */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>

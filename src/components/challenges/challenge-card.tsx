@@ -64,7 +64,7 @@ export function ChallengeCard({
       <CardContent className="space-y-4">
         <p className="text-sm text-gray-600 line-clamp-2">{challenge.description}</p>
 
-        {/* Progress Section - Only show for active and completed challenges */}
+        {/* Progress Section */}
         {challenge.status !== "available" && (
           <div className="space-y-2">
             <div className="flex justify-between items-center text-sm">
@@ -82,7 +82,6 @@ export function ChallengeCard({
           </div>
         )}
 
-        {/* Stats Row */}
         <div className="flex items-center justify-between py-2 border-t border-gray-100">
           <div className="flex items-center gap-1.5 text-sm text-gray-600">
             <Users className="w-4 h-4 text-[#1a2a6c]" />
@@ -94,7 +93,6 @@ export function ChallengeCard({
           </div>
         </div>
 
-        {/* Action Buttons */}
         {challenge.status === "available" && (
           <Button
             onClick={() => onJoinChallenge(challenge.id, challenge.title)}
@@ -126,7 +124,6 @@ export function ChallengeCard({
           </div>
         )}
 
-        {/* Reward Badge */}
         {challenge.reward && (
           <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1a2a6c]/10 text-[#1a2a6c]">
             <Star className="w-4 h-4" />

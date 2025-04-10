@@ -22,7 +22,6 @@ export default function OnboardingPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-white to-gray-50 p-4">
       <div className="max-w-md w-full space-y-8 text-center">
-        {/* Logo or Icon */}
         <div className="relative w-24 h-24 mx-auto mb-8">
           <Image
             src="/images/logo/logo2.png"
@@ -33,7 +32,6 @@ export default function OnboardingPage() {
           />
         </div>
 
-        {/* Welcome Text */}
         <div className="space-y-4">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] bg-clip-text text-transparent">
             Welcome to SaverTounsi!
@@ -43,7 +41,6 @@ export default function OnboardingPage() {
           </p>
         </div>
 
-        {/* Get Started Button with Animation */}
         <div className="mt-12 relative group">
           <OnboardingButton 
             onClick={handleGetStarted} 
@@ -60,7 +57,6 @@ export default function OnboardingPage() {
                         blur-xl opacity-30 -z-10 group-hover:opacity-50 transition-opacity" />
         </div>
 
-        {/* Optional: Progress Indicator */}
         <div className="pt-8 flex justify-center gap-1">
           <div className="w-8 h-1 rounded-full bg-[#1a2a6c]" />
           <div className="w-8 h-1 rounded-full bg-gray-200" />

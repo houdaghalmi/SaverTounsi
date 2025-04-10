@@ -134,7 +134,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
           </CardContent>
         </Card>
 
-        {/* Savings Card - Update the data sources */}
+        {/* Savings Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-[#1a2a6c]">Yearly Savings</CardTitle>
@@ -190,7 +190,7 @@ export const YearlyReport: FC<YearlyReportProps> = ({
         </Card>
       </div>
 
-      {/* Charts Section - Update data sources */}
+      {/* Charts Section */}
       <div className="grid grid-cols-1 gap-6 mt-6">
         {/* Spending Chart */}
         <Card>

@@ -1,4 +1,3 @@
-// src/components/bon-plans/ReviewForm.tsx
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -26,7 +25,6 @@ export default function ReviewForm({ onSubmit }: ReviewFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Username Field with Enhanced Design */}
       <div className="space-y-2">
         <label className="text-sm font-semibold text-[#1a2a6c]">Username (Optional)</label>
         <Input
@@ -38,7 +36,7 @@ export default function ReviewForm({ onSubmit }: ReviewFormProps) {
         />
       </div>
 
-      {/* Rating Field with Enhanced Stars */}
+      {/* Rating Field */}
       <div className="space-y-2">
         <label className="text-sm font-semibold text-[#1a2a6c]">Rating</label>
         <div className="flex space-x-2">
@@ -65,7 +63,7 @@ export default function ReviewForm({ onSubmit }: ReviewFormProps) {
         </div>
       </div>
 
-      {/* Comment Field with Enhanced Design */}
+      {/* Comment Field  */}
       <div className="space-y-2">
         <label className="text-sm font-semibold text-[#1a2a6c]">Your Review</label>
         <Textarea
@@ -77,7 +75,7 @@ export default function ReviewForm({ onSubmit }: ReviewFormProps) {
         />
       </div>
 
-      {/* Submit Button with Gradient */}
+      {/* Submit Button */}
       <Button 
         type="submit" 
         className="w-full bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white hover:opacity-90 transition-opacity py-6 rounded-lg font-semibold"

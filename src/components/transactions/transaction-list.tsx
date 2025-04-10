@@ -5,7 +5,7 @@ interface Transaction {
   id: string;
   type: "INCOME" | "EXPENSE";
   amount: number;
-  date: string | Date; // Ensure the date is a string or Date object
+  date: string | Date; 
   description: string | null;
   category: {
     id: string;
@@ -31,7 +31,6 @@ export default function TransactionList({ transactions }: TransactionListProps) 
               className="group p-8 bg-white rounded-xl shadow-sm border border-gray-100 
                 hover:shadow-md transition-all duration-200 space-y-6 w-full"
             >
-              {/* Header with Category and Amount */}
               <div className="flex items-start justify-between">
                 <div className="space-y-2 flex-1">
                   <p className="font-semibold text-[#1a2a6c] text-lg">
@@ -54,7 +53,6 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                 </div>
               </div>
 
-              {/* Date with Icon */}
               <div className="flex items-center gap-3 text-gray-500 pt-3 border-t border-gray-100">
                 <CalendarDays className="w-5 h-5 flex-shrink-0" />
                 <time className="text-base">
@@ -68,7 +66,6 @@ export default function TransactionList({ transactions }: TransactionListProps) 
         })}
       </div>
 
-      {/* Empty State - Full Width */}
       {transactions.length === 0 && (
         <div className="w-full text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
           <p className="text-gray-600 font-medium">No transactions found</p>

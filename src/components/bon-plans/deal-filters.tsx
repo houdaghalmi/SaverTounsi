@@ -39,7 +39,6 @@ export const DealFilters = ({ onFilterChangeAction, categories }: DealFiltersPro
         </div>
       </div>
 
-      {/* Categories Section with Enhanced Button Design */}
       <div className="space-y-3">
         <label className="text-sm font-medium text-gray-700">Categories</label>
         <div className="grid grid-cols-1 gap-2">

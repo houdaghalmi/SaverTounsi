@@ -37,12 +37,25 @@ export default function CategoryManager() {
     name: string;
   } | null>(null);
 
-  // Fetch category groups on component mount
   useEffect(() => {
     fetchCategoryGroups();
   }, []);
 
-  // Fetch all category groups from the API
+  // Calculate total budget from all categories whenever categoryGroups changes
+  useEffect(() => {
+    if (categoryGroups && categoryGroups.length > 0) {
+      const calculatedTotal = categoryGroups.reduce((sum, group) => {
+        const groupSum = group.categories.reduce((groupTotal, category) => {
+          return groupTotal + (category.budget || 0);
+        }, 0);
+        return sum + groupSum;
+      }, 0);
+      setTotalBudget(calculatedTotal);
+    } else {
+      setTotalBudget(0);
+    }
+  }, [categoryGroups]);
+
   const fetchCategoryGroups = async () => {
     try {
       const response = await fetch("/api/category-groups");
@@ -50,7 +63,7 @@ export default function CategoryManager() {
         throw new Error(`Failed to fetch category groups: ${response.statusText}`);
       }
       const data = await response.json();
-      console.log("API Response:", data); // Log the API response
+      console.log("API Response:", data); 
       if (!Array.isArray(data)) {
         throw new Error("Invalid data format: expected an array");
       }
@@ -84,7 +97,7 @@ export default function CategoryManager() {
         throw new Error(`Failed to add category group: ${response.statusText}`);
       }
       const newGroup = await response.json();
-      console.log("New category group:", newGroup); // Log the new group
+      console.log("New category group:", newGroup); 
       setCategoryGroups([...categoryGroups, newGroup]);
       setNewGroupName("");
       setShowNewGroupModal(false);
@@ -113,7 +126,7 @@ export default function CategoryManager() {
           throw new Error(`Failed to add category: ${response.statusText}`);
         }
         const newCategory = await response.json();
-        console.log("New category:", newCategory); // Log the new category
+        console.log("New category:", newCategory); 
         setCategoryGroups(
           categoryGroups.map((group) => {
             if (group.id === selectedGroupId) {
@@ -135,7 +148,7 @@ export default function CategoryManager() {
     }
   };
 
-  // Update the total budget
+  // Update the total budget (this is now handled automatically by the useEffect)
   const updateBudget = () => {
     const amount = parseFloat(newBudgetAmount);
     if (!isNaN(amount) && amount > 0) {
@@ -145,7 +158,6 @@ export default function CategoryManager() {
     }
   };
 
-  // Add a helper function for calculating percentages
   const calculatePercentage = (current: number, total: number): string => {
     if (!total || isNaN(total) || !current || isNaN(current)) {
       return "0";
@@ -154,7 +166,7 @@ export default function CategoryManager() {
     return isFinite(percentage) ? percentage.toFixed(1) : "0";
   };
 
-  // Handle clicking the "Add Category" button for a specific group
+  // Handle clicking the "Add Category" button 
   const handleAddCategoryClick = (groupId: string) => {
     setSelectedGroupId(groupId);
     setShowNewCategoryModal(true);
@@ -243,7 +255,6 @@ export default function CategoryManager() {
     );
   }
 
-  // Render the component
   return (
     <div className="w-full min-h-screen bg-gray-50">
       <div className="w-full bg-white shadow-lg p-6 md:p-8">
@@ -264,7 +275,7 @@ export default function CategoryManager() {
         {/* Budget Info Section */}
         <div className="mb-10 bg-gradient-to-r from-[#1a2a6c]/5 to-[#b21f1f]/5 p-6 rounded-xl">
           <div className="text-2xl font-semibold text-[#1a2a6c]">
-            Total Budget: <span className="text-[#b21f1f]">{totalBudget} DT</span>
+            Total Budget: <span className="text-[#b21f1f]">{totalBudget.toFixed(2)} DT</span>
           </div>
           <button
             className="mt-4 flex items-center text-[#1a2a6c] hover:text-[#b21f1f] transition-all gap-2 group"
@@ -275,7 +286,7 @@ export default function CategoryManager() {
           </button>
         </div>
 
-        {/* Category Groups Grid */}
+        {/* Category Groups */}
         <div className="grid gap-8">
           {categoryGroups && categoryGroups.length > 0 ? (
             categoryGroups.map((group) => (
@@ -307,7 +318,7 @@ export default function CategoryManager() {
                   </div>
                 </div>
 
-                {/* Categories Grid */}
+                {/* Categories  */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                   {group.categories && group.categories.length > 0 ? (
                     group.categories.map((category) => (
@@ -468,7 +479,7 @@ export default function CategoryManager() {
               {selectedCategory.name}
             </h3>
             <div className="mb-6">
-              {/* Progress Circle - Smaller Size */}
+              {/* Progress Circle  */}
               <div className="w-40 h-40 mx-auto relative mb-6">
                 <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
                   {/* Keep all existing circles */}
@@ -515,7 +526,7 @@ export default function CategoryManager() {
                 </div>
               </div>
 
-              {/* Budget Information Cards - More Compact */}
+              {/* Budget Information Cards  */}
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="bg-gray-50/50 rounded-xl p-4 text-center">
                   <span className="text-sm text-gray-500 block mb-1">Available</span>
@@ -531,7 +542,7 @@ export default function CategoryManager() {
                 </div>
               </div>
 
-              {/* Status Message - Preserved */}
+              {/* Status Message */}
               {((selectedCategory.budget - selectedCategory.spent) / selectedCategory.budget) * 100 >= 50 ? (
                 <div className="bg-green-50 text-green-700 rounded-xl p-4 text-center text-sm font-medium">
                   🌟 Great job! You're keeping your budget under control.
@@ -543,7 +554,7 @@ export default function CategoryManager() {
               ) : null}
             </div>
 
-            {/* Action Buttons - More Compact */}
+            {/* Action Buttons */}
             <div className="flex gap-3">
               <button
                 className="flex-1 px-4 py-3 text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-xl font-medium transition-colors"

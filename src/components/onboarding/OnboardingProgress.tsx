@@ -1,4 +1,3 @@
-// src/app/onboarding/components/OnboardingProgress.tsx
 interface OnboardingProgressProps {
   currentStep: number;
   totalSteps: number;
@@ -10,11 +9,9 @@ export default function OnboardingProgress({
 }: OnboardingProgressProps) {
   return (
     <div className="w-full max-w-md mb-8">
-      {/* Step Indicators */}
       <div className="flex items-center justify-between w-full mb-4">
         {[...Array(totalSteps)].map((_, index) => (
           <div key={index} className="flex-1 flex items-center">
-            {/* Step Circle */}
             <div
               className={`
                 w-8 h-8 rounded-full flex items-center justify-center transition-all
@@ -30,7 +27,6 @@ export default function OnboardingProgress({
               <span className="text-sm font-medium">{index + 1}</span>
             </div>
             
-            {/* Connector Line */}
             {index < totalSteps - 1 && (
               <div className="flex-1 h-[2px] mx-2">
                 <div

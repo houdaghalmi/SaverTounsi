@@ -1,10 +1,9 @@
-// src/app/onboarding/components/OnboardingButton.tsx
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
 
 interface OnboardingButtonProps {
   onClick: () => void;
-  label: ReactNode;  // Changed from string to ReactNode
+  label: ReactNode;  
   disabled?: boolean;
   className?: string;
 }

@@ -5,8 +5,8 @@ import { MonthlyReport } from "@/types/reports";
 interface Category {
   name: string;
   id: string;
-  saved?: number;  // Add saved property as optional
-  spent?: number;  // Add spent property as optional
+  saved?: number;  
+  spent?: number;  
 }
 
 interface GroupData {
@@ -27,13 +27,11 @@ export function SavingsCard({ data, viewMode, setViewMode, groupedData }: Saving
   const challengesGroup = groupedData.find(group => group.groupName === "Challenges");
   const challengeCategoryNames = challengesGroup?.categories?.map((cat: Category) => cat.name) || [];
 
-  // Transform savings data to make all challenge categories positive
   const transformedSavingsData = data.savingsData.map(saving => ({
     ...saving,
     saved: challengeCategoryNames? Math.abs(saving.saved) : saving.saved
   }));
 
-  // Transform grouped data to make Challenges group positive
   const transformedGroupedData = groupedData.map(group => 
     group.groupName === "Challenges" 
       ? { 
@@ -48,7 +46,6 @@ export function SavingsCard({ data, viewMode, setViewMode, groupedData }: Saving
       : group
   );
 
-  // Calculate total saved using transformed values
   const totalSaved = transformedSavingsData.reduce((sum, saving) => sum + saving.saved, 0);
 
   return (

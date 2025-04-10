@@ -24,7 +24,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession(authOptions)
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -33,11 +32,12 @@ export default async function RootLayout({
           <LoadingBar />
           <main className="min-h-screen transition-opacity duration-300">
             {children}
-          </main>
-          <Toaster />
-          {!session && <Footer />}
+          </main>          
+          <Footer />      
+          <Toaster />          
           <SpeedInsights />
-        </NavigationProvider>
+        </NavigationProvider>  
+
       </body>
     </html>
   )

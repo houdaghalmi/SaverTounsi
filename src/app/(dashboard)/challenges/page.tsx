@@ -7,7 +7,6 @@ import { Challenge, UserChallenge } from "@prisma/client";
 import { useState, useEffect } from "react";
 import { Trophy, Activity, Sparkles } from "lucide-react";
 
-// Add this interface near the top of the file
 interface ChallengeWithDetails extends Challenge {
   current: number;
   progress: number;
@@ -78,7 +77,6 @@ export default function ChallengesPage() {
     }
   };
 
-  // Update the handleUpdateProgress function to manage both card and tracker progress
   const handleUpdateProgress = async (challengeId: string, newAmount: number) => {
     try {
       const userChallenge = userChallenges.find(
@@ -94,7 +92,6 @@ export default function ChallengesPage() {
       const newProgress = userChallenge.progress + newAmount;
       const isCompleted = newProgress >= challenge.goal;
 
-      // Optimistically update the UI
       setUserChallenges((prev) =>
         prev.map((uc) =>
           uc.id === userChallenge.id
@@ -150,7 +147,6 @@ export default function ChallengesPage() {
         throw new Error("Failed to update challenge progress");
       }
 
-      // Only revert if any API call fails
       if (!transactionResponse.ok || !progressResponse.ok || !response.ok) {
         setUserChallenges((prev) =>
           prev.map((uc) =>
@@ -215,7 +211,7 @@ export default function ChallengesPage() {
 
   const calculateProgressPercentage = (current: number, goal: number) => {
     if (!goal || goal === 0) return 0;
-    return Math.round((current / goal) * 100); // This will round to nearest whole number
+    return Math.round((current / goal) * 100); 
   };
 
   return (
@@ -230,13 +226,13 @@ export default function ChallengesPage() {
         </div>
       </div>
 
-      {/* Progress Tracker with improved styling */}
+      {/* Progress Tracker  */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <ProgressTracker
           milestones={userChallenges
-            .filter(uc => !uc.completedAt && uc.challenge) // Add check for challenge existence
+            .filter(uc => !uc.completedAt && uc.challenge) 
             .map((uc) => ({
-              title: uc.challenge?.title || 'Unnamed Challenge', // Add fallback
+              title: uc.challenge?.title || 'Unnamed Challenge', 
               target: uc.challenge?.goal || 0,
               current: uc.progress || 0,
               unit: "DT",
@@ -245,7 +241,6 @@ export default function ChallengesPage() {
         />
       </div>
 
-      {/* Enhanced Tabs */}
       <Tabs defaultValue="active">
         <TabsList className="bg-white p-1 rounded-lg border border-gray-200">
           <TabsTrigger 
@@ -271,7 +266,6 @@ export default function ChallengesPage() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Improved Tab Content */}
         {['active', 'completed', 'available'].map((status) => (
           <TabsContent key={status} value={status} className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -300,7 +294,6 @@ export default function ChallengesPage() {
                 );
               })}
 
-              {/* Enhanced Empty State */}
               {filterChallenges(status as 'active' | 'completed' | 'available').length === 0 && (
                 <div className="col-span-full">
                   <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">

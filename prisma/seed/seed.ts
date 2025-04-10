@@ -192,7 +192,7 @@ async function seedChallenges() {
 async function main() {
     try {
         console.log(" Deleting existing data...");
-        await prisma.review.deleteMany(); // Suppression des données dépendantes
+        await prisma.review.deleteMany(); 
         await prisma.bonPlan.deleteMany();
         await prisma.challenge.deleteMany();
 

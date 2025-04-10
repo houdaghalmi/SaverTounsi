@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     if (!user) {
       return new NextResponse('Invalid credentials', { status: 400 })
     }
-    const isValid = password === user.password
+    const isValid = compare(password, user.password);
 
     if (!isValid) {
       return new NextResponse('Invalid credentials', { status: 400 })

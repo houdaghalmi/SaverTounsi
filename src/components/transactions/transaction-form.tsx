@@ -1,6 +1,4 @@
-// components/transactions/transaction-form.tsx
 "use client";
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -22,16 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const transactionFormSchema = z.object({
   type: z.enum(["INCOME", "EXPENSE"]),
@@ -182,36 +175,29 @@ export function TransactionForm({
           control={form.control}
           name="date"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel className="text-sm font-semibold text-[#1a2a6c]">Date</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full pl-3 text-left font-normal border-gray-200 hover:bg-gray-50",
-                        !field.value && "text-gray-500"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 text-[#1a2a6c]" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
+            <FormItem>
+              <FormLabel className="text-sm font-semibold text-[#1a2a6c]">
+                Date
+              </FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <DatePicker
                     selected={field.value}
-                    onSelect={field.onChange}
-                    className="rounded-md border"
+                    onChange={field.onChange}
+                    className={cn(
+                      "w-full pl-3 text-left font-normal border-gray-200 hover:bg-gray-50",
+                      !field.value && "text-gray-500"
+                    )}
+                    dateFormat="MMMM d, yyyy"
+                    maxDate={new Date()}
+                    showPopperArrow={false}
+                    placeholderText="Select a date"
+                    popperClassName="react-datepicker-popper"
+                    popperPlacement="bottom-start"
                   />
-                </PopoverContent>
-              </Popover>
+                  <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#1a2a6c]" />
+                </div>
+              </FormControl>
               <FormMessage className="text-red-500" />
             </FormItem>
           )}
@@ -227,7 +213,7 @@ export function TransactionForm({
               <FormControl>
                 <Textarea
                   placeholder="Add notes about this transaction"
-                  className="resize-none border-gray-200 focus:border-[#1a2a6c] focus:ring-2 focus:ring-[#1a2a6c]/20"
+                  className="resize-none border-gray-200 focus:border-[#1a2a6c] focus:ring-2 focus:ring-[#1a2a6c]/20 min-h-[100px]"
                   {...field}
                 />
               </FormControl>
@@ -253,5 +239,6 @@ export function TransactionForm({
         </Button>
       </form>
     </Form>
+    
   );
 }

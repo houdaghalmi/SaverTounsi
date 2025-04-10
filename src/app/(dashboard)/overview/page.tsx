@@ -137,7 +137,6 @@ export default function OverviewPage() {
         .filter(t => t.type === 'EXPENSE')
         .reduce((acc, t) => acc + t.amount, 0);
 
-      // Calculate actual savings (income - expenses)
       const totalSavings = totalIncome - totalExpenses;
 
       // Calculate monthly summary
@@ -169,7 +168,7 @@ export default function OverviewPage() {
 
       setData({
         transactions,
-        totalBudget: totalSavings, // Update this to use actual savings
+        totalBudget: totalSavings, 
         totalExpenses,
         monthlySummary,
         categories: []
@@ -201,7 +200,6 @@ export default function OverviewPage() {
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
-      {/* Hero Section */}
       <section className="w-full py-12 bg-gradient-to-r from-[#1a2a6c] to-[#b21f1f] text-white">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">Financial Overview</h1>
@@ -216,7 +214,6 @@ export default function OverviewPage() {
 
       {/* Dashboard Content */}
       <div className="container mx-auto px-4 py-8 space-y-8">
-        {/* Financial Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {isLoading ? (
             <>

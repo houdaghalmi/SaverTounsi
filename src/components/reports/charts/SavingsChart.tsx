@@ -26,13 +26,11 @@ export function SavingsChart({ data, viewMode, groupedData }: SavingsChartProps)
   const challengesGroup = groupedData.find(group => group.groupName === "Challenges");
   const challengeCategoryNames = challengesGroup?.categories?.map((cat: Category) => cat.name) || [];
 
-  // Transform savings data to make challenge categories positive
   const transformedSavingsData = data.savingsData.map(saving => ({
     name: saving.categoryName,
     saved: challengeCategoryNames? Math.abs(saving.saved) : saving.saved
   }));
 
-  // Transform grouped data to make Challenges group positive
   const transformedGroupedData = groupedData.map(group => ({
     name: group.groupName,
     saved: group.groupName === "Challenges" 

@@ -10,15 +10,12 @@ interface SpendingCardProps {
 }
 
 export function SpendingCard({ data, viewMode, setViewMode, groupedData }: SpendingCardProps) {
-  // Filter out the Challenges category from groupedData
   const filteredGroupedData = groupedData.filter(group => group.groupName !== "Challenges");
   
-  // Filter out categories that belong to the Challenges group
   const filteredCategories = data.categories.filter(category => 
     category.group.name !== "Challenges"
   );
 
-  // Calculate total spent excluding Challenges
   const totalSpent = filteredCategories.reduce((sum, category) => sum + category.spent, 0);
 
   return (

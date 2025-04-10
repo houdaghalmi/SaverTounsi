@@ -186,7 +186,6 @@ const team = [
   
 ];
 
-// Icon components (simplified versions)
 function CommunityIcon({ className = "" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -1,11 +1,11 @@
 "use client"
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { signIn } from "next-auth/react"
+import * as React from "react" // Import de React pour utiliser ses fonctionnalités (hooks, composants)
+import { useRouter } from "next/navigation" // Hook de Next.js pour gérer la navigation entre les pages
+import { zodResolver } from "@hookform/resolvers/zod" // Intégration de la validation Zod avec React Hook Form
+import { useForm } from "react-hook-form" // Gestion des formulaires avec validation et état
+import * as z from "zod" // Bibliothèque pour définir et valider le format de données
+import { signIn } from "next-auth/react" // Fonction pour l'authentification avec NextAuth
 import { useState } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -16,6 +16,9 @@ import { User } from "@prisma/client"
 import { Icons } from "../ui/icons"
 
 const formSchema = z.object({
+  name: z.string().min(4, {
+    message: "Name must be at least 4 characters.",
+  }),
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
@@ -29,8 +32,8 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ mode }: AuthFormProps) {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const router = useRouter() //pour rediriger l'utilisateur après l'authentification.
+  const [isLoading, setIsLoading] = React.useState<boolean>(false) //l'état de chargement
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
@@ -48,6 +51,35 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Add schema validation only for required fields based on mode
+    try {
+      if (mode === "signup") {
+        formSchema.parse(formData);
+      } else {
+        // For signin, only validate email and password
+        z.object({
+          email: z.string().email({
+            message: "Please enter a valid email address.",
+          }),
+          password: z.string().min(8, {
+            message: "Password must be at least 8 characters.",
+          }),
+        }).parse(formData);
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        error.errors.forEach((err) => {
+          toast({
+            title: "Validation Error",
+            description: err.message,
+            variant: "destructive",
+          })
+        });
+        return;
+      }
+    }
+    
     setIsLoading(true)
     
     try {
