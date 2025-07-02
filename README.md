@@ -36,7 +36,7 @@ The project requires the following dependencies:
 ### Installation
 
 1. Clone the repository:
-   git clone https://github.com/yourusername/savertounsi.git
+   git clone https://github.com/houdaghalmi/savertounsi.git
 
 2. Navigate to the project directory:
    cd savertounsi
