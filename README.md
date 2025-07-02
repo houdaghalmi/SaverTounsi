@@ -1,40 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# SAVERTOUNSI
+
+
+ Overview
+
+SaverTounsi is a full-stack web application framework built on Next.js, tailored for creating scalable, secure, and visually engaging financial platforms. It combines a robust component architecture aligned with the New York design system, Tailwind CSS, and server-side rendering for optimal performance.
+
+## Why SaverTounsi?
+
+This project streamlines the development of modern web experiences with features including:
+
+- **Component Architecture**: Modular UI components built with Tailwind CSS, supporting server-side rendering and scalable design.
+- **Next.js Foundation**: Rapid development with optimized fonts, deployment on Vercel, and seamless API integration.
+- **Secure API & Authentication**: Robust routes for user data, challenges, transactions, and feedback, protected by NextAuth.
+- **Data Visualization**: Interactive reports, charts, and progress trackers to monitor financial health and challenge progress.
+- **Developer-Centric Tools**: TypeScript types, Prisma ORM, custom hooks, and utility libraries for efficient, maintainable code.
+
+## Built With
+
+- **Frontend**: React, TypeScript, Tailwind CSS, Leaflet, React Hook Form
+- **Backend**: Next.js, Prisma, Zod, Axios
+- **Tools**: Docker, npm, ESLint, PostCSS
+- **Utilities**: Font Awesome, datetime, JSON, Markdown
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The project requires the following dependencies:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Node.js (v16 or higher)
+- npm or yarn
+- Docker (for containerized deployment)
+- PostgreSQL (or your preferred database)
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Installation
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+1. Clone the repository:
+   git clone https://github.com/yourusername/savertounsi.git
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+2. Navigate to the project directory:
+   cd savertounsi
+   
+3. Install dependencies:
+   using npm :
+     npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Running the Application :
+      npm run dev
